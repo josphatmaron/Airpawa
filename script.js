@@ -41,13 +41,17 @@ if (ctx) {
 let rotationAngle = 0;
 
 function resizeCanvas() {
-  if (canvas) {
-    canvas.width = canvas.offsetWidth || 100;
-    canvas.height = canvas.offsetHeight || 100;
-    if (canvas.width === 0 || canvas.height === 0) {
-      console.warn("Canvas has zero dimensions. Check CSS or parent container.");
+    if (canvas) {
+        // Set canvas display size to match its parent container
+        canvas.width = canvas.offsetWidth || 100;
+        canvas.height = canvas.offsetHeight || 100;
+        if (canvas.width === 0 || canvas.height === 0) {
+            console.warn("Canvas has zero dimensions. Check CSS or parent container.");
+            // Fallback dimensions for mobile
+            canvas.width = window.innerWidth * 0.9; // 90% of viewport width
+            canvas.height = window.innerHeight * 0.5; // 50% of viewport height
+        }
     }
-  }
 }
 
 function calculateMaxRadius(centerX, centerY) {
