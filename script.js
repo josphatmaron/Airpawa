@@ -344,7 +344,7 @@ body {
   width: 250px;
   background-color: #111111;
   padding: 20px;
-  border-left: 2px solid #2a2f40px;
+  border-left: 2px solid #2a2f40;
   margin-left: 20px;
   flex-shrink: 0;
 }
@@ -833,7 +833,7 @@ body {
     flex-direction: column !important;
     min-height: 100vh !important;
     height: auto !important;
-    overflow-y: auto !important;
+    overflow-y: visible !important;
     overflow-x: hidden !important;
     width: 100% !important;
   }
@@ -844,25 +844,23 @@ body {
     max-width: 100% !important;
     height: 50vh !important;
     min-height: 300px !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
     flex-shrink: 0 !important;
     background-color: #000 !important;
-    border: 3px solid red !important; /* Debugging */
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
   }
 
   .right-panel {
     order: 1 !important;
     width: 100% !important;
     max-width: 100% !important;
-    min-height: 1200px !important; /* Keep large height */
-    flex: 1 0 auto !important;
+    min-height: auto !important;
+    flex: 0 1 auto !important;
     background-color: #111111 !important;
-    padding: 20px !important;
+    padding: 10px !important;
     margin: 0 !important;
-    border: 3px solid blue !important; /* Debugging */
     border-top: 1px solid #2a2f40 !important;
-    overflow-y: auto !important;
+    overflow-y: visible !important;
     overflow-x: hidden !important;
     display: block !important;
   }
@@ -873,11 +871,10 @@ body {
     max-width: 100% !important;
     min-height: auto !important;
     flex: 0 1 auto !important;
-    margin-top: 50px !important; /* Keep pushed down */
+    margin-top: 10px !important;
     padding: 10px !important;
     background-color: #222222 !important;
     border-radius: 20px !important;
-    border: 3px solid green !important; /* Debugging */
     overflow-x: hidden !important;
   }
 
@@ -901,18 +898,17 @@ body {
     width: 100% !important;
     padding: 10px 0 !important;
     margin: 0 !important;
-    border: 3px solid yellow !important; /* Debugging */
-    background-color: rgba(255, 255, 0, 0.1) !important; /* Debugging */
+    background-color: transparent !important;
   }
 
   .bet-panel {
     width: 100% !important;
     max-width: 100% !important;
-    min-height: 800px !important; /* Keep large height */
-    margin: 0 !important;
+    min-height: auto !important;
+    height: auto !important;
+    margin: 10px 0 !important;
     padding: 15px !important;
-    background-color: rgba(128, 0, 128, 0.2) !important; /* Debugging */
-    border: 3px solid purple !important; /* Debugging */
+    background-color: #1b1c1d !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: stretch !important;
@@ -947,23 +943,23 @@ body {
 /* Extra Small Screens */
 @media (max-width: 400px) {
   .right-panel {
-    min-height: 1400px !important; /* Keep large height */
-    padding: 15px !important;
-    border: 3px solid blue !important; /* Debugging */
+    min-height: auto !important;
+    padding: 10px !important;
   }
 
   .bet-panel {
-    min-height: 900px !important; /* Keep large height */
-    border: 3px solid purple !important; /* Debugging */
+    min-height: auto !important;
+    height: auto !important;
+    padding: 10px !important;
   }
 
   .bet-content {
-    gap: 10px !important;
+    gap: 8px !important;
   }
 
   .bet-button,
   .cashout-button {
-    font-size: 20px !important;
-    padding: 15px 20px !important;
+    font-size: 18px !important;
+    padding: 12px 15px !important;
   }
 }
