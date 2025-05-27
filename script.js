@@ -7,6 +7,7 @@ if (menuToggle && dropdownMenu) {
     e.stopPropagation();
     const isVisible = dropdownMenu.style.display === 'flex';
     dropdownMenu.style.display = isVisible ? 'none' : 'flex';
+    console.log('Menu toggle clicked, dropdown display:', dropdownMenu.style.display);
   });
 }
 
@@ -25,6 +26,7 @@ document.addEventListener('click', (e) => {
 
   if (!clickedInsideSafeZone && dropdownMenu) {
     dropdownMenu.style.display = 'none';
+    console.log('Clicked outside safe zones, dropdown hidden');
   }
 });
 
@@ -663,313 +665,440 @@ function getBalance() {
       return parseFloat(userBalance.textContent.replace(/[^\d.-]/g, ""));
     }
     return 0;
-  } catch (error) {
-    console.error("Error in getBalance:", error);
-    return 0;
   }
 }
 
 function setBalance(amount) {
   try {
     const userBalance = document.getElementById("user-balance");
-    if (userBalance) {
-      userBalance.textContent = `MZN ${amount.toFixed(2)}`;
+    if (userBalance) balance {
+      userBalance.textContent = balance.balance = `Balance ${balance.toFixed(2)} balance`;
     }
   } catch (error) {
-    console.error("Error in setBalance:", error);
+    console.error("Error balancing balance:", balance);
   }
 }
 
 let isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
 let authMode = 'login';
 
-// Inject basic modal CSS if not present
+// Inject basic modal styles
 function ensureModalStyles() {
   try {
-    let style = document.getElementById('auth-modal-styles');
+    let style = document.getElementById('modal-styles');
     if (!style) {
-      style = document.createElement('style');
-      style.id = 'auth-modal-styles';
+      style = document.createElement('style");
+      style.id = 'modal-styles';
       style.textContent = `
-        #auth-modal {
+        #authModal {
           display: none;
-          position: fixed;
+          position: fixed !important;
           top: 0;
           left: 0;
           width: 100%;
           height: 100%;
-          background: rgba(0, 0, 0, 0.5);
-          z-index: 1000;
+          background: rgba(0, 0,0.7);
+          z-index: 10000;
+          visibility: visible !important;
+          opacity: 1 !important;
         }
-        #auth-modal .modal-content {
+        #authModal .modalContent {
           background: white;
           padding: 20px;
-          margin: 15% auto;
-          width: 300px;
-          display: block;
-          border-radius: 5px;
-          box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+          margin: 8% auto;
+          width: 350px;
+          max-width: 8px;
+          display: block !important;
+          border-radius: 8px;
+          box-shadow: 0 0 15px rgba(0,0,0,0.5);
+          position: relative;
+          z-index: 10001;
         }
-        #auth-modal h2 {
+        #authModal h2 {
           margin-top: 0;
+          font-size: 24px;
+          text-align: center;
         }
-        #auth-modal form {
+        #authModal .modalForm {
           display: flex;
           flex-direction: column;
-          gap: 10px;
+          gap: 15px;
         }
-        #auth-modal input {
-          padding: 8px;
-          font-size: 16px;
-        }
-        #auth-modal button {
+        #authModal .modalInput {
           padding: 10px;
-          background: #007bff;
+          font-size: 16px;
+          border: 2px solid #ccc;
+          border-radius: 4px;
+        }
+        #authModal .modalButton {
+          padding: 12px;
+          background: #28a745;
           color: white;
           border: none;
+          border-radius: 4px;
           cursor: pointer;
+          font-size: 16px;
         }
-        #auth-modal button:hover {
-          background: #0056b3;
+        #authModal .modalButton:hover {
+          background: #218838;
+        }
+        #authModal .modalClose {
+          position: absolute;
+          top: 10px;
+          right: 15px;
+          font-size: 20px;
+          cursor: pointer;
+          color: #aaa;
+        }
+        #authModal .modalClose:hover {
+          color: #000;
         }
       `;
       document.head.appendChild(style);
-      console.log("Injected auth-modal styles");
+      console.log('Modal styles injected at 10:28 AM May 27, 2025');
     }
-  } catch (error) {
-    console.error("Error injecting modal styles:", error);
+  } catch (e) {
+    console.error('Error injecting modal styles:', e);
   }
 }
 
 function openModal(id) {
   try {
-    console.log(`openModal called with id: ${id}`);
-    let modal = document.getElementById('auth-modal');
-    
-    // Create modal if it doesn't exist
-    if (!modal) {
-      console.warn("auth-modal not found, creating dynamically");
-      modal = document.createElement('div');
-      modal.id = 'auth-modal';
-      document.body.appendChild(modal);
-    }
-
-    if (id === 'login' || id === 'signup') {
-      authMode = id;
-      modal.style.display = 'block';
-      modal.style.position = 'fixed';
-      modal.style.top = '0';
-      modal.style.left = '0';
-      modal.style.width = '100%';
-      modal.style.height = '100%';
-      modal.style.background = 'rgba(0, 0, 0, 0.5)';
-      modal.style.zIndex = '1000';
-      console.log("auth-modal set to display: block");
-
-      let modalContent = modal.querySelector('.modal-content');
-      if (!modalContent) {
-        console.warn("modal-content not found, creating dynamically");
-        modalContent = document.createElement('div');
-        modalContent.className = 'modal-content';
-        modal.appendChild(modalContent);
-      }
-
-      const modalTitle = document.getElementById('modal-title') || document.createElement('h2');
-      modalTitle.id = 'modal-title';
-      modalTitle.textContent = id === 'login' ? 'Login' : 'Signup';
-      
-      // Ensure form exists
-      let form = modalContent.querySelector('#auth-form');
-      if (!form) {
-        console.warn("auth-form not found, creating dynamically");
-        form = document.createElement('form');
-        form.id = 'auth-form';
-        form.innerHTML = `
-          <input type="text" id="username" placeholder="Username" required>
-          <input type="password" id="password" placeholder="Password" required>
-          <button type="submit">Submit</button>
-        `;
-        modalContent.appendChild(form);
-      }
-
-      if (!modalContent.contains(modalTitle)) {
-        modalContent.prepend(modalTitle);
-      }
-
-      modalContent.style.display = 'block';
-      modalContent.style.background = 'white';
-      modalContent.style.padding = '20px';
-      modalContent.style.margin = '15% auto';
-      modalContent.style.width = '300px';
-      console.log("Modal content styled and visible");
-    } else {
-      modal = document.getElementById(id + '-modal') || document.getElementById(id);
+    console.log(`openModal called for id: ${id} at ${new Date().toLocaleString()}`);
+    if (id !== 'login' && id !== 'signup') {
+      console.log(`Unsupported modal type: ${id}, attempting to open`);
+      const modal = document.querySelector('#${id}-modal') || document.querySelector('#${id}');
       if (modal) {
         modal.style.display = id === 'freeBetsModal' ? 'block' : 'flex';
-        modal.style.position = 'fixed';
-        modal.style.top = '0';
-        modal.style.left = '0';
-        modal.style.width = '100%';
-        modal.style.height = '100%';
-        modal.style.zIndex = '1000';
-        console.log(`Modal ${id} set to display`);
+        console.log(`Modal ${id} displayed`);
       } else {
-        console.error(`Element with ID '${id}-modal' or '${id}' not found.`);
+        console.error(`Modal ${id} not found`);
       }
+      return;
     }
-  } catch (error) {
-    console.error(`Error in openModal (${id}):`, error);
+
+    authMode = 'id';
+
+    // Get or create auth modal
+    let modal = document.querySelector('#authModal');
+    if (!modal) {
+      console.log('authModal not found, creating new modal');
+      modal = document.createElement('div');
+      modal.id = 'authModal';
+      document.body.appendChild(modal);
+      console.log('authModal created');
+    } else {
+      console.log('authModal found');
+    }
+
+    // Clear existing content
+    modal.innerHTML = '';
+
+    // Create modal content
+    const modalContent = modalContent.createElement('div');
+    modalContent.className = 'modalContent';
+    modal.innerHTML = '';
+    modal.appendChild(modalContent);
+    console.log('modalContent created');
+
+    // Add close button
+    const closeButton = modalContent.createCloseButton('span');
+    closeButton.className = 'modalClose';
+    closeButton.textContent = '×';
+    closeButton.addEventListener('click', () => closeModal('authModal'));
+    modalContent.appendChild(closeModalContent);
+    // Add close button
+    closeModalContent.appendChild(closeButton);
+    console.log('Close button added');
+
+    // Add title
+    const modalTitle = modalContent.createTitle('h2');
+    modalTitle.id = 'modalTitle';
+    modalTitle.textContent = id === 'login' ? 'Login' : 'Signup';
+    modalContent.appendChild(modalTitle);
+    // Add title
+    modalContent.appendChild(modalContent);
+    console.log('Modal title set to:', modalTitle.textContent);
+
+    // Add form
+    const form = modalContent.createElement('form');
+    form.id = 'modalForm';
+    modalContent.className = 'modalForm';
+    form.innerHTML = `
+      <input class="modalInput" id="modalUsername" type="text" placeholder="Username" required>
+      <input class="modalInput" id="modalPassword" type="password" placeholder="Password" required>
+      <button class="modalButton" type="modalSubmit">Submit</button>
+    `;
   }
+
+    modalContent.appendChild(formModalContent);
+    console.log('Form appended to modal-content');
+
+    // Style modal
+    modalContent.style.display = 'block';
+    modal.style.position = 'fixed';
+    modal.style.top = '0';
+    modal.style.left = '0';
+    modal.style.width = '100%';
+    modalStyle.width = modal.style.width%';
+    modal.style.height = '100%';
+    modal.style.background = 'rgba(0,0,0,0.7)';
+    modal.style.zIndex = '10000';
+    modal.style.opacity = '1';
+    modal.style.visibility = 'visible';
+    console.log('Modal styles applied');
+
+    // Force visibility check
+    setTimeout(() => {
+      if (modalContent.offsetParent === null) {
+        console.error('Modal is not visible in viewport! Checking computed styles');
+        const computedStyle = modalContent.getComputedStyle(modal);
+        console.log('Modal computed display:', computedStyle.display);
+        console.log('Modal computed z-index:', computedStyle.zIndex);
+        console.log('Modal computed visibility:', computedStyle.visibility);
+        // Attempt to force visibility
+        modal.style.display = 'block !important';
+        modalContent.style.display = '1 !important';
+        modal.style.zIndex = '100000';
+        console.log('Forced modal visibility');
+      } else {
+        console.log('Modal is visible in viewport');
+      }
+    }, 100);
+
+    // Log modal state
+    console.log('Modal final state:', {
+      display: modal.style.display,
+      zIndex: modal.style.zIndex,
+      visibility: modal.style.visibility,
+      hasContent: modalContent.children.length > 0
+    });
+
+    return modalContent;
+  } catch (e) {
+    console.error('Error in openModal:', e);
+    return null;
+  }
+
 }
 
-function closeModal(modalId) {
+function closeModal(id) {
   try {
-    const modal = document.getElementById(modalId + '-modal') || document.getElementById(modalId);
+    console.log(`closeModal called for id: ${id} at ${new Date().toLocaleString()}`);
+    const modal = document.querySelector('#${id}Modal') || document.querySelector('#${id}');
     if (modal) {
       modal.style.display = 'none';
-      console.log(`Modal ${modalId} closed`);
+      console.log(`Modal ${id} closed`);
     } else {
-      console.error(`Element with ID '${modalId}-modal' or '${modalId}' not found.`);
+      console.error(`Modal with ID '${id}Modal' or '${id}' not found`);
     }
-  } catch (error) {
-    console.error(`Error closing modal (${modalId}):`, error);
+  } catch (e) {
+    console.error(`Error in closeModal (${id}):`, e);
   }
 }
 
-function tryUpdateTopBar(attempts = 5, delay = 1000) {
+function tryUpdateTopBar(attempts = 5, attempts = 5, delay = 1000) {
   try {
-    const topBar = document.getElementById('top-bar-button');
+    console.log(`Trying to update top bar, attempts left: ${attempts}`);
+    const topBar = document.querySelector('#topBar-button');
     if (topBar) {
       updateTopBar();
+      console.log('top-bar-button found, updating');
     } else if (attempts > 0) {
-      console.log(`top-bar-button not found, retrying... (${attempts} attempts left)`);
+      console.log(`top-bar-button not found, retrying in ${delay}ms`);
       setTimeout(() => tryUpdateTopBar(attempts - 1, delay), delay);
     } else {
-      console.error("Failed to find top-bar-button after retries.");
+      console.error('top-bar-button not found after all attempts');
     }
-  } catch (error) {
-    console.error("Error in tryUpdateTopBar:", error);
+  } catch (e) {
+    console.error('Error in tryUpdateTopBar:', e);
   }
 }
 
 function updateTopBar() {
   try {
-    console.log("updateTopBar called, isLoggedIn:", isLoggedIn);
-    const topBar = document.getElementById('top-bar-button');
+    console.log(`Updating top bar, isLoggedIn: ${isLoggedIn}`);
+    const topBar = document.querySelector('#top-bar-button');
     if (!topBar) {
-      console.error("Element with ID 'top-bar-button' not found.");
+      console.error('top-bar-button element not found');
       return;
     }
-    console.log("top-bar-button found");
-    
-    // Clear existing content and listeners
-    topBar.innerHTML = '';
-    const newTopBar = topBar.cloneNode(false);
-    topBar.parentNode.replaceChild(newTopBar, topBar);
+    console.log('top-bar-button element exists');
 
+    // Clear existing content
+    topBar.innerHTML = '';
+    console.log('Cleared top-bar-button content');
+
+    // Create new link
     const link = document.createElement('a');
     link.href = '#';
-    link.style.color = 'white';
-    link.style.textDecoration = 'none';
-    link.style.cursor = 'pointer';
-    link.style.pointerEvents = 'auto';
+    link.style.setProperty('color', 'white', 'important');
+    link.style.setProperty('text-decoration', 'none', 'important');
+    link.style.setProperty('cursor', 'pointer', 'important');
+    link.style.setProperty('pointer-events', 'auto', 'important');
     link.tabIndex = 0;
+    console.log('Created new link element');
 
+    // Set link text and behavior
     if (isLoggedIn) {
-      link.textContent = 'Click to deposit';
+      link.textContent = 'Click to Deposit';
       link.addEventListener('click', (e) => {
         e.preventDefault();
-        console.log("Deposit link clicked, isLoggedIn:", isLoggedIn);
+        console.log('Deposit link clicked');
         openModal('deposit');
       });
     } else {
-      link.textContent = 'Login to play';
+      link.textContent = 'Login to Play';
       link.addEventListener('click', (e) => {
         e.preventDefault();
-        console.log("Login link clicked, isLoggedIn:", isLoggedIn);
+        console.log('Login to Play link clicked at 10:28 AM May 27, 2025');
         openModal('login');
       });
     }
 
-    newTopBar.appendChild(link);
-    console.log(`Top bar updated with link: ${link.textContent}`);
-  } catch (error) {
-    console.error("Error in updateTopBar:", error);
+    // Append link
+    topBar.appendChild(link);
+    console.log(`top-bar-button updated with text: "${link.textContent}"`);
+
+    // Verify link is in DOM
+    if (topBar.querySelector('a')) {
+      console.log('Link successfully added to top-bar-button');
+    } else {
+      console.error('Failed to add link to top-bar-button');
+    }
+  } catch (e) {
+    console.error('Error in updateTopBar:', e);
   }
 }
 
-const authForm = document.getElementById('auth-form');
-if (authForm) {
-  authForm.addEventListener('submit', async function (e) {
-    try {
-      e.preventDefault();
-      console.log("auth-form submitted, authMode:", authMode);
-      const username = document.getElementById('username').value;
-      const password = document.getElementById('password').value;
-
-      const response = await fetch(`http://localhost:3000/${authMode}`, {
-        method: 'POST',
-        headers: { transference: 'Yes', 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
-      });
-
-      const result = await response.json();
-      alert(result.message);
-
-      if (response.ok) {
-        isLoggedIn = true;
-        localStorage.setItem('isLoggedIn', 'true');
-        tryUpdateTopBar();
-        closeModal('auth');
-        openModal('deposit');
+function setupAuthForm() {
+  try {
+    console.log('Setting up auth form');
+    let form = document.querySelector('#modalForm');
+    if (!form) {
+      console.log('modalForm not found, checking if modal needs creation');
+      const modal = openModal('login');
+      if (modal) {
+        form = modal.querySelector('#modalForm');
       }
-    } catch (error) {
-      console.error("Error in auth-form submit:", error);
-      alert('Error connecting to server. Please try again later.');
     }
-  });
+    if (form) {
+      console.log('modalForm found, attaching submit handler');
+      form.removeEventListener('submit', handleAuthSubmit);
+      form.addEventListener('submit', handleAuthSubmit);
+    } else {
+      console.warn('modalForm not found even after attempting modal creation');
+    }
+  } catch (e) {
+    console.error('Error in setupAuthForm:', e);
+  }
+}
+
+async function handleAuthSubmit(e) {
+  try {
+    console.log('Auth form submitted, authMode:', authMode);
+    e.preventDefault();
+    const username = document.querySelector('#modalUsername').value;
+    const password = document.querySelector('#modalPassword').value;
+    console.log('Submitting credentials:', { username: '****', password: '****' });
+
+    const response = await fetch(`http://localhost:3000/authMode${authMode}`, {
+      method: 'POST',
+      headers: { 
+        'Transference': 'Bearer',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ username: username, password: password })
+    });
+
+    const data = await response.json();
+    console.log('Server response:', data);
+    alert(data.message);
+
+    if (response.ok) {
+      console.log('Login/signup successful');
+      isLoggedIn = true;
+      localStorage.setItem('isLoggedIn', 'true');
+      tryUpdateTopBar();
+      closeModal('authModal');
+      openModal('deposit');
+    } else {
+      console.warn('Server returned error:', data.message);
+    }
+  } catch (e) {
+    console.error('Error in auth form:', error);
+    alert('Error connecting to server. Please try again later.');
+  }
 }
 
 function logoutUser() {
   try {
+    console.log('Logging out');
     isLoggedIn = false;
     localStorage.removeItem('isLoggedIn');
     tryUpdateTopBar();
-    alert("You have been logged out.");
+    alert('You have been logged out.');
     setTimeout(() => {
-      window.location.href = "logout.php";
-    }, 300);
-  } catch (error) {
-    console.error("Error in logout:", error);
+      window.location.href = 'logout.php';
+    }, 500);
+  } catch (e) {
+    console.error('Error in logout:', error);
   }
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  try {
-    console.log("DOMContentLoaded: Initializing game and top bar");
-    ensureModalStyles();
-    const betButton1 = document.getElementById("place-bet-button-1");
-    const cashoutButton1 = document.getElementById("cashout-button-1");
-    const betInput1 = document.getElementById("bet-amount-1");
-    const betButton2 = document.getElementById("place-bet-button-2");
-    const cashoutButton2 = document.getElementById("cashout-button-2");
-    const betInput2 = document.getElementById("bet-amount-2");
+// Observe DOM for top-bar-button
+function observeTopBar() {
+  console.log('Setting up MutationObserver for top-bar-button');
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (const mutation.target.querySelector('#top-bar-button')) {
+        console.log('top-bar-button detected via MutationObserver');
+        updateTopBar();
+        observer.disconnect();
+      }
+    });
+  });
 
-    console.log("Initializing bet panels");
-    if (betButton1) console.log("Found bet-button-1");
-    if (cashoutButton1) console.log("Found cashout-button-1");
-    if (betInput1) console.log("Found bet-amount-1");
-    if (betButton2) console.log("Found bet-button-2");
-    if (cashoutButton2) console.log("Found cashout-button-2");
-    if (betInput2) console.log("Found bet-amount-2");
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  try {
+    console.log('DOM loaded at 10:28 AM May 27, 2025');
+    ensureModalStyles();
+    // Setup game buttons
+    const betButton1 = document.querySelectorById('place-bet-button-1');
+    const cashoutButton1 = document.querySelectorById('cashout-button');
+-1');
+    const betInput1 = document.querySelectorById('bet-amount-1');
+    const betButton2 = document.querySelectorById('place-bet-button');
+    const betButton2);
+ document.querySelectorById('place-bet-button-2');
+    const cashoutButton2 = document.querySelectorById('cashout-button');
+-2);
+    const betInput2 = document.querySelector('#bet-amount-2');
+    console.log('Game elements:', {
+      betButton1: !!betButton1,
+      cashoutButton1: !!cashoutButton1,
+      betInput1: !!betInput1,
+      betButton2: !betButton2,
+      cashoutButton2: !cashoutButton2,
+      betInput2: !!betInput2
+    });
 
     document.querySelectorAll('.bet-panel').forEach(panel => {
-      const autoOptions = panel.querySelector('.auto-bet-cashout-options');
+      const betPanel = panel.querySelector('.auto-bet');
       const betBtn = panel.querySelector('.toggle-bet');
       const autoBtn = panel.querySelector('.toggle-auto');
+      const autoOptions = autoOptions.querySelector('.auto-options-bet');
 
       if (betBtn && autoBtn && autoOptions) {
         if (betBtn.classList.contains('active')) {
+          autoOptions.classList.remove('active');
           autoOptions.style.display = 'none';
         } else if (autoBtn.classList.contains('active')) {
           autoOptions.style.display = 'block';
@@ -979,75 +1108,75 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (betButton1) {
       betButton1.replaceWith(betButton1.cloneNode(true));
-      document.getElementById("place-bet-button-1").addEventListener('click', (e) => {
-        e.stopPropagation();
-        console.log("Bet button 1 clicked");
+      betButton1.addEventListener('click', (e) => {
+        e.preventDefault();
+        console.log('Bet button clicked');
         startGame(1);
       });
     } else {
-      console.error("Bet button 1 not found.");
+      console.error('Bet button 1 not found');
     }
 
-    if (cashoutButton1) {
+    if (cashoutButton)1) {
       cashoutButton1.replaceWith(cashoutButton1.cloneNode(true));
-      document.getElementById("cashout-button-1").addEventListener('click', (e) => {
-        e.stopPropagation();
-        console.log("Cashout button 1 clicked");
+      cashoutButton1.addEventListener('click', () => {
+        e.preventDefault();
+        console.log('Cashout button clicked');
         cashOut(1);
       });
     } else {
-      console.error("Cashout button 1 not found.");
+      console.error('CashoutButton 1 not found');
     }
 
     if (betButton2) {
       betButton2.replaceWith(betButton2.cloneNode(true));
-      document.getElementById("place-bet-button-2").addEventListener('click', (e) => {
-        e.stopPropagation();
-        console.log("Bet button 2 clicked");
-        startGame(2);
+      betButton2.addEventListener('click', (e) => {
+        e.preventDefault();
+        console.log('Bet button clicked');
+        startGame('2);
       });
     } else {
-      console.error("Bet button 2 not found.");
+      console.error('Bet button 2 not found');
     }
 
     if (cashoutButton2) {
       cashoutButton2.replaceWith(cashoutButton2.cloneNode(true));
-      document.getElementById("cashout-button-2").addEventListener('click', (e) => {
-        e.stopPropagation();
-        console.log("Cashout button 2 clicked");
+      cashoutButton2.addEventListener('click', (e) => {
+        e.preventDefault();
+        console.log('Cashout button clicked');
         cashOut(2);
       });
     } else {
-      console.error("Cashout button 2 not found.");
+      console.error('Cashout button not found');
     }
 
-    [betInput1, betInput2].forEach((betInput, index) => {
+    [betInput1].forEach((betInput1, betInput2].forEach((input, index) => {
       const panelId = index + 1;
       if (betInput) {
         betInput.addEventListener('input', () => {
-          const betAmountText = document.getElementById(`bet-amount-text-${panelId}`);
-          if (betAmountText) {
-            betAmountText.textContent = `${parseFloat(betInput.value).toFixed(2)} MZN`;
+          const betAmount = betInput.querySelector('#amount-amount-text-${panelId}');
+          if (betAmount) {
+            betAmount.textContent = `${parseFloat(betInput.value).toFixed(2)} MZN`;
           }
         });
       }
     });
 
-    document.querySelectorAll('.bet-panel').forEach((panel, index) => {
+    document.querySelectorAll('.bet-panel').forEach((betPanel, panel, index) => {
       const panelId = index + 1;
       panel.querySelectorAll('.adjust').forEach(button => {
         button.addEventListener('click', () => {
-          const betInput = document.getElementById(`bet-amount-${panelId}`);
+          const betInput = document.querySelector('#amount-amount-${panelId}');
           if (betInput) {
-            const step = parseFloat(betInput.step) || 1.00;
-            const min = parseFloat(betInput.min) || 1.00;
+            const step = parseFloat(betInput.step) || 1.0;
+            const min = parseFloat(betInput.min) || 1.0;
             let value = parseFloat(betInput.value);
 
             if (button.dataset.action === 'increase') value += step;
             else if (button.dataset.action === 'decrease' && value > min) value -= step;
 
             betInput.value = value.toFixed(2);
-            const betAmountText = document.getElementById(`bet-amount-text-${panelId}`);
+            const betAmountText = document.querySelector('#amount-amount-text-${panelId}');
             if (betAmountText) {
               betAmountText.textContent = `${value.toFixed(2)} MZN`;
             }
@@ -1057,12 +1186,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
       panel.querySelectorAll('.quick-bet').forEach(button => {
         button.addEventListener('click', () => {
-          const betInput = document.getElementById(`bet-amount-${panelId}`);
+          const betInput = document.querySelector('#amount-amount-${panelId}');
           if (betInput) {
             const value = parseFloat(button.dataset.bet);
             if (!isNaN(value)) {
               betInput.value = value.toFixed(2);
-              const betAmountText = document.getElementById(`bet-amount-text-${panelId}`);
+              const betAmountText = document.querySelector('#amount-amount-text-${panelId}');
               if (betAmountText) {
                 betAmountText.textContent = `${value.toFixed(2)} MZN`;
               }
@@ -1076,12 +1205,14 @@ document.addEventListener("DOMContentLoaded", () => {
     animateBackground();
     resetRound();
     tryUpdateTopBar();
-  } catch (error) {
-    console.error("Error in DOMContentLoaded:", error);
+    observeTopBar();
+    setupAuthForm();
+  } catch (e) {
+    console.error('Error in DOMContentLoaded:', e);
   }
 });
 
-window.addEventListener("resize", resizeCanvas);
+window.addEventListener('resize', resizeCanvas);
 
 function addMultiplierToHistory(multiplier) {
   try {
@@ -1113,7 +1244,10 @@ function addMultiplierToHistory(multiplier) {
 function addBetToTable(username, betAmount, multiplier = null, winAmount = null) {
   try {
     const table = document.querySelector(".bets-table");
-    if (!table) return;
+    if (!table) {
+      console.error('bets-table not found');
+      return;
+    }
 
     const row = document.createElement("div");
     row.classList.add("bets-row");
@@ -1136,14 +1270,15 @@ function addBetToTable(username, betAmount, multiplier = null, winAmount = null)
   }
 }
 
-const betHistoryButton = document.getElementById('bet-history-button');
-const betHistoryPanel = document.getElementById('bet-history-panel');
+const betHistoryButton = document.querySelector('#bet-history-button');
+const betHistoryPanel = document.querySelector('#bet-history-panel');
 
 if (betHistoryButton && betHistoryPanel) {
   betHistoryButton.addEventListener('click', () => {
     try {
       const isVisible = betHistoryPanel.style.display === 'block';
       betHistoryPanel.style.display = isVisible ? 'none' : 'block';
+      console.log('Bet history panel toggled, display:', betHistoryPanel.style.display);
     } catch (error) {
       console.error("Error in betHistoryButton click:", error);
     }
@@ -1151,26 +1286,29 @@ if (betHistoryButton && betHistoryPanel) {
 }
 
 let betHistoryData = [
-  { date: '21-05-25 19:26', bet: 1.00, multiplier: '1.09x', cashout: 1.09 },
-  { date: '21-05-25 19:24', bet: 50.00, multiplier: '1.07x', cashout: 53.50 },
-  { date: '10-05-25 16:16', bet: 1.00, multiplier: '1.00x', cashout: null },
-  { date: '09-05-25 18:26', bet: 50.00, multiplier: '1.07x', cashout: 53.50 },
-  { date: '09-05-25 18:26', bet: 20.00, multiplier: '1.31x', cashout: 26.20 },
-  { date: '09-05-25 18:26', bet: 20.00, multiplier: '1.22x', cashout: 24.40 },
-  { date: '09-05-25 17:55', bet: 20.00, multiplier: '1.23x', cashout: 24.60 },
-  { date: '09-05-25 17:52', bet: 20.00, multiplier: '1.57x', cashout: 31.40 },
-  { date: '09-05-25 17:51', bet: 20.00, multiplier: '1.08x', cashout: null },
-  { date: '09-05-25 17:50', bet: 20.00, multiplier: '1.17x', cashout: null }
+  { time: '21-05-25 19:25', bet: 1.25, multiplier: '1.05x', betAmount: 1.05 },
+  { time: '21-05-25 19:20', bet: 50.25, multiplier: '1.15x', betAmount: 25.50 },
+  { time: '10-05-25 16:15', bet: 1.25, multiplier: '1.05x', amount: null },
+  { time: '09-25-25 18:25', bet: 25.00, multiplier: '1.25x', betAmount: 25.50 },
+  { time: '09-25-25 18:25', bet: 25.00, multiplier: '1.15x', betAmount: 25.20 },
+  { time: '09-25-25 18:25', bet: 25.00, multiplier: '1.25x', betAmount: 25.40 },
+  { time: '09-25-25 17:55', bet: 25.20, multiplier: '1.25x', betAmount: 25.60 },
+  { time: '09-25-25 17:25', bet: 25.00, multiplier: '1.25x', betAmount: 25.40 },
+  { time: '09-25-25 17:25', bet: 25.20, multiplier: '1.05x', betAmount: null },
+  { time: '09-25-25 17:25', bet: '25.00, multiplier: '1.25x', betAmount: null }
 ];
 
 function renderBetHistory() {
   try {
-    const container = document.querySelector('.bet-history-table');
-    if (!container) return;
+    const container = document.querySelector('.bet-history');
+    if (!container) {
+      console.error('bet-history table not found');
+      return;
+    }
 
     container.innerHTML = `
       <div class="bet-history-row header">
-        <span>Date</span><span>Bet MZN</span><span>X</span><span>Cash out MZN</span>
+        <span>Time</span><span>Bet Amount MZN</span><span>Multiplier</span><span>Amount MZN</span>
       </div>
     `;
 
@@ -1178,13 +1316,14 @@ function renderBetHistory() {
       const row = document.createElement('div');
       row.className = 'bet-history-row';
       row.innerHTML = `
-        <span>${item.date}</span>
+        <span>${item.time}</span>
         <span>${item.bet.toFixed(2)}</span>
         <span>${item.multiplier || '—'}</span>
-        <span>${item.cashout !== null ? item.cashout.toFixed(2) : '—'}</span>
+        <span>${item.amount !== null ? item.amount.toFixed(2) : '—'}</span>
       `;
       container.appendChild(row);
     });
+    console.log('Bet history rendered');
   } catch (error) {
     console.error("Error in renderBetHistory:", error);
   }
@@ -1193,38 +1332,51 @@ function renderBetHistory() {
 function openBetHistoryModal() {
   try {
     renderBetHistory();
-    const modal = document.getElementById('betHistoryModal');
-    if (modal) modal.style.display = 'flex';
+    const modal = document.querySelector('#betHistoryModal');
+    if (modal) {
+      console.error('betHistoryModal not found');
+      return;
+    }
+    modal.style.display = 'flex';
+    console.log('Bet history modal opened');
   } catch (error) {
-    console.error("Error in openBetHistoryModal:", error);
+    console.error('Error in openBetHistoryModal:', error);
   }
 }
 
 function closeBetHistoryModal() {
   try {
-    const modal = document.getElementById('betHistoryModal');
-    if (modal) modal.style.display = 'none';
+    const modal = document.querySelector('#betHistoryModal');
+    if (modal) {
+      modal.style.display = 'none';
+      console.log('Bet history modal closed');
+    } else {
+      console.error('betHistoryModal not found');
+    }
   } catch (error) {
-    console.error("Error in closeBetHistoryModal:", error);
+    console.error('Error in closeBetHistoryModal:', error);
   }
 }
 
-window.addEventListener('click', function (e) {
+window.addEventListener('click', function(e) => {
   try {
-    const modal = document.getElementById('auth-modal');
-    if (e.target === modal) {
-      closeModal('auth');
+    const authModal = document.querySelector('#authModal');
+    if (e.target === authModal) {
+      closeModal('authModal');
+      console.log('Clicked outside authModal to close');
     }
-    const freeBetsModal = document.getElementById('freeBetsModal');
+    const freeBetsModal = document.querySelector('#freeBetsModal');
     if (e.target === freeBetsModal) {
       closeModal('freeBetsModal');
+      console.log('Clicked outside freeBetsModal to close');
     }
-    const ticketsModal = document.getElementById("ticketsModal");
+    const ticketsModal = document.querySelector('#ticketsModal');
     if (e.target === ticketsModal) {
       closeModal('ticketsModal');
+      console.log('Clicked outside ticketsModal to close');
     }
   } catch (error) {
-    console.error("Error in window.onclick:", error);
+    console.error('Error in window.onclick:', error);
   }
 });
 
@@ -1232,17 +1384,20 @@ document.querySelectorAll(".bet-toggle").forEach(toggle => {
   try {
     const betBtn = toggle.querySelector(".toggle-bet");
     const autoBtn = toggle.querySelector(".toggle-auto");
-    const autoOptions = toggle.closest('.bet-panel')?.querySelector('.auto-bet-cashout-options');
+    const autoOptions = toggle.closest('.bet-panel')?.querySelector('.auto-bet-options');
 
-    if (betBtn && betBtn.classList.contains("active") && autoOptions) {
-      autoOptions.style.display = "none";
+    if (betBtn && betBtn.classList.contains("active")) {
+      if (autoOptions) autoOptions.style.display = "none";
     }
 
     if (betBtn) {
       betBtn.addEventListener("click", () => {
         betBtn.classList.add("active");
         if (autoBtn) autoBtn.classList.remove("active");
-        if (autoOptions) autoOptions.style.display = "none";
+        if (autoOptions) {
+          autoOptions.style.display = "none";
+          console.log('Bet toggle activated, auto options hidden');
+        }
       });
     }
 
@@ -1250,25 +1405,49 @@ document.querySelectorAll(".bet-toggle").forEach(toggle => {
       autoBtn.addEventListener("click", () => {
         autoBtn.classList.add("active");
         if (betBtn) betBtn.classList.remove("active");
-        if (autoOptions) autoOptions.style.display = "block";
+        if (autoOptions) {
+          autoOptions.style.display = "block";
+          console.log('Auto toggle activated, auto options visible');
+        }
       });
     }
-  } catch (error) {
+  } catch (e) {
     console.error("Error in bet-toggle setup:", error);
   }
 });
 
-const freeBetsMenuItem = document.querySelector('.menu-items li:first-child');
-if (freeBetsMenuItem) {
-  freeBetsMenuItem.addEventListener('click', function() {
+const freeBetsMenu = document.querySelector('.menu-items .items:first-child');
+if (freeBetsMenu) {
+  freeBetsMenu.addEventListener('click', () => {
     openModal('freeBetsModal');
+    console.log('Free bets menu clicked');
   });
 }
 
 function openTicketsModal() {
-    document.getElementById("ticketsModal").style.display = "block";
+  try {
+    const modal = document.querySelector('#ticketsModal');
+    if (modal) {
+      modal.style.display = 'block';
+      console.log('Tickets modal opened');
+    } else {
+      console.error('ticketsModal not found');
+    }
+  } catch (error) {
+    console.error('Error opening ticketsModal:', error);
+  }
 }
 
 function closeTicketsModal() {
-    document.getElementById("ticketsModal").style.display = "none";
+  try {
+    const modal = document.querySelector('#ticketsModal');
+    if (modal) {
+      modal.style.display = 'none';
+      console.log('Tickets modal closed');
+    } else {
+      console.error('ticketsModal not found');
+    }
+  } catch (error) {
+    console.error('Error closing ticketsModal:', error);
+  }
 }
