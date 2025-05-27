@@ -829,129 +829,141 @@ body {
 /* Responsive */
 @media (max-width: 768px) {
   .content-body {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    height: auto;
-    overflow-y: auto;
-    overflow-x: hidden;
-    width: 100%;
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 100vh !important;
+    height: auto !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    width: 100% !important;
   }
 
   .game-area {
-    order: 0;
-    width: 100%;
-    max-width: 100%;
-    height: 50vh;
-    min-height: 300px;
-    overflow-y: auto;
-    overflow-x: hidden;
-    flex-shrink: 0;
-    border: 1px solid red; /* Temporary debugging border */
+    order: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 50vh !important;
+    min-height: 300px !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    flex-shrink: 0 !important;
+    background-color: #000 !important;
+    border: 3px solid red !important; /* Debugging */
   }
 
   .right-panel {
-    order: 1;
-    width: 100%;
-    max-width: 100%;
-    min-height: 1200px; /* Doubled from 600px */
-    flex: 1 0 auto;
-    border: none;
-    border-top: 1px solid #2a2f40;
-    margin-left: 0;
-    padding: 20px;
-    overflow-y: auto;
-    overflow-x: hidden;
-    border: 1px solid blue; /* Temporary debugging border */
+    order: 1 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: 1200px !important; /* Keep large height */
+    flex: 1 0 auto !important;
+    background-color: #111111 !important;
+    padding: 20px !important;
+    margin: 0 !important;
+    border: 3px solid blue !important; /* Debugging */
+    border-top: 1px solid #2a2f40 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    display: block !important;
   }
 
   .left-panel {
-    order: 2;
-    width: 100%;
-    max-width: 100%;
-    min-height: auto;
-    flex: 0 1 auto;
-    border: none;
-    border-top: 1px solid #2a2f40;
-    margin-top: 50px; /* Increased to push left-panel further down */
-    padding: 10px;
-    background-color: #222222;
-    border-radius: 20px;
-    overflow-x: hidden;
-    border: 1px solid green; /* Temporary debugging border */
+    order: 2 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: auto !important;
+    flex: 0 1 auto !important;
+    margin-top: 50px !important; /* Keep pushed down */
+    padding: 10px !important;
+    background-color: #222222 !important;
+    border-radius: 20px !important;
+    border: 3px solid green !important; /* Debugging */
+    overflow-x: hidden !important;
   }
 
   .bets-table {
-    width: 100%;
-    max-width: 100%;
-    overflow-x: hidden;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
   }
 
   .bets-header,
   .bets-row {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    font-size: 12px;
-    padding: 5px;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    font-size: 12px !important;
+    padding: 5px !important;
   }
 
   .bet-panels-row {
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
-    width: 100%;
-    padding: 10px 0;
-    border: 1px solid yellow; /* Temporary debugging border */
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    width: 100% !important;
+    padding: 10px 0 !important;
+    margin: 0 !important;
+    border: 3px solid yellow !important; /* Debugging */
+    background-color: rgba(255, 255, 0, 0.1) !important; /* Debugging */
   }
 
   .bet-panel {
-    width: 100%;
-    max-width: 100%;
-    margin: 0;
-    min-height: 800px; /* Doubled from 400px */
-    background-color: rgba(255, 255, 255, 0.1); /* Temporary debugging background */
-    border: 2px solid purple; /* Temporary debugging border */
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: 800px !important; /* Keep large height */
+    margin: 0 !important;
+    padding: 15px !important;
+    background-color: rgba(128, 0, 128, 0.2) !important; /* Debugging */
+    border: 3px solid purple !important; /* Debugging */
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    border-radius: 20px !important;
   }
 
   .bet-content {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 15px;
-    width: 100%;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 15px !important;
+    width: 100% !important;
   }
 
   .bet-controls {
-    flex-basis: auto;
-    width: 100%;
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
   }
 
   .modal-content {
-    width: 95%;
-    max-width: 320px;
+    width: 95% !important;
+    max-width: 320px !important;
   }
 
   .modal-content.bet-history-box {
-    max-width: 95%;
+    max-width: 95% !important;
   }
 }
 
 /* Extra Small Screens */
 @media (max-width: 400px) {
   .right-panel {
-    min-height: 1400px; /* Doubled from 700px */
-    padding: 15px;
+    min-height: 1400px !important; /* Keep large height */
+    padding: 15px !important;
+    border: 3px solid blue !important; /* Debugging */
   }
 
   .bet-panel {
-    min-height: 900px; /* Doubled from 450px */
+    min-height: 900px !important; /* Keep large height */
+    border: 3px solid purple !important; /* Debugging */
   }
 
   .bet-content {
-    gap: 10px;
+    gap: 10px !important;
   }
 
   .bet-button,
   .cashout-button {
-    font-size: 20px;
-    padding: 15px 20px;
+    font-size: 20px !important;
+    padding: 15px 20px !important;
   }
 }
