@@ -39,7 +39,6 @@
             <div class="dropdown-menu" id="dropdown-menu">
               <div class="user-section">
                 <img src="plane-avatar.png" class="avatar" alt="Avatar" />
-                <!-- LOGIN / SIGNUP BUTTONS -->
                 <div class="auth-buttons">
                   <button onclick="openModal('login-modal')">Login</button>
                   <button onclick="openSignupModal()">Signup</button>
@@ -81,50 +80,14 @@
       </div>
 
       <div class="content-body">
-        <!-- LEFT PANEL: Sidebar on desktop, fixed at bottom on mobile -->
-        <div class="left-panel">
-          <h3 id="all-bets-title">ALL BETS</h3>
-          <p id="total-bets-count">0</p>
-          <div class="bets-table">
-            <div class="bets-header">
-              <span>Player</span>
-              <span>Bet MZN</span>
-              <span>X</span>
-              <span>Win MZN</span>
-            </div>
-            <div class="bets-row">
-              <span>s***e</span><span>10,638.04</span><span>—</span><span>—</span>
-            </div>
-            <div class="bets-row">
-              <span>s***e</span><span>10,638.04</span><span>—</span><span>—</span>
-            </div>
-            <div class="bets-row">
-              <span>2***3</span><span>4,941.52</span><span>—</span><span>—</span>
-            </div>
-            <div class="bets-row">
-              <span>2***3</span><span>4,941.52</span><span>—</span><span>—</span>
-            </div>
-            <div class="bets-row">
-              <span>2***0</span><span>4,150.87</span><span>—</span><span>—</span>
-            </div>
-            <div class="bets-row highlight">
-              <span>b***u</span><span>1,085.08</span><span>1.21x</span><span>1,312.94</span>
-            </div>
-          </div>
-        </div>
-
         <div class="game-area" id="game-area">
           <div class="multiplier-history" id="multiplier-history"></div>
           <canvas id="game-bg"></canvas>
-
           <div class="multiplier-container">
             <span class="multiplier" id="multiplier">1.00x</span>
           </div>
           <div class="crash-message" id="crash-message" style="display: none;">FLEW AWAY!</div>
-
-          <!-- Bet Panels Row -->
           <div class="bet-panels-row">
-
             <!-- Bet Panel 1 -->
             <div class="bet-panel">
               <div class="bet-toggle">
@@ -203,9 +166,40 @@
                 </div>
               </div>
             </div>
-          </div> <!-- End bet-panels-row -->
-        </div> <!-- End game-area -->
-      </div> <!-- End content-body -->
+          </div>
+        </div>
+        <!-- LEFT PANEL (at end of content-body, appears at bottom on mobile) -->
+        <div class="left-panel">
+          <h3 id="all-bets-title">ALL BETS</h3>
+          <p id="total-bets-count">0</p>
+          <div class="bets-table">
+            <div class="bets-header">
+              <span>Player</span>
+              <span>Bet MZN</span>
+              <span>X</span>
+              <span>Win MZN</span>
+            </div>
+            <div class="bets-row">
+              <span>s***e</span><span>10,638.04</span><span>—</span><span>—</span>
+            </div>
+            <div class="bets-row">
+              <span>s***e</span><span>10,638.04</span><span>—</span><span>—</span>
+            </div>
+            <div class="bets-row">
+              <span>2***3</span><span>4,941.52</span><span>—</span><span>—</span>
+            </div>
+            <div class="bets-row">
+              <span>2***3</span><span>4,941.52</span><span>—</span><span>—</span>
+            </div>
+            <div class="bets-row">
+              <span>2***0</span><span>4,150.87</span><span>—</span><span>—</span>
+            </div>
+            <div class="bets-row highlight">
+              <span>b***u</span><span>1,085.08</span><span>1.21x</span><span>1,312.94</span>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <!-- SIGNUP MODAL -->
       <div id="signupModal" class="modal" style="display: none;">
@@ -213,20 +207,15 @@
           <span class="close" onclick="closeSignupModal()" style="position: absolute; right: 10px; top: 10px; font-size: 20px; cursor: pointer;">&times;</span>
           <h2 style="text-align: center;">Join Airpawa</h2>
           <p style="text-align: center; font-size: 0.9em; margin-bottom: 20px;">Home to fast wins and easy bets</p>
-
           <form id="signupForm">
             <label>Phone number</label>
             <input type="tel" placeholder="+256 7xxxxxxxx" required style="width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: none;" />
-
             <label>Password</label>
             <input type="password" required style="width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: none;" />
-
             <label>Confirm password</label>
             <input type="password" required style="width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: none;" />
-
             <label>Referral code (optional)</label>
             <input type="text" placeholder="e.g. ABCDXY" style="width: 100%; padding: 10px; margin: 5px 0 15px; border-radius: 5px; border: none;" />
-
             <button type="submit" style="width: 100%; padding: 10px; background: red; color: white; border: none; border-radius: 5px;">Sign Up</button>
             <p style="text-align: center; margin-top: 10px;">
               or <a href="#" onclick="openLoginModal()" style="color: #00f;">Login</a>
@@ -235,7 +224,7 @@
         </div>
       </div>
 
-      <!-- ODIBETS-STYLE LOGIN MODAL -->
+      <!-- LOGIN MODAL -->
       <div id="login-modal" class="modal" style="display: none;">
         <div class="modal-content dark-modal">
           <span class="close" onclick="closeModal('login-modal')">&times;</span>
@@ -299,8 +288,8 @@
           </div>
         </div>
       </div>
-    </div> <!-- End main-container -->
-  </div> <!-- End layout -->
+    </div>
+  </div>
 
   <script>
     // Toggle for bet/auto
