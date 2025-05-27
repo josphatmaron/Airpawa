@@ -967,3 +967,14 @@ body {
     padding: 15px 20px !important;
   }
 }
+
+@media (max-width: 768px) {
+  .game-area {
+    height: auto !important;
+    min-height: 850px !important;
+    overflow-y: visible !important;
+  }
+  .bet-panel {
+    min-height: 400px !important; /* or less */
+  }
+}
