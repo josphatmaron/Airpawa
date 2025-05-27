@@ -156,7 +156,7 @@ body {
   cursor: pointer;
 }
 
-.toggles input[type="checkbox"]::before {
+.toggles input[type="checkbox"]:before {
   content: '';
   position: absolute;
   width: 18px;
@@ -168,7 +168,7 @@ body {
   transition: 0.3s;
 }
 
-.toggles input[type="checkbox"]:checked::before {
+.toggles input[type="checkbox"]:checked:before {
   transform: translateX(20px);
   background-color: #0f0;
 }
@@ -393,6 +393,7 @@ body {
   margin: 0 5px;
 }
 
+/* Bet Toggle */
 .bet-toggle {
   margin: 5px;
   border-radius: 32px;
@@ -515,6 +516,7 @@ body {
   justify-content: center;
 }
 
+/* Bet Button (Green) */
 .bet-button {
   background-color: #00c000;
 }
@@ -523,6 +525,7 @@ body {
   background-color: #00a800;
 }
 
+/* Cashout Button (Orange) */
 .cashout-button {
   background-color: orange;
 }
@@ -531,11 +534,13 @@ body {
   background-color: darkorange;
 }
 
+/* Winnings Display */
 .potential-winnings {
   font-size: 1.2rem;
   font-weight: bold;
 }
 
+/* Cashout Section */
 .cashout-section {
   display: flex;
   align-items: center;
@@ -543,6 +548,7 @@ body {
   margin-top: 10px;
 }
 
+/* Auto Panel */
 .auto-options {
   display: flex;
   justify-content: space-between;
@@ -578,7 +584,7 @@ body {
   background: #00c000;
 }
 
-.toggle-switch::before {
+.toggle-switch:before {
   content: '';
   position: absolute;
   width: 18px;
@@ -590,7 +596,7 @@ body {
   transition: transform 0.3s;
 }
 
-.toggle-switch:checked::before {
+.toggle-switch:checked:before {
   transform: translateX(20px);
 }
 
@@ -844,14 +850,13 @@ body {
     min-height: 300px !important;
     max-height: none !important;
     overflow-y: auto !important;
-    overflow-x: hidden !important;
-    flex-shrink: 0 !important;
     background-color: #000 !important;
     border: 3px solid red !important; /* Debugging */
     position: relative !important;
   }
 
   .bet-panels-row {
+    order: 1 !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
@@ -860,7 +865,6 @@ body {
     margin: 0 !important;
     border: 3px solid yellow !important; /* Debugging */
     background-color: rgba(255, 255, 0, 0.1) !important; /* Debugging */
-    order: 1 !important;
   }
 
   .left-panel {
@@ -868,7 +872,7 @@ body {
     width: 100% !important;
     max-width: 100% !important;
     min-height: 180px !important;
-    max-height: 300px !important;
+    max-height: unset !important;
     margin: 20px 0 0 0 !important;
     padding: 10px !important;
     background-color: #222222 !important;
@@ -879,6 +883,7 @@ body {
     position: static !important;
     box-shadow: none !important;
     z-index: auto !important;
+    display: block !important;
   }
 
   .bets-table {
@@ -958,6 +963,7 @@ body {
   }
 
   .left-panel {
-    max-height: 180px !important;
+    min-height: 120px !important;
+    max-height: unset !important;
   }
 }
