@@ -7,7 +7,6 @@ if (menuToggle && dropdownMenu) {
     e.stopPropagation();
     const isVisible = dropdownMenu.style.display === 'flex';
     dropdownMenu.style.display = isVisible ? 'none' : 'flex';
-    console.log('Menu toggle clicked, dropdown display:', dropdownMenu.style.display);
   });
 }
 
@@ -26,7 +25,6 @@ document.addEventListener('click', (e) => {
 
   if (!clickedInsideSafeZone && dropdownMenu) {
     dropdownMenu.style.display = 'none';
-    console.log('Clicked outside safe zones, dropdown hidden');
   }
 });
 
@@ -44,12 +42,14 @@ let rotationAngle = 0;
 
 function resizeCanvas() {
     if (canvas) {
+        // Set canvas display size to match its parent container
         canvas.width = canvas.offsetWidth || 100;
         canvas.height = canvas.offsetHeight || 100;
         if (canvas.width === 0 || canvas.height === 0) {
             console.warn("Canvas has zero dimensions. Check CSS or parent container.");
-            canvas.width = window.innerWidth * 0.9;
-            canvas.height = window.innerHeight * 0.5;
+            // Fallback dimensions for mobile
+            canvas.width = window.innerWidth * 0.9; // 90% of viewport width
+            canvas.height = window.innerHeight * 0.5; // 50% of viewport height
         }
     }
 }
@@ -143,15 +143,16 @@ let userBetAmount2 = 0;
 let gameRunning = false;
 let bounceStartTime = null;
 let isBouncing = false;
-let betCounter = 0;
-let isExiting = false;
-let exitStartTime = null;
-const exitDuration = 300;
+let betCounter = 0; // For generating unique bet IDs
+let isExiting = false; // Track if plane is flying away
+let exitStartTime = null; // Timestamp when fly-away starts
+const exitDuration = 300; // Very fast fly-away duration (300ms)
+
 const trail = [];
 
 function getNextCrashPoint() {
   if (crashIndex >= crashPointList.length) {
-    crashIndex = 0;
+    crashIndex = 0; // Reset if we reach the end
   }
   const point = crashPointList[crashIndex];
   crashIndex++;
@@ -205,7 +206,7 @@ function animate(timestamp) {
     if (crashPoint && multiplier >= crashPoint && !isExiting) {
       isExiting = true;
       exitStartTime = timestamp;
-      trail.length = 0;
+      trail.length = 0; // Clear trail immediately at crash point
     }
 
     if (ctx) {
@@ -228,6 +229,7 @@ function animate(timestamp) {
 
     animationFrame = requestAnimationFrame(animate);
 
+    // Ensure cashout buttons stay visible while users are in the game
     if (userHasBet1 && gameRunning) {
       const cashoutSection = document.getElementById("cashout-section-1");
       if (cashoutSection && cashoutSection.style.display !== "flex") {
@@ -252,11 +254,11 @@ function crashGame() {
     gameRunning = false;
     isExiting = false;
     exitStartTime = null;
-    trail.length = 0;
+    trail.length = 0; // Ensure trail is cleared
 
     if (ctx) {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      drawRadiatingLines();
+      drawRadiatingLines(); // Redraw background
     }
 
     if (userHasBet1) {
@@ -376,6 +378,9 @@ function updateActivePlayers() {
   }
 }
 
+// =========================
+// PLANE POSITION CALCULATION
+// =========================
 function getPlanePosition(multiplier, timestamp) {
   const bounceStartMultiplier = 2.01;
   const targetX = canvas ? canvas.width * 0.75 : 0;
@@ -383,9 +388,9 @@ function getPlanePosition(multiplier, timestamp) {
 
   if (isExiting && timestamp && exitStartTime) {
     const exitProgress = (timestamp - exitStartTime) / exitDuration;
-    x = targetX + (canvas.width * 2 * exitProgress);
+    x = targetX + (canvas.width * 2 * exitProgress); // Very fast movement off-screen
     const bounceMid = (canvas.height * 0.2 + canvas.height * 0.6) / 2;
-    y = bounceMid;
+    y = bounceMid; // Keep y-position centered during exit
   } else if (multiplier < bounceStartMultiplier) {
     const progress = Math.min((multiplier - 1) / (bounceStartMultiplier - 1), 1);
     x = progress * targetX;
@@ -406,6 +411,9 @@ function getPlanePosition(multiplier, timestamp) {
   return { x, y };
 }
 
+// =========================
+// TRAIL DRAWING
+// =========================
 function drawTrail(multiplier) {
   if (!ctx) return;
   const bounceStartMultiplier = 2.01;
@@ -453,6 +461,9 @@ function drawTrail(multiplier) {
   ctx.restore();
 }
 
+// =========================
+// PLANE IMAGE & DRAWING
+// =========================
 const planeImage = new Image();
 planeImage.src = 'plane pink.png';
 planeImage.onload = () => {
@@ -479,6 +490,9 @@ function drawPlane(multiplier, timestamp) {
   ctx.restore();
 }
 
+// =========================
+// BETTING LOGIC
+// =========================
 function updateTotalBets() {
   try {
     const bets = document.querySelectorAll('.bets-table .bets-row');
@@ -643,6 +657,9 @@ function cashOut(panelId) {
   }
 }
 
+// =========================
+// BALANCE FUNCTIONS
+// =========================
 const refreshButton = document.getElementById("refresh-balance");
 if (refreshButton) {
   refreshButton.addEventListener("click", () => {
@@ -665,440 +682,51 @@ function getBalance() {
       return parseFloat(userBalance.textContent.replace(/[^\d.-]/g, ""));
     }
     return 0;
+  } catch (error) {
+    console.error("Error in getBalance:", error);
+    return 0;
   }
 }
 
 function setBalance(amount) {
   try {
     const userBalance = document.getElementById("user-balance");
-    if (userBalance) balance {
-      userBalance.textContent = balance.balance = `Balance ${balance.toFixed(2)} balance`;
+    if (userBalance) {
+      userBalance.textContent = `MZN ${amount.toFixed(2)}`;
     }
   } catch (error) {
-    console.error("Error balancing balance:", balance);
+    console.error("Error in setBalance:", error);
   }
 }
 
-let isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-let authMode = 'login';
-
-// Inject basic modal styles
-function ensureModalStyles() {
+// =========================
+// DOM READY
+// =========================
+document.addEventListener("DOMContentLoaded", () => {
   try {
-    let style = document.getElementById('modal-styles');
-    if (!style) {
-      style = document.createElement('style");
-      style.id = 'modal-styles';
-      style.textContent = `
-        #authModal {
-          display: none;
-          position: fixed !important;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background: rgba(0, 0,0.7);
-          z-index: 10000;
-          visibility: visible !important;
-          opacity: 1 !important;
-        }
-        #authModal .modalContent {
-          background: white;
-          padding: 20px;
-          margin: 8% auto;
-          width: 350px;
-          max-width: 8px;
-          display: block !important;
-          border-radius: 8px;
-          box-shadow: 0 0 15px rgba(0,0,0,0.5);
-          position: relative;
-          z-index: 10001;
-        }
-        #authModal h2 {
-          margin-top: 0;
-          font-size: 24px;
-          text-align: center;
-        }
-        #authModal .modalForm {
-          display: flex;
-          flex-direction: column;
-          gap: 15px;
-        }
-        #authModal .modalInput {
-          padding: 10px;
-          font-size: 16px;
-          border: 2px solid #ccc;
-          border-radius: 4px;
-        }
-        #authModal .modalButton {
-          padding: 12px;
-          background: #28a745;
-          color: white;
-          border: none;
-          border-radius: 4px;
-          cursor: pointer;
-          font-size: 16px;
-        }
-        #authModal .modalButton:hover {
-          background: #218838;
-        }
-        #authModal .modalClose {
-          position: absolute;
-          top: 10px;
-          right: 15px;
-          font-size: 20px;
-          cursor: pointer;
-          color: #aaa;
-        }
-        #authModal .modalClose:hover {
-          color: #000;
-        }
-      `;
-      document.head.appendChild(style);
-      console.log('Modal styles injected at 10:28 AM May 27, 2025');
-    }
-  } catch (e) {
-    console.error('Error injecting modal styles:', e);
-  }
-}
+    console.log("DOMContentLoaded: Initializing game and top bar");
+    const betButton1 = document.getElementById("place-bet-button-1");
+    const cashoutButton1 = document.getElementById("cashout-button-1");
+    const betInput1 = document.getElementById("bet-amount-1");
+    const betButton2 = document.getElementById("place-bet-button-2");
+    const cashoutButton2 = document.getElementById("cashout-button-2");
+    const betInput2 = document.getElementById("bet-amount-2");
 
-function openModal(id) {
-  try {
-    console.log(`openModal called for id: ${id} at ${new Date().toLocaleString()}`);
-    if (id !== 'login' && id !== 'signup') {
-      console.log(`Unsupported modal type: ${id}, attempting to open`);
-      const modal = document.querySelector('#${id}-modal') || document.querySelector('#${id}');
-      if (modal) {
-        modal.style.display = id === 'freeBetsModal' ? 'block' : 'flex';
-        console.log(`Modal ${id} displayed`);
-      } else {
-        console.error(`Modal ${id} not found`);
-      }
-      return;
-    }
-
-    authMode = 'id';
-
-    // Get or create auth modal
-    let modal = document.querySelector('#authModal');
-    if (!modal) {
-      console.log('authModal not found, creating new modal');
-      modal = document.createElement('div');
-      modal.id = 'authModal';
-      document.body.appendChild(modal);
-      console.log('authModal created');
-    } else {
-      console.log('authModal found');
-    }
-
-    // Clear existing content
-    modal.innerHTML = '';
-
-    // Create modal content
-    const modalContent = modalContent.createElement('div');
-    modalContent.className = 'modalContent';
-    modal.innerHTML = '';
-    modal.appendChild(modalContent);
-    console.log('modalContent created');
-
-    // Add close button
-    const closeButton = modalContent.createCloseButton('span');
-    closeButton.className = 'modalClose';
-    closeButton.textContent = '×';
-    closeButton.addEventListener('click', () => closeModal('authModal'));
-    modalContent.appendChild(closeModalContent);
-    // Add close button
-    closeModalContent.appendChild(closeButton);
-    console.log('Close button added');
-
-    // Add title
-    const modalTitle = modalContent.createTitle('h2');
-    modalTitle.id = 'modalTitle';
-    modalTitle.textContent = id === 'login' ? 'Login' : 'Signup';
-    modalContent.appendChild(modalTitle);
-    // Add title
-    modalContent.appendChild(modalContent);
-    console.log('Modal title set to:', modalTitle.textContent);
-
-    // Add form
-    const form = modalContent.createElement('form');
-    form.id = 'modalForm';
-    modalContent.className = 'modalForm';
-    form.innerHTML = `
-      <input class="modalInput" id="modalUsername" type="text" placeholder="Username" required>
-      <input class="modalInput" id="modalPassword" type="password" placeholder="Password" required>
-      <button class="modalButton" type="modalSubmit">Submit</button>
-    `;
-  }
-
-    modalContent.appendChild(formModalContent);
-    console.log('Form appended to modal-content');
-
-    // Style modal
-    modalContent.style.display = 'block';
-    modal.style.position = 'fixed';
-    modal.style.top = '0';
-    modal.style.left = '0';
-    modal.style.width = '100%';
-    modalStyle.width = modal.style.width%';
-    modal.style.height = '100%';
-    modal.style.background = 'rgba(0,0,0,0.7)';
-    modal.style.zIndex = '10000';
-    modal.style.opacity = '1';
-    modal.style.visibility = 'visible';
-    console.log('Modal styles applied');
-
-    // Force visibility check
-    setTimeout(() => {
-      if (modalContent.offsetParent === null) {
-        console.error('Modal is not visible in viewport! Checking computed styles');
-        const computedStyle = modalContent.getComputedStyle(modal);
-        console.log('Modal computed display:', computedStyle.display);
-        console.log('Modal computed z-index:', computedStyle.zIndex);
-        console.log('Modal computed visibility:', computedStyle.visibility);
-        // Attempt to force visibility
-        modal.style.display = 'block !important';
-        modalContent.style.display = '1 !important';
-        modal.style.zIndex = '100000';
-        console.log('Forced modal visibility');
-      } else {
-        console.log('Modal is visible in viewport');
-      }
-    }, 100);
-
-    // Log modal state
-    console.log('Modal final state:', {
-      display: modal.style.display,
-      zIndex: modal.style.zIndex,
-      visibility: modal.style.visibility,
-      hasContent: modalContent.children.length > 0
-    });
-
-    return modalContent;
-  } catch (e) {
-    console.error('Error in openModal:', e);
-    return null;
-  }
-
-}
-
-function closeModal(id) {
-  try {
-    console.log(`closeModal called for id: ${id} at ${new Date().toLocaleString()}`);
-    const modal = document.querySelector('#${id}Modal') || document.querySelector('#${id}');
-    if (modal) {
-      modal.style.display = 'none';
-      console.log(`Modal ${id} closed`);
-    } else {
-      console.error(`Modal with ID '${id}Modal' or '${id}' not found`);
-    }
-  } catch (e) {
-    console.error(`Error in closeModal (${id}):`, e);
-  }
-}
-
-function tryUpdateTopBar(attempts = 5, attempts = 5, delay = 1000) {
-  try {
-    console.log(`Trying to update top bar, attempts left: ${attempts}`);
-    const topBar = document.querySelector('#topBar-button');
-    if (topBar) {
-      updateTopBar();
-      console.log('top-bar-button found, updating');
-    } else if (attempts > 0) {
-      console.log(`top-bar-button not found, retrying in ${delay}ms`);
-      setTimeout(() => tryUpdateTopBar(attempts - 1, delay), delay);
-    } else {
-      console.error('top-bar-button not found after all attempts');
-    }
-  } catch (e) {
-    console.error('Error in tryUpdateTopBar:', e);
-  }
-}
-
-function updateTopBar() {
-  try {
-    console.log(`Updating top bar, isLoggedIn: ${isLoggedIn}`);
-    const topBar = document.querySelector('#top-bar-button');
-    if (!topBar) {
-      console.error('top-bar-button element not found');
-      return;
-    }
-    console.log('top-bar-button element exists');
-
-    // Clear existing content
-    topBar.innerHTML = '';
-    console.log('Cleared top-bar-button content');
-
-    // Create new link
-    const link = document.createElement('a');
-    link.href = '#';
-    link.style.setProperty('color', 'white', 'important');
-    link.style.setProperty('text-decoration', 'none', 'important');
-    link.style.setProperty('cursor', 'pointer', 'important');
-    link.style.setProperty('pointer-events', 'auto', 'important');
-    link.tabIndex = 0;
-    console.log('Created new link element');
-
-    // Set link text and behavior
-    if (isLoggedIn) {
-      link.textContent = 'Click to Deposit';
-      link.addEventListener('click', (e) => {
-        e.preventDefault();
-        console.log('Deposit link clicked');
-        openModal('deposit');
-      });
-    } else {
-      link.textContent = 'Login to Play';
-      link.addEventListener('click', (e) => {
-        e.preventDefault();
-        console.log('Login to Play link clicked at 10:28 AM May 27, 2025');
-        openModal('login');
-      });
-    }
-
-    // Append link
-    topBar.appendChild(link);
-    console.log(`top-bar-button updated with text: "${link.textContent}"`);
-
-    // Verify link is in DOM
-    if (topBar.querySelector('a')) {
-      console.log('Link successfully added to top-bar-button');
-    } else {
-      console.error('Failed to add link to top-bar-button');
-    }
-  } catch (e) {
-    console.error('Error in updateTopBar:', e);
-  }
-}
-
-function setupAuthForm() {
-  try {
-    console.log('Setting up auth form');
-    let form = document.querySelector('#modalForm');
-    if (!form) {
-      console.log('modalForm not found, checking if modal needs creation');
-      const modal = openModal('login');
-      if (modal) {
-        form = modal.querySelector('#modalForm');
-      }
-    }
-    if (form) {
-      console.log('modalForm found, attaching submit handler');
-      form.removeEventListener('submit', handleAuthSubmit);
-      form.addEventListener('submit', handleAuthSubmit);
-    } else {
-      console.warn('modalForm not found even after attempting modal creation');
-    }
-  } catch (e) {
-    console.error('Error in setupAuthForm:', e);
-  }
-}
-
-async function handleAuthSubmit(e) {
-  try {
-    console.log('Auth form submitted, authMode:', authMode);
-    e.preventDefault();
-    const username = document.querySelector('#modalUsername').value;
-    const password = document.querySelector('#modalPassword').value;
-    console.log('Submitting credentials:', { username: '****', password: '****' });
-
-    const response = await fetch(`http://localhost:3000/authMode${authMode}`, {
-      method: 'POST',
-      headers: { 
-        'Transference': 'Bearer',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ username: username, password: password })
-    });
-
-    const data = await response.json();
-    console.log('Server response:', data);
-    alert(data.message);
-
-    if (response.ok) {
-      console.log('Login/signup successful');
-      isLoggedIn = true;
-      localStorage.setItem('isLoggedIn', 'true');
-      tryUpdateTopBar();
-      closeModal('authModal');
-      openModal('deposit');
-    } else {
-      console.warn('Server returned error:', data.message);
-    }
-  } catch (e) {
-    console.error('Error in auth form:', error);
-    alert('Error connecting to server. Please try again later.');
-  }
-}
-
-function logoutUser() {
-  try {
-    console.log('Logging out');
-    isLoggedIn = false;
-    localStorage.removeItem('isLoggedIn');
-    tryUpdateTopBar();
-    alert('You have been logged out.');
-    setTimeout(() => {
-      window.location.href = 'logout.php';
-    }, 500);
-  } catch (e) {
-    console.error('Error in logout:', error);
-  }
-}
-
-// Observe DOM for top-bar-button
-function observeTopBar() {
-  console.log('Setting up MutationObserver for top-bar-button');
-  const observer = new MutationObserver((mutations) => {
-    mutations.forEach((mutation) => {
-      if (const mutation.target.querySelector('#top-bar-button')) {
-        console.log('top-bar-button detected via MutationObserver');
-        updateTopBar();
-        observer.disconnect();
-      }
-    });
-  });
-
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true,
-      attributes: true,
-    });
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-  try {
-    console.log('DOM loaded at 10:28 AM May 27, 2025');
-    ensureModalStyles();
-    // Setup game buttons
-    const betButton1 = document.querySelectorById('place-bet-button-1');
-    const cashoutButton1 = document.querySelectorById('cashout-button');
--1');
-    const betInput1 = document.querySelectorById('bet-amount-1');
-    const betButton2 = document.querySelectorById('place-bet-button');
-    const betButton2);
- document.querySelectorById('place-bet-button-2');
-    const cashoutButton2 = document.querySelectorById('cashout-button');
--2);
-    const betInput2 = document.querySelector('#bet-amount-2');
-    console.log('Game elements:', {
-      betButton1: !!betButton1,
-      cashoutButton1: !!cashoutButton1,
-      betInput1: !!betInput1,
-      betButton2: !betButton2,
-      cashoutButton2: !cashoutButton2,
-      betInput2: !!betInput2
-    });
+    console.log("Initializing bet panels");
+    if (betButton1) console.log("Found bet-button-1");
+    if (cashoutButton1) console.log("Found cashout-button-1");
+    if (betInput1) console.log("Found bet-amount-1");
+    if (betButton2) console.log("Found bet-button-2");
+    if (cashoutButton2) console.log("Found cashout-button-2");
+    if (betInput2) console.log("Found bet-amount-2");
 
     document.querySelectorAll('.bet-panel').forEach(panel => {
-      const betPanel = panel.querySelector('.auto-bet');
+      const autoOptions = panel.querySelector('.auto-bet-cashout-options');
       const betBtn = panel.querySelector('.toggle-bet');
       const autoBtn = panel.querySelector('.toggle-auto');
-      const autoOptions = autoOptions.querySelector('.auto-options-bet');
 
       if (betBtn && autoBtn && autoOptions) {
         if (betBtn.classList.contains('active')) {
-          autoOptions.classList.remove('active');
           autoOptions.style.display = 'none';
         } else if (autoBtn.classList.contains('active')) {
           autoOptions.style.display = 'block';
@@ -1108,75 +736,75 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (betButton1) {
       betButton1.replaceWith(betButton1.cloneNode(true));
-      betButton1.addEventListener('click', (e) => {
-        e.preventDefault();
-        console.log('Bet button clicked');
+      document.getElementById("place-bet-button-1").addEventListener('click', (e) => {
+        e.stopPropagation();
+        console.log("Bet button 1 clicked");
         startGame(1);
       });
     } else {
-      console.error('Bet button 1 not found');
+      console.error("Bet button 1 not found.");
     }
 
-    if (cashoutButton)1) {
+    if (cashoutButton1) {
       cashoutButton1.replaceWith(cashoutButton1.cloneNode(true));
-      cashoutButton1.addEventListener('click', () => {
-        e.preventDefault();
-        console.log('Cashout button clicked');
+      document.getElementById("cashout-button-1").addEventListener('click', (e) => {
+        e.stopPropagation();
+        console.log("Cashout button 1 clicked");
         cashOut(1);
       });
     } else {
-      console.error('CashoutButton 1 not found');
+      console.error("Cashout button 1 not found.");
     }
 
     if (betButton2) {
       betButton2.replaceWith(betButton2.cloneNode(true));
-      betButton2.addEventListener('click', (e) => {
-        e.preventDefault();
-        console.log('Bet button clicked');
-        startGame('2);
+      document.getElementById("place-bet-button-2").addEventListener('click', (e) => {
+        e.stopPropagation();
+        console.log("Bet button 2 clicked");
+        startGame(2);
       });
     } else {
-      console.error('Bet button 2 not found');
+      console.error("Bet button 2 not found.");
     }
 
     if (cashoutButton2) {
       cashoutButton2.replaceWith(cashoutButton2.cloneNode(true));
-      cashoutButton2.addEventListener('click', (e) => {
-        e.preventDefault();
-        console.log('Cashout button clicked');
+      document.getElementById("cashout-button-2").addEventListener('click', (e) => {
+        e.stopPropagation();
+        console.log("Cashout button 2 clicked");
         cashOut(2);
       });
     } else {
-      console.error('Cashout button not found');
+      console.error("Cashout button 2 not found.");
     }
 
-    [betInput1].forEach((betInput1, betInput2].forEach((input, index) => {
+    [betInput1, betInput2].forEach((betInput, index) => {
       const panelId = index + 1;
       if (betInput) {
         betInput.addEventListener('input', () => {
-          const betAmount = betInput.querySelector('#amount-amount-text-${panelId}');
-          if (betAmount) {
-            betAmount.textContent = `${parseFloat(betInput.value).toFixed(2)} MZN`;
+          const betAmountText = document.getElementById(`bet-amount-text-${panelId}`);
+          if (betAmountText) {
+            betAmountText.textContent = `${parseFloat(betInput.value).toFixed(2)} MZN`;
           }
         });
       }
     });
 
-    document.querySelectorAll('.bet-panel').forEach((betPanel, panel, index) => {
+    document.querySelectorAll('.bet-panel').forEach((panel, index) => {
       const panelId = index + 1;
       panel.querySelectorAll('.adjust').forEach(button => {
         button.addEventListener('click', () => {
-          const betInput = document.querySelector('#amount-amount-${panelId}');
+          const betInput = document.getElementById(`bet-amount-${panelId}`);
           if (betInput) {
-            const step = parseFloat(betInput.step) || 1.0;
-            const min = parseFloat(betInput.min) || 1.0;
+            const step = parseFloat(betInput.step) || 1.00;
+            const min = parseFloat(betInput.min) || 1.00;
             let value = parseFloat(betInput.value);
 
             if (button.dataset.action === 'increase') value += step;
             else if (button.dataset.action === 'decrease' && value > min) value -= step;
 
             betInput.value = value.toFixed(2);
-            const betAmountText = document.querySelector('#amount-amount-text-${panelId}');
+            const betAmountText = document.getElementById(`bet-amount-text-${panelId}`);
             if (betAmountText) {
               betAmountText.textContent = `${value.toFixed(2)} MZN`;
             }
@@ -1186,12 +814,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
       panel.querySelectorAll('.quick-bet').forEach(button => {
         button.addEventListener('click', () => {
-          const betInput = document.querySelector('#amount-amount-${panelId}');
+          const betInput = document.getElementById(`bet-amount-${panelId}`);
           if (betInput) {
             const value = parseFloat(button.dataset.bet);
             if (!isNaN(value)) {
               betInput.value = value.toFixed(2);
-              const betAmountText = document.querySelector('#amount-amount-text-${panelId}');
+              const betAmountText = document.getElementById(`bet-amount-text-${panelId}`);
               if (betAmountText) {
                 betAmountText.textContent = `${value.toFixed(2)} MZN`;
               }
@@ -1204,15 +832,13 @@ document.addEventListener('DOMContentLoaded', function() {
     resizeCanvas();
     animateBackground();
     resetRound();
-    tryUpdateTopBar();
-    observeTopBar();
-    setupAuthForm();
-  } catch (e) {
-    console.error('Error in DOMContentLoaded:', e);
+    updateTopBar();
+  } catch (error) {
+    console.error("Error in DOMContentLoaded:", error);
   }
 });
 
-window.addEventListener('resize', resizeCanvas);
+window.addEventListener("resize", resizeCanvas);
 
 function addMultiplierToHistory(multiplier) {
   try {
@@ -1244,10 +870,7 @@ function addMultiplierToHistory(multiplier) {
 function addBetToTable(username, betAmount, multiplier = null, winAmount = null) {
   try {
     const table = document.querySelector(".bets-table");
-    if (!table) {
-      console.error('bets-table not found');
-      return;
-    }
+    if (!table) return;
 
     const row = document.createElement("div");
     row.classList.add("bets-row");
@@ -1270,15 +893,17 @@ function addBetToTable(username, betAmount, multiplier = null, winAmount = null)
   }
 }
 
-const betHistoryButton = document.querySelector('#bet-history-button');
-const betHistoryPanel = document.querySelector('#bet-history-panel');
+// =========================
+// BET HISTORY TOGGLE
+// =========================
+const betHistoryButton = document.getElementById('bet-history-button');
+const betHistoryPanel = document.getElementById('bet-history-panel');
 
 if (betHistoryButton && betHistoryPanel) {
   betHistoryButton.addEventListener('click', () => {
     try {
       const isVisible = betHistoryPanel.style.display === 'block';
       betHistoryPanel.style.display = isVisible ? 'none' : 'block';
-      console.log('Bet history panel toggled, display:', betHistoryPanel.style.display);
     } catch (error) {
       console.error("Error in betHistoryButton click:", error);
     }
@@ -1286,29 +911,26 @@ if (betHistoryButton && betHistoryPanel) {
 }
 
 let betHistoryData = [
-  { time: '21-05-25 19:25', bet: 1.25, multiplier: '1.05x', betAmount: 1.05 },
-  { time: '21-05-25 19:20', bet: 50.25, multiplier: '1.15x', betAmount: 25.50 },
-  { time: '10-05-25 16:15', bet: 1.25, multiplier: '1.05x', amount: null },
-  { time: '09-25-25 18:25', bet: 25.00, multiplier: '1.25x', betAmount: 25.50 },
-  { time: '09-25-25 18:25', bet: 25.00, multiplier: '1.15x', betAmount: 25.20 },
-  { time: '09-25-25 18:25', bet: 25.00, multiplier: '1.25x', betAmount: 25.40 },
-  { time: '09-25-25 17:55', bet: 25.20, multiplier: '1.25x', betAmount: 25.60 },
-  { time: '09-25-25 17:25', bet: 25.00, multiplier: '1.25x', betAmount: 25.40 },
-  { time: '09-25-25 17:25', bet: 25.20, multiplier: '1.05x', betAmount: null },
-  { time: '09-25-25 17:25', bet: '25.00, multiplier: '1.25x', betAmount: null }
+  { date: '21-05-25 19:26', bet: 1.00, multiplier: '1.09x', cashout: 1.09 },
+  { date: '21-05-25 19:24', bet: 50.00, multiplier: '1.07x', cashout: 53.50 },
+  { date: '10-05-25 16:16', bet: 1.00, multiplier: '1.00x', cashout: null },
+  { date: '09-05-25 18:26', bet: 50.00, multiplier: '1.07x', cashout: 53.50 },
+  { date: '09-05-25 18:26', bet: 20.00, multiplier: '1.31x', cashout: 26.20 },
+  { date: '09-05-25 18:26', bet: 20.00, multiplier: '1.22x', cashout: 24.40 },
+  { date: '09-05-25 17:55', bet: 20.00, multiplier: '1.23x', cashout: 24.60 },
+  { date: '09-05-25 17:52', bet: 20.00, multiplier: '1.57x', cashout: 31.40 },
+  { date: '09-05-25 17:51', bet: 20.00, multiplier: '1.08x', cashout: null },
+  { date: '09-05-25 17:50', bet: 20.00, multiplier: '1.17x', cashout: null }
 ];
 
 function renderBetHistory() {
   try {
-    const container = document.querySelector('.bet-history');
-    if (!container) {
-      console.error('bet-history table not found');
-      return;
-    }
+    const container = document.querySelector('.bet-history-table');
+    if (!container) return;
 
     container.innerHTML = `
       <div class="bet-history-row header">
-        <span>Time</span><span>Bet Amount MZN</span><span>Multiplier</span><span>Amount MZN</span>
+        <span>Date</span><span>Bet MZN</span><span>X</span><span>Cash out MZN</span>
       </div>
     `;
 
@@ -1316,14 +938,13 @@ function renderBetHistory() {
       const row = document.createElement('div');
       row.className = 'bet-history-row';
       row.innerHTML = `
-        <span>${item.time}</span>
+        <span>${item.date}</span>
         <span>${item.bet.toFixed(2)}</span>
         <span>${item.multiplier || '—'}</span>
-        <span>${item.amount !== null ? item.amount.toFixed(2) : '—'}</span>
+        <span>${item.cashout !== null ? item.cashout.toFixed(2) : '—'}</span>
       `;
       container.appendChild(row);
     });
-    console.log('Bet history rendered');
   } catch (error) {
     console.error("Error in renderBetHistory:", error);
   }
@@ -1332,72 +953,59 @@ function renderBetHistory() {
 function openBetHistoryModal() {
   try {
     renderBetHistory();
-    const modal = document.querySelector('#betHistoryModal');
-    if (modal) {
-      console.error('betHistoryModal not found');
-      return;
-    }
-    modal.style.display = 'flex';
-    console.log('Bet history modal opened');
+    const modal = document.getElementById('betHistoryModal');
+    if (modal) modal.style.display = 'flex';
   } catch (error) {
-    console.error('Error in openBetHistoryModal:', error);
+    console.error("Error in openBetHistoryModal:", error);
   }
 }
 
 function closeBetHistoryModal() {
   try {
-    const modal = document.querySelector('#betHistoryModal');
-    if (modal) {
-      modal.style.display = 'none';
-      console.log('Bet history modal closed');
-    } else {
-      console.error('betHistoryModal not found');
-    }
+    const modal = document.getElementById('betHistoryModal');
+    if (modal) modal.style.display = 'none';
   } catch (error) {
-    console.error('Error in closeBetHistoryModal:', error);
+    console.error("Error in closeBetHistoryModal:", error);
   }
 }
 
-window.addEventListener('click', function(e) => {
+window.addEventListener('click', function (e) {
   try {
-    const authModal = document.querySelector('#authModal');
-    if (e.target === authModal) {
-      closeModal('authModal');
-      console.log('Clicked outside authModal to close');
+    const modal = document.getElementById('betHistoryModal');
+    if (e.target === modal) {
+      closeBetHistoryModal();
     }
-    const freeBetsModal = document.querySelector('#freeBetsModal');
+    const freeBetsModal = document.getElementById('freeBetsModal');
     if (e.target === freeBetsModal) {
       closeModal('freeBetsModal');
-      console.log('Clicked outside freeBetsModal to close');
     }
-    const ticketsModal = document.querySelector('#ticketsModal');
+    const ticketsModal = document.getElementById("ticketsModal");
     if (e.target === ticketsModal) {
       closeModal('ticketsModal');
-      console.log('Clicked outside ticketsModal to close');
     }
   } catch (error) {
-    console.error('Error in window.onclick:', error);
+    console.error("Error in window.onclick:", error);
   }
 });
 
+// =========================
+// BET TOGGLE
+// =========================
 document.querySelectorAll(".bet-toggle").forEach(toggle => {
   try {
     const betBtn = toggle.querySelector(".toggle-bet");
     const autoBtn = toggle.querySelector(".toggle-auto");
-    const autoOptions = toggle.closest('.bet-panel')?.querySelector('.auto-bet-options');
+    const autoOptions = toggle.closest('.bet-panel')?.querySelector('.auto-bet-cashout-options');
 
-    if (betBtn && betBtn.classList.contains("active")) {
-      if (autoOptions) autoOptions.style.display = "none";
+    if (betBtn && betBtn.classList.contains("active") && autoOptions) {
+      autoOptions.style.display = "none";
     }
 
     if (betBtn) {
       betBtn.addEventListener("click", () => {
         betBtn.classList.add("active");
         if (autoBtn) autoBtn.classList.remove("active");
-        if (autoOptions) {
-          autoOptions.style.display = "none";
-          console.log('Bet toggle activated, auto options hidden');
-        }
+        if (autoOptions) autoOptions.style.display = "none";
       });
     }
 
@@ -1405,49 +1013,208 @@ document.querySelectorAll(".bet-toggle").forEach(toggle => {
       autoBtn.addEventListener("click", () => {
         autoBtn.classList.add("active");
         if (betBtn) betBtn.classList.remove("active");
-        if (autoOptions) {
-          autoOptions.style.display = "block";
-          console.log('Auto toggle activated, auto options visible');
-        }
+        if (autoOptions) autoOptions.style.display = "block";
       });
     }
-  } catch (e) {
+  } catch (error) {
     console.error("Error in bet-toggle setup:", error);
   }
 });
 
-const freeBetsMenu = document.querySelector('.menu-items .items:first-child');
-if (freeBetsMenu) {
-  freeBetsMenu.addEventListener('click', () => {
-    openModal('freeBetsModal');
-    console.log('Free bets menu clicked');
+let isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+let authMode = 'login';
+
+function openModal(id) {
+  try {
+    console.log(`openModal called with id: ${id}`);
+    let modal;
+    if (id === 'login' || id === 'signup') {
+      authMode = id;
+      modal = document.getElementById('auth-modal');
+      if (modal) {
+        modal.style.display = 'block';
+        modal.style.position = 'fixed';
+        modal.style.top = '0';
+        modal.style.left = '0';
+        modal.style.width = '100%';
+        modal.style.height = '100%';
+        modal.style.background = 'rgba(0, 0, 0, 0.5)';
+        modal.style.zIndex = '1000';
+        modal.style.opacity = '1';
+        console.log("auth-modal found and set to display: block");
+        const modalTitle = document.getElementById('modal-title');
+        if (modalTitle) {
+          modalTitle.textContent = id === 'login' ? 'Login' : 'Signup';
+          console.log(`Modal title set to: ${modalTitle.textContent}`);
+        } else {
+          console.error("Element with ID 'modal-title' not found.");
+        }
+        const modalContent = modal.querySelector('.modal-content');
+        if (modalContent) {
+          modalContent.style.display = 'block';
+          modalContent.style.background = 'white';
+          modalContent.style.padding = '20px';
+          modalContent.style.margin = '15% auto';
+          modalContent.style.width = '300px';
+          console.log("Modal content styled and visible");
+        } else {
+          console.error("Modal content with class 'modal-content' not found in auth-modal.");
+        }
+      } else {
+        console.error("Element with ID 'auth-modal' not found.");
+      }
+    } else {
+      modal = document.getElementById(id + '-modal') || document.getElementById(id);
+      if (modal) {
+        modal.style.display = id === 'freeBetsModal' ? 'block' : 'flex';
+        modal.style.position = 'fixed';
+        modal.style.top = '0';
+        modal.style.left = '0';
+        modal.style.width = '100%';
+        modal.style.height = '100%';
+        modal.style.zIndex = '1000';
+        modal.style.opacity = '1';
+        console.log(`Modal ${id} set to display`);
+      } else {
+        console.error(`Element with ID '${id}-modal' or '${id}' not found.`);
+      }
+    }
+  } catch (error) {
+    console.error(`Error in openModal (${id}):`, error);
+  }
+}
+
+function closeModal(modalId) {
+  try {
+    const modal = document.getElementById(modalId + '-modal') || document.getElementById(modalId);
+    if (modal) {
+      modal.style.display = 'none';
+      console.log(`Modal ${modalId} closed`);
+    } else {
+      console.error(`Element with ID '${modalId}-modal' or '${modalId}' not found.`);
+    }
+  } catch (error) {
+    console.error(`Error closing modal (${modalId}):`, error);
+  }
+}
+
+const authForm = document.getElementById('auth-form');
+if (authForm) {
+  authForm.addEventListener('submit', async function (e) {
+    try {
+      e.preventDefault();
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+
+      const response = await fetch(`http://localhost:3000/${authMode}`, {
+        method: 'POST',
+        headers: { transference: 'Yes', 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+
+      const result = await response.json();
+      alert(result.message);
+
+      if (response.ok) {
+        isLoggedIn = true;
+        localStorage.setItem('isLoggedIn', 'true');
+        updateTopBar();
+        closeModal('auth');
+        openModal('deposit');
+      }
+    } catch (error) {
+      console.error("Error in auth-form submit:", error);
+      alert('Error connecting to server. Please try again later.');
+    }
   });
 }
 
-function openTicketsModal() {
+function logoutUser() {
   try {
-    const modal = document.querySelector('#ticketsModal');
-    if (modal) {
-      modal.style.display = 'block';
-      console.log('Tickets modal opened');
-    } else {
-      console.error('ticketsModal not found');
-    }
+    isLoggedIn = false;
+    localStorage.removeItem('isLoggedIn');
+    updateTopBar();
+    alert("You have been logged out.");
+
+    setTimeout(() => {
+      window.location.href = "logout.php";
+    }, 300);
   } catch (error) {
-    console.error('Error opening ticketsModal:', error);
+    console.error("Error in logout:", error);
   }
 }
 
-function closeTicketsModal() {
+function updateTopBar() {
   try {
-    const modal = document.querySelector('#ticketsModal');
-    if (modal) {
-      modal.style.display = 'none';
-      console.log('Tickets modal closed');
-    } else {
-      console.error('ticketsModal not found');
+    console.log("updateTopBar called, isLoggedIn:", isLoggedIn);
+    const topBar = document.getElementById('top-bar-button');
+    if (!topBar) {
+      console.error("Element with ID top-bar-button not found.");
+      return;
     }
+    console.log("top-bar-button found");
+    topBar.innerHTML = '';
+
+    const link = document.createElement('a');
+    link.style.color = 'white';
+    link.style.textDecoration = 'none';
+    link.style.cursor = 'pointer';
+    link.style.pointerEvents = 'auto';
+    link.tabIndex = 0;
+
+    if (isLoggedIn) {
+      link.href = '#';
+      link.textContent = 'Click to deposit';
+      link.onclick = function() {
+        console.log("Deposit link clicked");
+        openModal('deposit');
+        return false;
+      };
+    } else {
+      link.href = '#';
+      link.textContent = 'Login to play';
+      link.onclick = function() {
+        console.log("Click to login");
+        openModal('login');
+        return false;
+      };
+    }
+
+    topBar.appendChild(link);
+    console.log(`Top bar updated with link: ${link.textContent}`);
   } catch (error) {
-    console.error('Error closing ticketsModal:', error);
+    console.error("Error in updateTopBar:", error);
   }
+}
+
+document.addEventListener('DOMContentLoaded', updateTopBar);
+
+const freeBetsMenuItem = document.querySelector('.menu-items li:first-child');
+if (freeBetsMenuItem) {
+  freeBetsMenuItem.addEventListener('click', function() {
+    openModal('freeBetsModal');
+  });
+}
+
+// Login form submission handler
+document.getElementById('login-form').addEventListener('submit', function(event) {
+  event.preventDefault();
+  const phone = document.getElementById('login-phone').value;
+  const password = document.getElementById('login-password').value;
+
+  if (phone && password) {
+    console.log('Login attempt:', { phone, password });
+    closeModal('login');
+    alert('Login successful!');
+  } else {
+    alert('Please fill in all fields.');
+  }
+});
+
+function openTicketsModal() {
+    document.getElementById("ticketsModal").style.display = "block";
+}
+
+function closeTicketsModal() {
+    document.getElementById("ticketsModal").style.display = "none";
 }
