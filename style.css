@@ -1,4 +1,3 @@
-/* Reset and Base Styles */
 * {
   margin: 0;
   padding: 0;
@@ -7,19 +6,14 @@
 
 body {
   font-family: 'Inter', sans-serif;
-  background-color: #000000;
-  color: white;
+  background-color: #000;
+  color: #fff;
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
   overflow-x: hidden;
 }
 
 .layout, .main-container, .content-body {
-  min-height: calc(100vh - 40px);
-  overflow-y: auto;
-  overflow-x: hidden;
+  min-height: 100vh;
 }
 
 /* Top Bar */
@@ -31,19 +25,6 @@ body {
   align-items: center;
   padding: 0 30px;
   border-bottom: 2px solid #222222;
-}
-
-/* Layout Containers */
-.layout {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-}
-
-.main-container {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
 }
 
 /* Secondary Bar */
@@ -194,47 +175,28 @@ body {
   color: #999;
 }
 
-/* Content Body */
+/* Main Layout */
 .content-body {
   display: flex;
-  flex: 1;
-  overflow-x: hidden;
+  flex-direction: row;
+  align-items: flex-start;
 }
 
-.logo {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  margin: 0;
-  padding: 0;
-  height: 40px;
-}
-
-.logo img {
-  display: block;
-  height: 25px;
-  margin: 0;
-  padding: 0;
-}
-
+/* Sidebar / left-panel */
 .left-panel {
-  margin-top: 10px;
-  width: 380px;
-  padding: 10px;
-  color: white;
-  font-family: Arial, sans-serif;
-  background-color: #222222;
+  width: 340px;
+  min-width: 220px;
+  max-width: 400px;
+  background: #222;
   border-radius: 20px;
+  margin: 14px 0 14px 14px;
+  padding: 12px;
+  color: #fff;
   overflow-y: auto;
-  max-height: 100vh;
-}
-
-.total-bets-heading {
-  padding: 8px;
-  font-size: 14px;
-  line-height: 1.2;
-  align-items: center;
-  justify-content: space-between;
+  height: auto;
+  position: static;
+  z-index: 1;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
 .bets-table {
@@ -243,7 +205,6 @@ body {
   flex-direction: column;
   gap: 5px;
 }
-
 .bets-header,
 .bets-row {
   display: grid;
@@ -251,32 +212,31 @@ body {
   padding: 5px 10px;
   font-size: 14px;
 }
-
 .bets-header {
   font-weight: bold;
   border-bottom: 1px solid #444;
   margin-bottom: 5px;
 }
-
 .bets-row {
   background-color: #222;
   border-radius: 5px;
 }
-
 .bets-row.highlight {
   background-color: #183318;
   color: #90ee90;
   font-weight: bold;
 }
 
+/* Main area */
 .game-area {
-  position: relative;
-  width: 100%;
-  height: 92vh;
-  background-color: #000;
+  flex: 1;
+  margin: 14px;
+  border-radius: 20px;
   overflow: hidden;
+  background: #000;
 }
 
+/* Multiplier Display and crash-message styles (keep as in your previous CSS) */
 .multiplier-history {
   display: flex;
   margin-right: 0 4px;
@@ -286,7 +246,6 @@ body {
   cursor: pointer;
   text-align: center;
   font-feature-settings: lining-nums;
-  font-size: bold;
   color: #4CAF50;
   font-weight: normal;
   letter-spacing: -.18px;
@@ -314,7 +273,6 @@ body {
   border: 1px solid #808080;
 }
 
-/* Multiplier Display */
 .multiplier-container {
   position: absolute;
   top: 30%;
@@ -339,36 +297,6 @@ body {
   z-index: 20;
   text-align: center;
   border-radius: 8px;
-}
-
-/* Right Panel */
-.right-panel {
-  width: 250px;
-  background-color: #111111;
-  padding: 20px;
-  border-left: 2px solid #2a2f40px;
-  margin-left: 20px;
-  flex-shrink: 0;
-}
-
-.balance {
-  text-align: right;
-  font-size: 14px;
-  font-feature-settings: normal;
-  font-variant-numeric: normal;
-}
-
-.balance-amount {
-  color: #28a745;
-  font-weight: bold;
-  margin-right: 4px;
-}
-
-.balance-currency {
-  color: #9b9c9e;
-  font-weight: normal;
-  letter-spacing: 2px;
-  margin-right: 4px;
 }
 
 /* Bet Panels */
@@ -495,7 +423,6 @@ body {
   font-size: 14px;
 }
 
-/* Button Base */
 .bet-button,
 .cashout-button {
   padding: 18px 30px;
@@ -516,28 +443,17 @@ body {
   justify-content: center;
 }
 
-/* Bet Button (Green) */
 .bet-button {
   background-color: #00c000;
 }
-
 .bet-button:hover {
   background-color: #00a800;
 }
-
-/* Cashout Button (Orange) */
 .cashout-button {
   background-color: orange;
 }
-
 .cashout-button:hover {
   background-color: darkorange;
-}
-
-/* Winnings Display */
-.potential-winnings {
-  font-size: 1.2rem;
-  font-weight: bold;
 }
 
 /* Cashout Section */
@@ -642,243 +558,52 @@ body {
   100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
 }
 
-/* Modal Styles */
-.modal {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.8);
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-}
+/* Modal Styles (keep as in your previous CSS, omitted for brevity) */
 
-.modal-content {
-  background-color: #1c1c1c;
-  color: white;
-  padding: 20px;
-  border-radius: 10px;
-  width: 90%;
-  max-width: 360px;
-  position: relative;
-  box-shadow: 0 0 12px rgba(0, 0, 0, 0.6);
-  animation: slideUp 0.3s ease-out;
-  text-align: center;
-}
-
-.modal-content.bet-history-box {
-  max-width: 500px;
-  max-height: 80vh;
-  overflow-y: auto;
-}
-
-.modal-content .close {
-  position: absolute;
-  right: 10px;
-  top: 10px;
-  font-size: 20px;
-  color: #aaa;
-  cursor: pointer;
-  transition: color 0.2s;
-}
-
-.modal-content .close:hover {
-  color: #fff;
-}
-
-.modal-content form input[type="text"],
-.modal-content form input[type="password"],
-.modal-content form input[type="tel"] {
-  width: 100%;
-  padding: 10px 12px;
-  margin: 6px 0 12px;
-  border-radius: 6px;
-  border: 1px solid #333;
-  background-color: #2b2b2b;
-  color: white;
-  font-size: 15px;
-}
-
-.modal-content form label {
-  font-size: 14px;
-  margin-bottom: 4px;
-  display: block;
-  color: #ccc;
-}
-
-.modal-content form button {
-  background-color: #f7253f;
-  border: none;
-  padding: 12px;
-  width: 100%;
-  font-weight: bold;
-  font-size: 16px;
-  color: white;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.modal-content form button:hover {
-  background-color: #d91d35;
-}
-
-.modal-content form button.login-btn {
-  background-color: #00b300;
-}
-
-.modal-content form button.login-btn:hover {
-  background-color: #009900;
-}
-
-.modal-content form button.cancel-btn {
-  background-color: #555;
-}
-
-.modal-content form button.cancel-btn:hover {
-  background-color: #666;
-}
-
-.modal-content form p {
-  text-align: center;
-  font-size: 14px;
-  margin-top: 14px;
-}
-
-.modal-content form a {
-  color: #1e90ff;
-  text-decoration: none;
-}
-
-.modal-content form a:hover {
-  text-decoration: underline;
-}
-
-.modal-links {
-  display: flex;
-  justify-content: space-between;
-  font-size: 14px;
-  margin: 10px 0;
-}
-
-.modal-links a {
-  color: #1e90ff;
-  text-decoration: none;
-}
-
-.modal-links a:hover {
-  text-decoration: underline;
-}
-
-.free-bets-container {
-  background: #2c2c2c;
-  padding: 10px;
-  border-radius: 5px;
-  text-align: left;
-}
-
-.modal-content input[type="radio"] {
-  margin-right: 10px;
-}
-
-.bet-history-table {
-  margin-top: 15px;
-}
-
-.bet-history-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 10px 0;
-  border-bottom: 1px solid #333;
-}
-
-.bet-history-row.header {
-  font-weight: bold;
-  border-bottom: 2px solid #555;
-}
-
-.load-more {
-  background-color: #333;
-  color: white;
-  border: none;
-  padding: 10px;
-  width: 100%;
-  margin-top: 10px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 16px;
-}
-
-.load-more:hover {
-  background-color: #444;
-}
-
-/* Animation */
-@keyframes slideUp {
-  from {
-    transform: translateY(40px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-/* Responsive: MOBILE */
+/* Responsive: Fixed left-panel at bottom on mobile */
 @media (max-width: 768px) {
   .content-body {
-    display: flex !important;
-    flex-direction: column !important;
-    width: 100% !important;
-    min-height: 100vh !important;
-    height: auto !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    position: static !important;
-    padding-bottom: 0 !important;
-  }
-  .game-area {
-    order: 0 !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    height: 350px !important;
-    min-height: 300px !important;
-    overflow-y: auto !important;
-    background-color: #000 !important;
-    position: relative !important;
-  }
-  .bet-panels-row {
-    order: 1 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    width: 100% !important;
-    padding: 10px 0 !important;
-    margin: 0 !important;
-    background-color: transparent !important;
-    border: none !important;
+    display: block !important;
+    min-height: 100vh;
+    padding-bottom: 0;
   }
   .left-panel {
-    order: 2 !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    margin-top: 20px !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-    border-radius: 20px !important;
-    padding: 10px !important;
-    background-color: #222222 !important;
-    min-height: 180px !important;
-    max-height: unset !important;
-    overflow-y: auto !important;
-    position: static !important;
-    box-shadow: none !important;
-    z-index: auto !important;
+    position: fixed !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    height: 80px !important; /* Adjust as needed for your content */
+    min-width: unset !important;
+    max-height: 80px !important;
+    margin: 0 !important;
+    padding: 10px 8px !important;
+    border-radius: 20px 20px 0 0 !important;
+    box-shadow: 0 -3px 12px rgba(0,0,0,0.3);
+    z-index: 9999 !important;
+    overflow: hidden !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  .game-area {
+    margin: 0 !important;
+    border-radius: 0 !important;
+  }
+  body, .main-container {
+    padding-bottom: 90px !important; /* Make room for the fixed left-panel */
+  }
+  /* Hide table and count on mobile, show only the title (customize as needed) */
+  .left-panel .bets-table,
+  .left-panel #total-bets-count {
+    display: none !important;
+  }
+  .left-panel h3#all-bets-title {
+    margin: 0 auto !important;
+    font-size: 18px !important;
     display: block !important;
+    text-align: center !important;
+    width: 100% !important;
   }
 }
 
@@ -896,7 +621,9 @@ body {
     padding: 15px 20px !important;
   }
   .left-panel {
-    min-height: 120px !important;
+    min-height: 50px !important;
     max-height: unset !important;
+    height: 60px !important;
+    padding: 5px 4px !important;
   }
 }
