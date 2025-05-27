@@ -937,7 +937,7 @@ body {
 /* Extra Small Screens */
 @media (max-width: 400px) {
   .right-panel {
-    min-height: 700px; /* Further increased for small screens */
+    min-height: 1700px; /* Further increased for small screens */
     padding: 15px;
   }
 
