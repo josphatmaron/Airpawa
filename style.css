@@ -830,9 +830,8 @@ body {
 @media (max-width: 768px) {
   .content-body {
     display: flex;
-    flex-wrap: nowrap;
-    flex-direction: column !important;
-    min-height: 100%;
+    flex-direction: column;
+    min-height: 100vh;
     height: auto;
     overflow-y: auto;
     overflow-x: hidden;
@@ -840,36 +839,41 @@ body {
   }
 
   .game-area {
-    order: 0 !important;
+    order: 0;
     width: 100%;
     max-width: 100%;
-    height: auto;
-    min-height: 50vh;
+    height: 50vh;
+    min-height: 300px;
     overflow-y: auto;
     overflow-x: hidden;
+    flex-shrink: 0;
   }
 
   .right-panel {
-    order: 1 !important;
+    order: 1;
     width: 100%;
     max-width: 100%;
     min-height: auto;
-    flex: 1 1 auto;
+    flex: 0 1 auto;
     border: none;
     border-top: 1px solid #2a2f40;
     margin-left: 0;
+    padding: 10px;
     overflow-x: hidden;
   }
 
   .left-panel {
-    order: 2 !important;
+    order: 2;
     width: 100%;
     max-width: 100%;
     min-height: auto;
-    flex: 1 1 auto;
+    flex: 0 1 auto;
     border: none;
     border-top: 1px solid #2a2f40;
     margin-top: 10px;
+    padding: 10px;
+    background-color: #222222;
+    border-radius: 20px;
     overflow-x: hidden;
   }
 
