@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const menuToggle = document.getElementById('menu-toggle');
 const dropdownMenu = document.getElementById('dropdown-menu');
 
