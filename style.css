@@ -890,6 +890,18 @@ body {
     padding: 5px;
   }
 
+  .bet-panels-row {
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .bet-panel {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+  }
+
   .modal-content {
     width: 95%;
     max-width: 320px;
