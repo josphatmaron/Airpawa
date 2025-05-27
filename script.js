@@ -470,12 +470,12 @@ function drawTrail(multiplier) {
 // PLANE IMAGE & DRAWING
 // =========================
 const planeImage = new Image();
-planeImage.src = 'assets/plane pink.png'; // Adjust path as needed
+planeImage.src = 'plane pink.png'; // Adjust path as needed 
 planeImage.onload = () => {
   console.log("Plane image loaded successfully");
 };
 planeImage.onerror = () => {
-  console.error("Failed to load plane image. Check path: 'assets/plane pink.png'");
+  console.error("Failed to load plane image. Check path: 'plane pink.png'");
 };
 
 function drawPlane(multiplier, timestamp) {
