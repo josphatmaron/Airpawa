@@ -854,12 +854,12 @@ body {
     order: 1;
     width: 100%;
     max-width: 100%;
-    min-height: 500px; /* Increased to ensure bet panels have space */
+    min-height: 600px; /* Increased to ensure bet panels have space */
     flex: 1 0 auto; /* Prioritize space allocation */
     border: none;
     border-top: 1px solid #2a2f40;
     margin-left: 0;
-    padding: 20px; /* Increased padding */
+    padding: 20px;
     overflow-y: auto;
     overflow-x: hidden;
     border: 1px solid blue; /* Temporary debugging border */
@@ -873,7 +873,7 @@ body {
     flex: 0 1 auto;
     border: none;
     border-top: 1px solid #2a2f40;
-    margin-top: 30px; /* Further increased to push left-panel down */
+    margin-top: 40px; /* Increased to push left-panel further down */
     padding: 10px;
     background-color: #222222;
     border-radius: 20px;
@@ -897,7 +897,7 @@ body {
   .bet-panels-row {
     flex-direction: column;
     align-items: center;
-    gap: 20px; /* Increased for better spacing */
+    gap: 20px;
     width: 100%;
     padding: 10px 0;
     border: 1px solid yellow; /* Temporary debugging border */
@@ -907,20 +907,20 @@ body {
     width: 100%;
     max-width: 100%;
     margin: 0;
-    min-height: 350px; /* Increased to prevent squeezing */
+    min-height: 400px; /* Increased to prevent squeezing */
     background-color: rgba(255, 255, 255, 0.1); /* Temporary debugging background */
-    border: 2px solid purple; /* Thicker debugging border */
+    border: 2px solid purple; /* Temporary debugging border */
   }
 
   .bet-content {
-    flex-direction: column; /* Stack internal elements vertically */
+    flex-direction: column;
     align-items: stretch;
     gap: 15px;
     width: 100%;
   }
 
   .bet-controls {
-    flex-basis: auto; /* Allow natural sizing */
+    flex-basis: auto;
     width: 100%;
   }
 
@@ -937,12 +937,12 @@ body {
 /* Extra Small Screens */
 @media (max-width: 400px) {
   .right-panel {
-    min-height: 600px; /* More space for very small screens */
+    min-height: 700px; /* Further increased for small screens */
     padding: 15px;
   }
 
   .bet-panel {
-    min-height: 400px; /* Ensure bet panels have enough height */
+    min-height: 450px; /* Further increased to prevent squeezing */
   }
 
   .bet-content {
@@ -951,7 +951,7 @@ body {
 
   .bet-button,
   .cashout-button {
-    font-size: 20px; /* Slightly smaller buttons */
+    font-size: 20px;
     padding: 15px 20px;
   }
 }
