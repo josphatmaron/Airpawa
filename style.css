@@ -225,6 +225,8 @@ body {
   font-family: Arial, sans-serif;
   background-color: #222222;
   border-radius: 20px;
+  overflow-y: auto; /* Always enable vertical scrolling */
+  max-height: 100vh;
 }
 
 .total-bets-heading {
@@ -836,26 +838,30 @@ body {
     overflow-y: auto !important;
     overflow-x: hidden !important;
     width: 100% !important;
+    position: relative;
+    padding-bottom: 320px; /* Reserve space for fixed left-panel */
   }
 
   .game-area {
     order: 0 !important;
     width: 100% !important;
     max-width: 100% !important;
-    height: 50vh !important;
+    height: 350px !important;
     min-height: 300px !important;
+    max-height: none !important;
     overflow-y: auto !important;
     overflow-x: hidden !important;
     flex-shrink: 0 !important;
     background-color: #000 !important;
     border: 3px solid red !important; /* Debugging */
+    position: relative !important;
   }
 
   .right-panel {
     order: 1 !important;
     width: 100% !important;
     max-width: 100% !important;
-    min-height: 1200px !important; /* Keep large height */
+    min-height: 400px !important;
     flex: 1 0 auto !important;
     background-color: #111111 !important;
     padding: 20px !important;
@@ -869,21 +875,29 @@ body {
 
   .left-panel {
     order: 2 !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    min-height: auto !important;
-    flex: 0 1 auto !important;
-    margin-top: 50px !important; /* Keep pushed down */
+    width: 100vw !important;
+    max-width: 100vw !important;
+    min-height: unset !important;
+    max-height: 300px !important; /* Set your scrollable height */
+    position: fixed !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    margin: 0 !important;
     padding: 10px !important;
     background-color: #222222 !important;
-    border-radius: 20px !important;
+    border-radius: 20px 20px 0 0 !important;
     border: 3px solid green !important; /* Debugging */
+    border-bottom: none !important;
     overflow-x: hidden !important;
+    overflow-y: auto !important;
+    z-index: 9999 !important;
+    box-shadow: 0 -2px 16px rgba(0,0,0,0.3);
   }
 
   .bets-table {
     width: 100% !important;
     max-width: 100% !important;
+    overflow-y: auto !important;
     overflow-x: hidden !important;
   }
 
@@ -908,7 +922,7 @@ body {
   .bet-panel {
     width: 100% !important;
     max-width: 100% !important;
-    min-height: 800px !important; /* Keep large height */
+    min-height: 400px !important;
     margin: 0 !important;
     padding: 15px !important;
     background-color: rgba(128, 0, 128, 0.2) !important; /* Debugging */
@@ -947,13 +961,13 @@ body {
 /* Extra Small Screens */
 @media (max-width: 400px) {
   .right-panel {
-    min-height: 1400px !important; /* Keep large height */
+    min-height: 600px !important;
     padding: 15px !important;
     border: 3px solid blue !important; /* Debugging */
   }
 
   .bet-panel {
-    min-height: 900px !important; /* Keep large height */
+    min-height: 500px !important;
     border: 3px solid purple !important; /* Debugging */
   }
 
@@ -966,38 +980,8 @@ body {
     font-size: 20px !important;
     padding: 15px 20px !important;
   }
-}
 
-@media (max-width: 768px) {
-  .game-area {
-    height: 350px !important; /* or a value that fits your UI */
-    min-height: 350px !important;
-    max-height: none !important;
-    position: relative !important;
-    overflow: visible !important;
-  }
-  
-  .bet-panel {
-    min-height: 400px !important; /* or less */
-  }
-  
-  .content-body {
-    position: relative;
-    padding-bottom: 320px; /* Height of .left-panel, adjust as needed */
-  }
   .left-panel {
-    position: fixed;
-    left: 0;
-    bottom: 0;
-    width: 100vw;
-    max-width: 100vw;
-    max-height: 300px;    /* Make scrollable if content is tall */
-    overflow-y: auto;     /* Enables scrolling */
-    z-index: 9999;
-    margin: 0 !important;
-    border-radius: 20px 20px 0 0 !important;
-    border-bottom: none !important;
-    box-shadow: 0 -2px 16px rgba(0,0,0,0.3);
-    background: #222222 !important;
+    max-height: 180px !important; /* Reduce for very small screens */
   }
 }
