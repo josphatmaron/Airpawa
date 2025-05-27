@@ -980,6 +980,22 @@ body {
   .bet-panel {
     min-height: 400px !important; /* or less */
   }
+  
+  .content-body {
+    position: relative;
+    padding-bottom: 320px; /* Height of .left-panel, adjust as needed */
+  }
+  .left-panel {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100vw;
+    max-width: 100vw;
+    z-index: 9999;
+    margin: 0 !important;
+    border-radius: 20px 20px 0 0 !important;
+    border-bottom: none !important;
+    box-shadow: 0 -2px 16px rgba(0,0,0,0.3);
+  }
 }
-
 
