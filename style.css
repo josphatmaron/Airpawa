@@ -937,12 +937,12 @@ body {
 /* Extra Small Screens */
 @media (max-width: 400px) {
   .right-panel {
-    min-height: 1700px; /* Further increased for small screens */
+    min-height: 700px; /* Further increased for small screens */
     padding: 15px;
   }
 
   .bet-panel {
-    min-height: 450px; /* Further increased to prevent squeezing */
+    min-height: 700px; /* Further increased to prevent squeezing */
   }
 
   .bet-content {
