@@ -680,9 +680,274 @@ function setBalance(amount) {
   }
 }
 
+let isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+let authMode = 'login';
+
+// Inject basic modal CSS if not present
+function ensureModalStyles() {
+  try {
+    let style = document.getElementById('auth-modal-styles');
+    if (!style) {
+      style = document.createElement('style');
+      style.id = 'auth-modal-styles';
+      style.textContent = `
+        #auth-modal {
+          display: none;
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.5);
+          z-index: 1000;
+        }
+        #auth-modal .modal-content {
+          background: white;
+          padding: 20px;
+          margin: 15% auto;
+          width: 300px;
+          display: block;
+          border-radius: 5px;
+          box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+        #auth-modal h2 {
+          margin-top: 0;
+        }
+        #auth-modal form {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+        }
+        #auth-modal input {
+          padding: 8px;
+          font-size: 16px;
+        }
+        #auth-modal button {
+          padding: 10px;
+          background: #007bff;
+          color: white;
+          border: none;
+          cursor: pointer;
+        }
+        #auth-modal button:hover {
+          background: #0056b3;
+        }
+      `;
+      document.head.appendChild(style);
+      console.log("Injected auth-modal styles");
+    }
+  } catch (error) {
+    console.error("Error injecting modal styles:", error);
+  }
+}
+
+function openModal(id) {
+  try {
+    console.log(`openModal called with id: ${id}`);
+    let modal = document.getElementById('auth-modal');
+    
+    // Create modal if it doesn't exist
+    if (!modal) {
+      console.warn("auth-modal not found, creating dynamically");
+      modal = document.createElement('div');
+      modal.id = 'auth-modal';
+      document.body.appendChild(modal);
+    }
+
+    if (id === 'login' || id === 'signup') {
+      authMode = id;
+      modal.style.display = 'block';
+      modal.style.position = 'fixed';
+      modal.style.top = '0';
+      modal.style.left = '0';
+      modal.style.width = '100%';
+      modal.style.height = '100%';
+      modal.style.background = 'rgba(0, 0, 0, 0.5)';
+      modal.style.zIndex = '1000';
+      console.log("auth-modal set to display: block");
+
+      let modalContent = modal.querySelector('.modal-content');
+      if (!modalContent) {
+        console.warn("modal-content not found, creating dynamically");
+        modalContent = document.createElement('div');
+        modalContent.className = 'modal-content';
+        modal.appendChild(modalContent);
+      }
+
+      const modalTitle = document.getElementById('modal-title') || document.createElement('h2');
+      modalTitle.id = 'modal-title';
+      modalTitle.textContent = id === 'login' ? 'Login' : 'Signup';
+      
+      // Ensure form exists
+      let form = modalContent.querySelector('#auth-form');
+      if (!form) {
+        console.warn("auth-form not found, creating dynamically");
+        form = document.createElement('form');
+        form.id = 'auth-form';
+        form.innerHTML = `
+          <input type="text" id="username" placeholder="Username" required>
+          <input type="password" id="password" placeholder="Password" required>
+          <button type="submit">Submit</button>
+        `;
+        modalContent.appendChild(form);
+      }
+
+      if (!modalContent.contains(modalTitle)) {
+        modalContent.prepend(modalTitle);
+      }
+
+      modalContent.style.display = 'block';
+      modalContent.style.background = 'white';
+      modalContent.style.padding = '20px';
+      modalContent.style.margin = '15% auto';
+      modalContent.style.width = '300px';
+      console.log("Modal content styled and visible");
+    } else {
+      modal = document.getElementById(id + '-modal') || document.getElementById(id);
+      if (modal) {
+        modal.style.display = id === 'freeBetsModal' ? 'block' : 'flex';
+        modal.style.position = 'fixed';
+        modal.style.top = '0';
+        modal.style.left = '0';
+        modal.style.width = '100%';
+        modal.style.height = '100%';
+        modal.style.zIndex = '1000';
+        console.log(`Modal ${id} set to display`);
+      } else {
+        console.error(`Element with ID '${id}-modal' or '${id}' not found.`);
+      }
+    }
+  } catch (error) {
+    console.error(`Error in openModal (${id}):`, error);
+  }
+}
+
+function closeModal(modalId) {
+  try {
+    const modal = document.getElementById(modalId + '-modal') || document.getElementById(modalId);
+    if (modal) {
+      modal.style.display = 'none';
+      console.log(`Modal ${modalId} closed`);
+    } else {
+      console.error(`Element with ID '${modalId}-modal' or '${modalId}' not found.`);
+    }
+  } catch (error) {
+    console.error(`Error closing modal (${modalId}):`, error);
+  }
+}
+
+function tryUpdateTopBar(attempts = 5, delay = 1000) {
+  try {
+    const topBar = document.getElementById('top-bar-button');
+    if (topBar) {
+      updateTopBar();
+    } else if (attempts > 0) {
+      console.log(`top-bar-button not found, retrying... (${attempts} attempts left)`);
+      setTimeout(() => tryUpdateTopBar(attempts - 1, delay), delay);
+    } else {
+      console.error("Failed to find top-bar-button after retries.");
+    }
+  } catch (error) {
+    console.error("Error in tryUpdateTopBar:", error);
+  }
+}
+
+function updateTopBar() {
+  try {
+    console.log("updateTopBar called, isLoggedIn:", isLoggedIn);
+    const topBar = document.getElementById('top-bar-button');
+    if (!topBar) {
+      console.error("Element with ID 'top-bar-button' not found.");
+      return;
+    }
+    console.log("top-bar-button found");
+    
+    // Clear existing content and listeners
+    topBar.innerHTML = '';
+    const newTopBar = topBar.cloneNode(false);
+    topBar.parentNode.replaceChild(newTopBar, topBar);
+
+    const link = document.createElement('a');
+    link.href = '#';
+    link.style.color = 'white';
+    link.style.textDecoration = 'none';
+    link.style.cursor = 'pointer';
+    link.style.pointerEvents = 'auto';
+    link.tabIndex = 0;
+
+    if (isLoggedIn) {
+      link.textContent = 'Click to deposit';
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        console.log("Deposit link clicked, isLoggedIn:", isLoggedIn);
+        openModal('deposit');
+      });
+    } else {
+      link.textContent = 'Login to play';
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        console.log("Login link clicked, isLoggedIn:", isLoggedIn);
+        openModal('login');
+      });
+    }
+
+    newTopBar.appendChild(link);
+    console.log(`Top bar updated with link: ${link.textContent}`);
+  } catch (error) {
+    console.error("Error in updateTopBar:", error);
+  }
+}
+
+const authForm = document.getElementById('auth-form');
+if (authForm) {
+  authForm.addEventListener('submit', async function (e) {
+    try {
+      e.preventDefault();
+      console.log("auth-form submitted, authMode:", authMode);
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+
+      const response = await fetch(`http://localhost:3000/${authMode}`, {
+        method: 'POST',
+        headers: { transference: 'Yes', 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+
+      const result = await response.json();
+      alert(result.message);
+
+      if (response.ok) {
+        isLoggedIn = true;
+        localStorage.setItem('isLoggedIn', 'true');
+        tryUpdateTopBar();
+        closeModal('auth');
+        openModal('deposit');
+      }
+    } catch (error) {
+      console.error("Error in auth-form submit:", error);
+      alert('Error connecting to server. Please try again later.');
+    }
+  });
+}
+
+function logoutUser() {
+  try {
+    isLoggedIn = false;
+    localStorage.removeItem('isLoggedIn');
+    tryUpdateTopBar();
+    alert("You have been logged out.");
+    setTimeout(() => {
+      window.location.href = "logout.php";
+    }, 300);
+  } catch (error) {
+    console.error("Error in logout:", error);
+  }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   try {
     console.log("DOMContentLoaded: Initializing game and top bar");
+    ensureModalStyles();
     const betButton1 = document.getElementById("place-bet-button-1");
     const cashoutButton1 = document.getElementById("cashout-button-1");
     const betInput1 = document.getElementById("bet-amount-1");
@@ -946,9 +1211,9 @@ function closeBetHistoryModal() {
 
 window.addEventListener('click', function (e) {
   try {
-    const modal = document.getElementById('betHistoryModal');
+    const modal = document.getElementById('auth-modal');
     if (e.target === modal) {
-      closeBetHistoryModal();
+      closeModal('auth');
     }
     const freeBetsModal = document.getElementById('freeBetsModal');
     if (e.target === freeBetsModal) {
@@ -992,185 +1257,6 @@ document.querySelectorAll(".bet-toggle").forEach(toggle => {
     console.error("Error in bet-toggle setup:", error);
   }
 });
-
-let isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-let authMode = 'login';
-
-function openModal(id) {
-  try {
-    console.log(`openModal called with id: ${id}`);
-    let modal;
-    if (id === 'login' || id === 'signup') {
-      authMode = id;
-      modal = document.getElementById('auth-modal');
-      if (modal) {
-        modal.style.display = 'block';
-        modal.style.position = 'fixed';
-        modal.style.top = '0';
-        modal.style.left = '0';
-        modal.style.width = '100%';
-        modal.style.height = '100%';
-        modal.style.background = 'rgba(0, 0, 0, 0.5)';
-        modal.style.zIndex = '1000';
-        console.log("auth-modal found and set to display: block");
-        const modalTitle = document.getElementById('modal-title') || document.createElement('h2');
-        modalTitle.id = 'modal-title';
-        modalTitle.textContent = id === 'login' ? 'Login' : 'Signup';
-        let modalContent = modal.querySelector('.modal-content');
-        if (!modalContent) {
-          modalContent = document.createElement('div');
-          modalContent.className = 'modal-content';
-          modalContent.style.background = 'white';
-          modalContent.style.padding = '20px';
-          modalContent.style.margin = '15% auto';
-          modalContent.style.width = '300px';
-          modal.appendChild(modalContent);
-        }
-        if (!modalContent.contains(modalTitle)) {
-          modalContent.prepend(modalTitle);
-        }
-        modalContent.style.display = 'block';
-        console.log("Modal content styled and visible");
-      } else {
-        console.error("Element with ID 'auth-modal' not found.");
-      }
-    } else {
-      modal = document.getElementById(id + '-modal') || document.getElementById(id);
-      if (modal) {
-        modal.style.display = id === 'freeBetsModal' ? 'block' : 'flex';
-        modal.style.position = 'fixed';
-        modal.style.top = '0';
-        modal.style.left = '0';
-        modal.style.width = '100%';
-        modal.style.height = '100%';
-        modal.style.zIndex = '1000';
-        console.log(`Modal ${id} set to display`);
-      } else {
-        console.error(`Element with ID '${id}-modal' or '${id}' not found.`);
-      }
-    }
-  } catch (error) {
-    console.error(`Error in openModal (${id}):`, error);
-  }
-}
-
-function closeModal(modalId) {
-  try {
-    const modal = document.getElementById(modalId + '-modal') || document.getElementById(modalId);
-    if (modal) {
-      modal.style.display = 'none';
-      console.log(`Modal ${modalId} closed`);
-    } else {
-      console.error(`Element with ID '${modalId}-modal' or '${modalId}' not found.`);
-    }
-  } catch (error) {
-    console.error(`Error closing modal (${modalId}):`, error);
-  }
-}
-
-const authForm = document.getElementById('auth-form');
-if (authForm) {
-  authForm.addEventListener('submit', async function (e) {
-    try {
-      e.preventDefault();
-      const username = document.getElementById('username').value;
-      const password = document.getElementById('password').value;
-
-      const response = await fetch(`http://localhost:3000/${authMode}`, {
-        method: 'POST',
-        headers: { transference: 'Yes', 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
-      });
-
-      const result = await response.json();
-      alert(result.message);
-
-      if (response.ok) {
-        isLoggedIn = true;
-        localStorage.setItem('isLoggedIn', 'true');
-        tryUpdateTopBar();
-        closeModal('auth');
-        openModal('deposit');
-      }
-    } catch (error) {
-      console.error("Error in auth-form submit:", error);
-      alert('Error connecting to server. Please try again later.');
-    }
-  });
-}
-
-function logoutUser() {
-  try {
-    isLoggedIn = false;
-    localStorage.removeItem('isLoggedIn');
-    tryUpdateTopBar();
-    alert("You have been logged out.");
-
-    setTimeout(() => {
-      window.location.href = "logout.php";
-    }, 300);
-  } catch (error) {
-    console.error("Error in logout:", error);
-  }
-}
-
-function tryUpdateTopBar(attempts = 5, delay = 1000) {
-  try {
-    const topBar = document.getElementById('top-bar-button');
-    if (topBar) {
-      updateTopBar();
-    } else if (attempts > 0) {
-      console.log(`top-bar-button not found, retrying... (${attempts} attempts left)`);
-      setTimeout(() => tryUpdateTopBar(attempts - 1, delay), delay);
-    } else {
-      console.error("Failed to find top-bar-button after retries.");
-    }
-  } catch (error) {
-    console.error("Error in tryUpdateTopBar:", error);
-  }
-}
-
-function updateTopBar() {
-  try {
-    console.log("updateTopBar called, isLoggedIn:", isLoggedIn);
-    const topBar = document.getElementById('top-bar-button');
-    if (!topBar) {
-      console.error("Element with ID 'top-bar-button' not found.");
-      return;
-    }
-    console.log("top-bar-button found");
-    topBar.innerHTML = '';
-
-    const link = document.createElement('a');
-    link.href = '#';
-    link.style.color = 'white';
-    link.style.textDecoration = 'none';
-    link.style.cursor = 'pointer';
-    link.style.pointerEvents = 'auto';
-    link.tabIndex = 0;
-
-    if (isLoggedIn) {
-      link.textContent = 'Click to deposit';
-      link.addEventListener('click', (e) => {
-        e.preventDefault();
-        console.log("Deposit link clicked, isLoggedIn:", isLoggedIn);
-        openModal('deposit');
-      });
-    } else {
-      link.textContent = 'Login to play';
-      link.addEventListener('click', (e) => {
-        e.preventDefault();
-        console.log("Login link clicked, isLoggedIn:", isLoggedIn);
-        openModal('login');
-      });
-    }
-
-    topBar.appendChild(link);
-    console.log(`Top bar updated with link: ${link.textContent}`);
-  } catch (error) {
-    console.error("Error in updateTopBar:", error);
-  }
-}
 
 const freeBetsMenuItem = document.querySelector('.menu-items li:first-child');
 if (freeBetsMenuItem) {
