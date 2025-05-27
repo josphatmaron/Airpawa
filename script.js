@@ -42,14 +42,12 @@ let rotationAngle = 0;
 
 function resizeCanvas() {
     if (canvas) {
-        // Set canvas display size to match its parent container
         canvas.width = canvas.offsetWidth || 100;
         canvas.height = canvas.offsetHeight || 100;
         if (canvas.width === 0 || canvas.height === 0) {
             console.warn("Canvas has zero dimensions. Check CSS or parent container.");
-            // Fallback dimensions for mobile
-            canvas.width = window.innerWidth * 0.9; // 90% of viewport width
-            canvas.height = window.innerHeight * 0.5; // 50% of viewport height
+            canvas.width = window.innerWidth * 0.9;
+            canvas.height = window.innerHeight * 0.5;
         }
     }
 }
@@ -143,16 +141,15 @@ let userBetAmount2 = 0;
 let gameRunning = false;
 let bounceStartTime = null;
 let isBouncing = false;
-let betCounter = 0; // For generating unique bet IDs
-let isExiting = false; // Track if plane is flying away
-let exitStartTime = null; // Timestamp when fly-away starts
-const exitDuration = 300; // Very fast fly-away duration (300ms)
-
+let betCounter = 0;
+let isExiting = false;
+let exitStartTime = null;
+const exitDuration = 300;
 const trail = [];
 
 function getNextCrashPoint() {
   if (crashIndex >= crashPointList.length) {
-    crashIndex = 0; // Reset if we reach the end
+    crashIndex = 0;
   }
   const point = crashPointList[crashIndex];
   crashIndex++;
@@ -206,7 +203,7 @@ function animate(timestamp) {
     if (crashPoint && multiplier >= crashPoint && !isExiting) {
       isExiting = true;
       exitStartTime = timestamp;
-      trail.length = 0; // Clear trail immediately at crash point
+      trail.length = 0;
     }
 
     if (ctx) {
@@ -229,7 +226,6 @@ function animate(timestamp) {
 
     animationFrame = requestAnimationFrame(animate);
 
-    // Ensure cashout buttons stay visible while users are in the game
     if (userHasBet1 && gameRunning) {
       const cashoutSection = document.getElementById("cashout-section-1");
       if (cashoutSection && cashoutSection.style.display !== "flex") {
@@ -254,11 +250,11 @@ function crashGame() {
     gameRunning = false;
     isExiting = false;
     exitStartTime = null;
-    trail.length = 0; // Ensure trail is cleared
+    trail.length = 0;
 
     if (ctx) {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      drawRadiatingLines(); // Redraw background
+      drawRadiatingLines();
     }
 
     if (userHasBet1) {
@@ -378,9 +374,6 @@ function updateActivePlayers() {
   }
 }
 
-// =========================
-// PLANE POSITION CALCULATION
-// =========================
 function getPlanePosition(multiplier, timestamp) {
   const bounceStartMultiplier = 2.01;
   const targetX = canvas ? canvas.width * 0.75 : 0;
@@ -388,9 +381,9 @@ function getPlanePosition(multiplier, timestamp) {
 
   if (isExiting && timestamp && exitStartTime) {
     const exitProgress = (timestamp - exitStartTime) / exitDuration;
-    x = targetX + (canvas.width * 2 * exitProgress); // Very fast movement off-screen
+    x = targetX + (canvas.width * 2 * exitProgress);
     const bounceMid = (canvas.height * 0.2 + canvas.height * 0.6) / 2;
-    y = bounceMid; // Keep y-position centered during exit
+    y = bounceMid;
   } else if (multiplier < bounceStartMultiplier) {
     const progress = Math.min((multiplier - 1) / (bounceStartMultiplier - 1), 1);
     x = progress * targetX;
@@ -411,9 +404,6 @@ function getPlanePosition(multiplier, timestamp) {
   return { x, y };
 }
 
-// =========================
-// TRAIL DRAWING
-// =========================
 function drawTrail(multiplier) {
   if (!ctx) return;
   const bounceStartMultiplier = 2.01;
@@ -461,9 +451,6 @@ function drawTrail(multiplier) {
   ctx.restore();
 }
 
-// =========================
-// PLANE IMAGE & DRAWING
-// =========================
 const planeImage = new Image();
 planeImage.src = 'plane pink.png';
 planeImage.onload = () => {
@@ -490,9 +477,6 @@ function drawPlane(multiplier, timestamp) {
   ctx.restore();
 }
 
-// =========================
-// BETTING LOGIC
-// =========================
 function updateTotalBets() {
   try {
     const bets = document.querySelectorAll('.bets-table .bets-row');
@@ -657,9 +641,6 @@ function cashOut(panelId) {
   }
 }
 
-// =========================
-// BALANCE FUNCTIONS
-// =========================
 const refreshButton = document.getElementById("refresh-balance");
 if (refreshButton) {
   refreshButton.addEventListener("click", () => {
@@ -699,9 +680,6 @@ function setBalance(amount) {
   }
 }
 
-// =========================
-// DOM READY
-// =========================
 document.addEventListener("DOMContentLoaded", () => {
   try {
     console.log("DOMContentLoaded: Initializing game and top bar");
@@ -832,7 +810,7 @@ document.addEventListener("DOMContentLoaded", () => {
     resizeCanvas();
     animateBackground();
     resetRound();
-    updateTopBar();
+    tryUpdateTopBar();
   } catch (error) {
     console.error("Error in DOMContentLoaded:", error);
   }
@@ -893,9 +871,6 @@ function addBetToTable(username, betAmount, multiplier = null, winAmount = null)
   }
 }
 
-// =========================
-// BET HISTORY TOGGLE
-// =========================
 const betHistoryButton = document.getElementById('bet-history-button');
 const betHistoryPanel = document.getElementById('bet-history-panel');
 
@@ -988,9 +963,6 @@ window.addEventListener('click', function (e) {
   }
 });
 
-// =========================
-// BET TOGGLE
-// =========================
 document.querySelectorAll(".bet-toggle").forEach(toggle => {
   try {
     const betBtn = toggle.querySelector(".toggle-bet");
@@ -1040,26 +1012,25 @@ function openModal(id) {
         modal.style.height = '100%';
         modal.style.background = 'rgba(0, 0, 0, 0.5)';
         modal.style.zIndex = '1000';
-        modal.style.opacity = '1';
         console.log("auth-modal found and set to display: block");
-        const modalTitle = document.getElementById('modal-title');
-        if (modalTitle) {
-          modalTitle.textContent = id === 'login' ? 'Login' : 'Signup';
-          console.log(`Modal title set to: ${modalTitle.textContent}`);
-        } else {
-          console.error("Element with ID 'modal-title' not found.");
-        }
-        const modalContent = modal.querySelector('.modal-content');
-        if (modalContent) {
-          modalContent.style.display = 'block';
+        const modalTitle = document.getElementById('modal-title') || document.createElement('h2');
+        modalTitle.id = 'modal-title';
+        modalTitle.textContent = id === 'login' ? 'Login' : 'Signup';
+        let modalContent = modal.querySelector('.modal-content');
+        if (!modalContent) {
+          modalContent = document.createElement('div');
+          modalContent.className = 'modal-content';
           modalContent.style.background = 'white';
           modalContent.style.padding = '20px';
           modalContent.style.margin = '15% auto';
           modalContent.style.width = '300px';
-          console.log("Modal content styled and visible");
-        } else {
-          console.error("Modal content with class 'modal-content' not found in auth-modal.");
+          modal.appendChild(modalContent);
         }
+        if (!modalContent.contains(modalTitle)) {
+          modalContent.prepend(modalTitle);
+        }
+        modalContent.style.display = 'block';
+        console.log("Modal content styled and visible");
       } else {
         console.error("Element with ID 'auth-modal' not found.");
       }
@@ -1073,7 +1044,6 @@ function openModal(id) {
         modal.style.width = '100%';
         modal.style.height = '100%';
         modal.style.zIndex = '1000';
-        modal.style.opacity = '1';
         console.log(`Modal ${id} set to display`);
       } else {
         console.error(`Element with ID '${id}-modal' or '${id}' not found.`);
@@ -1118,7 +1088,7 @@ if (authForm) {
       if (response.ok) {
         isLoggedIn = true;
         localStorage.setItem('isLoggedIn', 'true');
-        updateTopBar();
+        tryUpdateTopBar();
         closeModal('auth');
         openModal('deposit');
       }
@@ -1133,7 +1103,7 @@ function logoutUser() {
   try {
     isLoggedIn = false;
     localStorage.removeItem('isLoggedIn');
-    updateTopBar();
+    tryUpdateTopBar();
     alert("You have been logged out.");
 
     setTimeout(() => {
@@ -1144,18 +1114,35 @@ function logoutUser() {
   }
 }
 
+function tryUpdateTopBar(attempts = 5, delay = 1000) {
+  try {
+    const topBar = document.getElementById('top-bar-button');
+    if (topBar) {
+      updateTopBar();
+    } else if (attempts > 0) {
+      console.log(`top-bar-button not found, retrying... (${attempts} attempts left)`);
+      setTimeout(() => tryUpdateTopBar(attempts - 1, delay), delay);
+    } else {
+      console.error("Failed to find top-bar-button after retries.");
+    }
+  } catch (error) {
+    console.error("Error in tryUpdateTopBar:", error);
+  }
+}
+
 function updateTopBar() {
   try {
     console.log("updateTopBar called, isLoggedIn:", isLoggedIn);
     const topBar = document.getElementById('top-bar-button');
     if (!topBar) {
-      console.error("Element with ID top-bar-button not found.");
+      console.error("Element with ID 'top-bar-button' not found.");
       return;
     }
     console.log("top-bar-button found");
     topBar.innerHTML = '';
 
     const link = document.createElement('a');
+    link.href = '#';
     link.style.color = 'white';
     link.style.textDecoration = 'none';
     link.style.cursor = 'pointer';
@@ -1163,21 +1150,19 @@ function updateTopBar() {
     link.tabIndex = 0;
 
     if (isLoggedIn) {
-      link.href = '#';
       link.textContent = 'Click to deposit';
-      link.onclick = function() {
-        console.log("Deposit link clicked");
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        console.log("Deposit link clicked, isLoggedIn:", isLoggedIn);
         openModal('deposit');
-        return false;
-      };
+      });
     } else {
-      link.href = '#';
       link.textContent = 'Login to play';
-      link.onclick = function() {
-        console.log("Click to login");
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        console.log("Login link clicked, isLoggedIn:", isLoggedIn);
         openModal('login');
-        return false;
-      };
+      });
     }
 
     topBar.appendChild(link);
@@ -1187,29 +1172,12 @@ function updateTopBar() {
   }
 }
 
-document.addEventListener('DOMContentLoaded', updateTopBar);
-
 const freeBetsMenuItem = document.querySelector('.menu-items li:first-child');
 if (freeBetsMenuItem) {
   freeBetsMenuItem.addEventListener('click', function() {
     openModal('freeBetsModal');
   });
 }
-
-// Login form submission handler
-document.getElementById('login-form').addEventListener('submit', function(event) {
-  event.preventDefault();
-  const phone = document.getElementById('login-phone').value;
-  const password = document.getElementById('login-password').value;
-
-  if (phone && password) {
-    console.log('Login attempt:', { phone, password });
-    closeModal('login');
-    alert('Login successful!');
-  } else {
-    alert('Please fill in all fields.');
-  }
-});
 
 function openTicketsModal() {
     document.getElementById("ticketsModal").style.display = "block";
