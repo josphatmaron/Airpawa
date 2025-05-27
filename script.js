@@ -41,17 +41,19 @@ if (ctx) {
 let rotationAngle = 0;
 
 function resizeCanvas() {
-    if (canvas) {
-        // Set canvas display size to match its parent container
-        canvas.width = canvas.offsetWidth || 100;
-        canvas.height = canvas.offsetHeight || 100;
-        if (canvas.width === 0 || canvas.height === 0) {
-            console.warn("Canvas has zero dimensions. Check CSS or parent container.");
-            // Fallback dimensions for mobile
-            canvas.width = window.innerWidth * 0.9; // 90% of viewport width
-            canvas.height = window.innerHeight * 0.5; // 50% of viewport height
-        }
+  if (canvas) {
+    const parent = canvas.parentElement;
+    canvas.width = parent ? parent.offsetWidth : window.innerWidth * 0.9;
+    canvas.height = parent ? parent.offsetHeight : window.innerHeight * 0.5;
+    if (canvas.width === 0 || canvas.height === 0) {
+      console.warn("Canvas has zero dimensions. Using fallback sizes.");
+      canvas.width = window.innerWidth * 0.9;
+      canvas.height = window.innerHeight * 0.5;
     }
+    console.log(`Canvas resized to ${canvas.width}x${canvas.height}`);
+  } else {
+    console.error("Canvas with ID 'game-bg' not found.");
+  }
 }
 
 function calculateMaxRadius(centerX, centerY) {
@@ -113,17 +115,17 @@ const crashPointList = [
   1.19, 56.99, 1.13, 7.80, 3.61, 1.85, 1.19, 1.90, 1.31,
   8.60, 1.75, 1.64, 1.54, 1.47, 2.35, 1.80, 3.63, 1.26,
   1.15, 8.63, 1.32, 3.71, 7.39, 2.74, 3.69, 1.45, 1.26, 1.31,
-  1.59, 1.75, 1.99, 1.08, 1.60, 1.75, 1.83, 
-  1.61, 1.75, 1.36, 2.95, 1.77, 5.25, 1.44,  
+  1.59, 1.75, 1.99, 1.08, 1.60, 1.75, 1.83,
+  1.61, 1.75, 1.36, 2.95, 1.77, 5.25, 1.44,
   1.17, 10.75, 1.76, 7.00, 1.46, 3.66, 1.78, 1.67, 1.66, 1.57, 1.84, 1.36, 1.50,
-  1.03, 1.21, 1.16, 3.67, 1.15, 2.91, 1.85, 1.20, 1.85, 1.34, 2.50, 1.99, 1.50, 1.93, 
+  1.03, 1.21, 1.16, 3.67, 1.15, 2.91, 1.85, 1.20, 1.85, 1.34, 2.50, 1.99, 1.50, 1.93,
   1.06, 4.55, 1.19, 3.21, 1.74, 6.50, 1.84, 3.50, 1.16, 5.81,
-  1.07, 
+  1.07,
   1.65, 1.58, 7.20, 1.05, 14.09,
   1.73, 30.00, 1.40, 3.05, 1.02, 3.95,
   1.10, 1.48, 1.08, 3.37, 1.42, 1.35, 1.03, 1.10, 1.13, 1.93,
-  1.06, 1.04, 2.42, 1.55, 1.52, 1.50, 1.20, 
-  1.79, 1.15, 6.80, 1.24, 3.95, 
+  1.06, 1.04, 2.42, 1.55, 1.52, 1.50, 1.20,
+  1.79, 1.15, 6.80, 1.24, 3.95,
   1.74, 1.45, 1.23, 1.10, 1.87, 1.88, 1.25, 1.86, 1.70, 1.70
 ];
 
@@ -138,8 +140,10 @@ let animationFrame;
 let startTime;
 let userHasBet1 = false;
 let userBetAmount1 = 0;
+let userBetId1 = null;
 let userHasBet2 = false;
 let userBetAmount2 = 0;
+let userBetId2 = null;
 let gameRunning = false;
 let bounceStartTime = null;
 let isBouncing = false;
@@ -161,6 +165,7 @@ function getNextCrashPoint() {
 
 function resetRound() {
   try {
+    console.log("resetRound called");
     multiplier = 1.0;
     crashPoint = getNextCrashPoint();
     startTime = null;
@@ -193,6 +198,7 @@ function resetRound() {
 
 function animate(timestamp) {
   try {
+    console.log(`Animating at timestamp ${timestamp}, multiplier: ${multiplier.toFixed(2)}`);
     if (!startTime) startTime = timestamp;
     const elapsed = (timestamp - startTime) / 1000;
 
@@ -200,13 +206,15 @@ function animate(timestamp) {
     const multiplierElement = document.getElementById("multiplier");
     if (multiplierElement) {
       multiplierElement.textContent = multiplier.toFixed(2) + "x";
+    } else {
+      console.error("Element with ID 'multiplier' not found.");
     }
     updateActivePlayers();
 
     if (crashPoint && multiplier >= crashPoint && !isExiting) {
       isExiting = true;
       exitStartTime = timestamp;
-      trail.length = 0; // Clear trail immediately at crash point
+      trail.length = 0;
     }
 
     if (ctx) {
@@ -229,7 +237,6 @@ function animate(timestamp) {
 
     animationFrame = requestAnimationFrame(animate);
 
-    // Ensure cashout buttons stay visible while users are in the game
     if (userHasBet1 && gameRunning) {
       const cashoutSection = document.getElementById("cashout-section-1");
       if (cashoutSection && cashoutSection.style.display !== "flex") {
@@ -254,11 +261,11 @@ function crashGame() {
     gameRunning = false;
     isExiting = false;
     exitStartTime = null;
-    trail.length = 0; // Ensure trail is cleared
+    trail.length = 0;
 
     if (ctx) {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      drawRadiatingLines(); // Redraw background
+      drawRadiatingLines();
     }
 
     if (userHasBet1) {
@@ -271,8 +278,6 @@ function crashGame() {
         betHistoryData[betIndex1].cashout = null;
         delete betHistoryData[betIndex1].panelId;
         delete betHistoryData[betIndex1].betId;
-      } else {
-        console.warn(`No matching bet found for panel 1 in betHistoryData`);
       }
       userHasBet1 = false;
       userBetAmount1 = 0;
@@ -292,8 +297,6 @@ function crashGame() {
         betHistoryData[betIndex2].cashout = null;
         delete betHistoryData[betIndex2].panelId;
         delete betHistoryData[betIndex2].betId;
-      } else {
-        console.warn(`No matching bet found for panel 2 in betHistoryData`);
       }
       userHasBet2 = false;
       userBetAmount2 = 0;
@@ -313,7 +316,9 @@ function crashGame() {
 
     document.dispatchEvent(new Event('gameCrash'));
 
+    console.log("Scheduling resetRound in 3 seconds");
     setTimeout(() => {
+      console.log("Executing resetRound");
       resetRound();
     }, 3000);
   } catch (error) {
@@ -388,9 +393,9 @@ function getPlanePosition(multiplier, timestamp) {
 
   if (isExiting && timestamp && exitStartTime) {
     const exitProgress = (timestamp - exitStartTime) / exitDuration;
-    x = targetX + (canvas.width * 2 * exitProgress); // Very fast movement off-screen
+    x = targetX + (canvas.width * 2 * exitProgress);
     const bounceMid = (canvas.height * 0.2 + canvas.height * 0.6) / 2;
-    y = bounceMid; // Keep y-position centered during exit
+    y = bounceMid;
   } else if (multiplier < bounceStartMultiplier) {
     const progress = Math.min((multiplier - 1) / (bounceStartMultiplier - 1), 1);
     x = progress * targetX;
@@ -465,12 +470,12 @@ function drawTrail(multiplier) {
 // PLANE IMAGE & DRAWING
 // =========================
 const planeImage = new Image();
-planeImage.src = 'plane pink.png';
+planeImage.src = 'assets/plane pink.png'; // Adjust path as needed
 planeImage.onload = () => {
   console.log("Plane image loaded successfully");
 };
 planeImage.onerror = () => {
-  console.error("Failed to load plane image: plane pink.png");
+  console.error("Failed to load plane image. Check path: 'assets/plane pink.png'");
 };
 
 function drawPlane(multiplier, timestamp) {
@@ -506,9 +511,6 @@ function updateTotalBets() {
 }
 
 updateTotalBets();
-
-let userBetId1 = null;
-let userBetId2 = null;
 
 function startGame(panelId) {
   try {
@@ -831,6 +833,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     resizeCanvas();
     animateBackground();
+    console.log("Calling resetRound");
     resetRound();
     updateTopBar();
   } catch (error) {
