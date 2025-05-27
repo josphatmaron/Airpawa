@@ -970,19 +970,15 @@ body {
 
 @media (max-width: 768px) {
   .game-area {
-    height: auto !important;
-    min-height: 850px !important;
-    overflow-y: visible !important;
+    height: 350px !important; /* or a value that fits your UI */
+    min-height: 350px !important;
+    max-height: none !important;
+    position: relative !important;
+    overflow: visible !important;
   }
+  
   .bet-panel {
     min-height: 400px !important; /* or less */
-  }
-
-   .multiplier-container {
-    top: 50% !important;
-    left: 50% !important;
-    transform: translate(-50%, -50%) !important;
-    font-size: 3rem !important;
   }
 }
 
