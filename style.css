@@ -124,7 +124,7 @@ body {
 }
 
 .change-avatar {
-  margin-left: auto;
+  margin-left: 20px;
   font-size: 12px;
   background: none;
   border: 1px solid #666;
@@ -283,10 +283,10 @@ body {
   z-index: 1;
   cursor: pointer;
   text-align: center;
-  font-feature-settings: lining-nums tabular-nums;
-  font-variant-numeric: lining-nums tabular-nums;
-  font-size: 12px;
-  font-weight: 500;
+  font-feature-settings: lining-nums;
+  font-size: bold;
+  color: #4CAF50;
+  font-weight: normal;
   letter-spacing: -.18px;
 }
 
@@ -323,7 +323,7 @@ body {
   font-size: 5rem;
   font-weight: bold;
   color: #fff;
-  text-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
+  text-shadow: 0 0 10px rgba(0, 0,0.7);
 }
 
 .crash-message {
@@ -344,7 +344,7 @@ body {
   width: 250px;
   background-color: #111111;
   padding: 20px;
-  border-left: 2px solid #2a2f40;
+  border-left: 2px solid #2a2f40px;
   margin-left: 20px;
   flex-shrink: 0;
 }
@@ -352,20 +352,20 @@ body {
 .balance {
   text-align: right;
   font-size: 14px;
-  font-feature-settings: lining-nums tabular-nums;
-  font-variant-numeric: lining-nums tabular-nums;
+  font-feature-settings: normal;
+  font-variant-numeric: normal;
 }
 
 .balance-amount {
-  color: #28a909;
-  font-weight: 600;
+  color: #28a745;
+  font-weight: bold;
   margin-right: 4px;
 }
 
 .balance-currency {
   color: #9b9c9e;
-  font-weight: 500;
-  letter-spacing: -.21px;
+  font-weight: normal;
+  letter-spacing: 2px;
   margin-right: 4px;
 }
 
@@ -854,8 +854,8 @@ body {
     order: 1;
     width: 100%;
     max-width: 100%;
-    min-height: 600px; /* Increased to ensure bet panels have space */
-    flex: 1 0 auto; /* Prioritize space allocation */
+    min-height: 1200px; /* Doubled from 600px */
+    flex: 1 0 auto;
     border: none;
     border-top: 1px solid #2a2f40;
     margin-left: 0;
@@ -873,7 +873,7 @@ body {
     flex: 0 1 auto;
     border: none;
     border-top: 1px solid #2a2f40;
-    margin-top: 40px; /* Increased to push left-panel further down */
+    margin-top: 50px; /* Increased to push left-panel further down */
     padding: 10px;
     background-color: #222222;
     border-radius: 20px;
@@ -907,7 +907,7 @@ body {
     width: 100%;
     max-width: 100%;
     margin: 0;
-    min-height: 400px; /* Increased to prevent squeezing */
+    min-height: 800px; /* Doubled from 400px */
     background-color: rgba(255, 255, 255, 0.1); /* Temporary debugging background */
     border: 2px solid purple; /* Temporary debugging border */
   }
@@ -937,12 +937,12 @@ body {
 /* Extra Small Screens */
 @media (max-width: 400px) {
   .right-panel {
-    min-height: 700px; /* Further increased for small screens */
+    min-height: 1400px; /* Doubled from 700px */
     padding: 15px;
   }
 
   .bet-panel {
-    min-height: 700px; /* Further increased to prevent squeezing */
+    min-height: 900px; /* Doubled from 450px */
   }
 
   .bet-content {
