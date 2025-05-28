@@ -3,7 +3,7 @@ function showCrashMessage(msg, color = "white", duration = 1500) {
   if (crashMessage) {
     crashMessage.textContent = msg;
     crashMessage.style.display = msg ? "block" : "none";
-    crashMessage.style.color = color;
+    crashMessage.style.color = color + " !important"; // Force color with !important
     if (duration > 0 && msg) {
       setTimeout(() => {
         crashMessage.style.display = "none";
@@ -54,7 +54,7 @@ function resizeCanvas() {
     canvas.width = parent ? parent.offsetWidth : window.innerWidth * 0.9;
     canvas.height = parent ? parent.offsetHeight : window.innerHeight * 0.5;
     if (canvas.width === 0 || canvas.height === 0) {
-      canvas sre.width = window.innerWidth * 0.9;
+      canvas.width = window.innerWidth * 0.9; // Fixed typo
       canvas.height = window.innerHeight * 0.5;
     }
     const dpr = window.devicePixelRatio || 1;
@@ -288,9 +288,9 @@ function crashGame() {
     const multiplierElement = document.getElementById("multiplier");
     if (multiplierElement) {
       multiplierElement.textContent = multiplier.toFixed(2) + "x";
-      multiplierElement.style.color = "red";
+      multiplierElement.style.color = "white"; // Updated to white
     }
-    showCrashMessage(`Crashed @ ${multiplier.toFixed(2)}x`, "white", 3000); // Updated to white
+    showCrashMessage(`Crashed @ ${multiplier.toFixed(2)}x`, "white", 3000);
     document.dispatchEvent(new Event('gameCrash'));
     setTimeout(() => {
       resetRound();
