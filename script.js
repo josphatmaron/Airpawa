@@ -1,7 +1,7 @@
 function showCrashMessage(msg, color = "white", duration = 1500) {
   const crashMessage = document.getElementById("crash-message");
   if (crashMessage) {
-    console.log(`Showing crash message: ${msg} in color ${color}`); // Debug log
+    console.log(`Showing crash message: ${msg} in color ${color}`);
     crashMessage.textContent = msg;
     crashMessage.style.display = msg ? "block" : "none";
     crashMessage.style.color = color + " !important";
@@ -59,14 +59,14 @@ function resizeCanvas() {
     canvas.width = parent ? parent.offsetWidth : window.innerWidth * 0.9;
     canvas.height = parent ? parent.offsetHeight : window.innerHeight * 0.5;
     if (canvas.width === 0 || canvas.height === 0) {
-      canvas.width = window.innerWidth * 0.9;
+      canvas.width = window.innerWidth * 0.9; // Corrected: no 'sre'
       canvas.height = window.innerHeight * 0.5;
     }
     const dpr = window.devicePixelRatio || 1;
     canvas.width *= dpr;
     canvas.height *= dpr;
     ctx.scale(dpr, dpr);
-    console.log(`Canvas resized: ${canvas.width/dpr}x${canvas.height/dpr}`); // Debug log
+    console.log(`Canvas resized: ${canvas.width/dpr}x${canvas.height/dpr}`);
   } else {
     console.error("Cannot resize canvas: canvas or ctx missing");
   }
@@ -181,7 +181,7 @@ function getNextCrashPoint() {
 }
 
 function resetRound() {
-  console.log("Starting new round"); // Debug log
+  console.log("Starting new round");
   multiplier = 1.0;
   crashPoint = getNextCrashPoint();
   startTime = null;
@@ -224,7 +224,7 @@ function animate(timestamp) {
     }
     if (!startTime) {
       startTime = timestamp;
-      console.log("Animation started, timestamp:", timestamp); // Debug log
+      console.log("Animation started, timestamp:", timestamp);
     }
     const elapsed = (timestamp - startTime) / 1000;
     multiplier = 1 + (elapsed / 3.5);
@@ -234,13 +234,13 @@ function animate(timestamp) {
     } else {
       console.error("Multiplier element not found in animate");
     }
-    console.log(`Animating: multiplier=${multiplier.toFixed(2)}, elapsed=${elapsed.toFixed(2)}s`); // Debug log
+    console.log(`Animating: multiplier=${multiplier.toFixed(2)}, elapsed=${elapsed.toFixed(2)}s`);
     updateActivePlayers();
     if (crashPoint && multiplier >= crashPoint && !isExiting) {
       isExiting = true;
       exitStartTime = timestamp;
       trail.length = 0;
-      console.log(`Crash triggered at ${multiplier.toFixed(2)}x`); // Debug log
+      console.log(`Crash triggered at ${multiplier.toFixed(2)}x`);
     }
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawRadiatingLines();
@@ -271,7 +271,7 @@ function animate(timestamp) {
 
 function crashGame() {
   try {
-    console.log("Crashing game"); // Debug log
+    console.log("Crashing game");
     cancelAnimationFrame(animationFrame);
     gameRunning = false;
     isExiting = false;
@@ -660,7 +660,7 @@ function setBalance(amount) {
 // =========================
 document.addEventListener("DOMContentLoaded", () => {
   try {
-    console.log("DOM loaded, initializing game"); // Debug log
+    console.log("DOM loaded, initializing game");
     const betButton1 = document.getElementById("place-bet-button-1");
     const cashoutButton1 = document.getElementById("cashout-button-1");
     const betInput1 = document.getElementById("bet-amount-1");
