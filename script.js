@@ -180,8 +180,11 @@ function resetRound() {
     isExiting = false;
     exitStartTime = null;
 
-    const multiplierElement = document.getElementById("multiplier");
-    const crashMessage = document.getElementById("crash-message");
+    if (crashMessage) {
+  crashMessage.textContent = "FLEW AWAY";
+  crashMessage.style.display = "block";
+  crashMessage.style.color = "white"; // Ensure the font is white
+}
     if (multiplierElement) {
       multiplierElement.textContent = "1.00x";
       multiplierElement.style.color = "#ffffff";
