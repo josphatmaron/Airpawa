@@ -160,7 +160,6 @@ let isExiting = false;
 let exitStartTime = null;
 const exitDuration = 300;
 const trail = [];
-let multiplierElement = document.getElementById("multiplier");
 
 function getNextCrashPoint() {
   if (crashIndex >= crashPointList.length) {
@@ -183,7 +182,7 @@ function resetRound() {
 
   showCrashMessage("", "white", 0); // Hide crash message at round start
 
-  if (!multiplierElement) multiplierElement = document.getElementById("multiplier");
+  const multiplierElement = document.getElementById("multiplier");
   if (multiplierElement) {
     multiplierElement.textContent = "1.00x";
     multiplierElement.style.color = "#ffffff";
@@ -199,7 +198,7 @@ function animate(timestamp) {
     if (!startTime) startTime = timestamp;
     const elapsed = (timestamp - startTime) / 1000;
     multiplier = 1 + (elapsed / 3.5);
-    if (!multiplierElement) multiplierElement = document.getElementById("multiplier");
+    const multiplierElement = document.getElementById("multiplier");
     if (multiplierElement) {
       multiplierElement.textContent = multiplier.toFixed(2) + "x";
     }
@@ -287,7 +286,7 @@ function crashGame() {
     }
     renderBetHistory();
     addMultiplierToHistory(multiplier);
-    if (!multiplierElement) multiplierElement = document.getElementById("multiplier");
+    const multiplierElement = document.getElementById("multiplier");
     if (multiplierElement) {
       multiplierElement.textContent = multiplier.toFixed(2) + "x";
       multiplierElement.style.color = "red";
@@ -435,12 +434,8 @@ function drawTrail(multiplier) {
 // =========================
 const planeImage = new Image();
 planeImage.src = 'plane pink.png'; // Adjust path as needed
-planeImage.onload = () => {
-  // Plane image loaded
-};
-planeImage.onerror = () => {
-  // Failed to load plane image
-};
+planeImage.onload = () => {};
+planeImage.onerror = () => {};
 function drawPlane(multiplier, timestamp) {
   if (!ctx || !canvas) return;
   const planeSize = 70;
@@ -626,7 +621,6 @@ function setBalance(amount) {
 // =========================
 document.addEventListener("DOMContentLoaded", () => {
   try {
-    multiplierElement = document.getElementById("multiplier");
     const betButton1 = document.getElementById("place-bet-button-1");
     const cashoutButton1 = document.getElementById("cashout-button-1");
     const betInput1 = document.getElementById("bet-amount-1");
@@ -860,66 +854,11 @@ document.querySelectorAll(".bet-toggle").forEach(toggle => {
   }
 });
 
+// =========================
+// TOP BAR LOGIC (Login/Deposit)
+// =========================
 let isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
 let authMode = 'login';
-
-function openModal(id) {
-  try {
-    let modal;
-    if (id === 'login' || id === 'signup') {
-      authMode = id;
-      modal = document.getElementById('auth-modal');
-      if (modal) {
-        modal.style.display = 'block';
-        modal.style.zIndex = '1000';
-        modal.addEventListener('click', (e) => e.stopPropagation());
-        const modalTitle = document.getElementById('modal-title');
-        if (modalTitle) {
-          modalTitle.textContent = id === 'login' ? 'Login' : 'Signup';
-        }
-        const modalContent = modal.querySelector('.modal-content');
-        if (modalContent) {
-          modalContent.style.display = 'block';
-          modalContent.addEventListener('click', (e) => e.stopPropagation());
-        }
-      }
-    } else {
-      modal = document.getElementById(id + '-modal') || document.getElementById(id);
-      if (modal) {
-        modal.style.display = id === 'freeBetsModal' ? 'block' : 'flex';
-        modal.style.zIndex = '1000';
-        modal.addEventListener('click', (e) => e.stopPropagation());
-      }
-    }
-  } catch (error) {
-    console.error(`Error in openModal (${id}):`, error);
-  }
-}
-
-function closeModal(modalId) {
-  try {
-    const modal = document.getElementById(modalId + '-modal') || document.getElementById(modalId);
-    if (modal) {
-      modal.style.display = 'none';
-    }
-  } catch (error) {
-    console.error(`Error closing modal (${modalId}):`, error);
-  }
-}
-
-function logoutUser() {
-  try {
-    isLoggedIn = false;
-    localStorage.removeItem('isLoggedIn');
-    updateTopBar();
-    alert("You have been logged out.");
-    setTimeout(() => {
-      window.location.href = "logout.php";
-    }, 300);
-  } catch (error) {
-    console.error("Error in logout:", error);
-  }
-}
 
 function updateTopBar() {
   try {
@@ -954,4 +893,4 @@ function updateTopBar() {
 }
 document.addEventListener('DOMContentLoaded', updateTopBar);
 
-// ... (Any additional modal and event logic as in your current script) ...
+// ... (Add your other modal and event logic as needed) ...
