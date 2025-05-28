@@ -59,7 +59,7 @@ function resizeCanvas() {
     canvas.width = parent ? parent.offsetWidth : window.innerWidth * 0.9;
     canvas.height = parent ? parent.offsetHeight : window.innerHeight * 0.5;
     if (canvas.width === 0 || canvas.height === 0) {
-      canvas.width = window.innerWidth * 0.9; // Corrected: no 'sre'
+      canvas.width = window.innerWidth * 0.9;
       canvas.height = window.innerHeight * 0.5;
     }
     const dpr = window.devicePixelRatio || 1;
@@ -326,7 +326,7 @@ function crashGame() {
       multiplierElement.textContent = multiplier.toFixed(2) + "x";
       multiplierElement.style.color = "white";
     }
-    showCrashMessage(FLEW AWAY!}x`, "white", 3000);
+    showCrashMessage("FLEW AWAY!", "white", 3000);
     document.dispatchEvent(new Event('gameCrash'));
     setTimeout(() => {
       resetRound();
@@ -589,7 +589,7 @@ function cashOut(panelId) {
       userBetId2 = null;
     }
     renderBetHistory();
-    showCrashMessage("FLEW AWAY", "white", 1500);
+    showCrashMessage("FLEW AWAY!", "white", 1500);
     const banner = document.getElementById("cashout-banner");
     const winAmountElement = document.getElementById("cashout-win-amount");
     if (banner && winAmountElement) {
