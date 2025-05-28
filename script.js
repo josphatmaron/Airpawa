@@ -326,7 +326,7 @@ function crashGame() {
       multiplierElement.textContent = multiplier.toFixed(2) + "x";
       multiplierElement.style.color = "white";
     }
-    showCrashMessage(`Crashed @ ${multiplier.toFixed(2)}x`, "white", 3000);
+    showCrashMessage(FLEW AWAY!}x`, "white", 3000);
     document.dispatchEvent(new Event('gameCrash'));
     setTimeout(() => {
       resetRound();
