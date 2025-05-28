@@ -29,14 +29,37 @@ document.addEventListener('click', (e) => {
 });
 
 // =========================
-// SIGNUP + PROFILE LOGIC (ADDED)
+// SIGNUP + PROFILE LOGIC
 // =========================
 let registeredUserId = null;
 
-function openSignupModal() { document.getElementById('signupModal').style.display = 'flex'; }
-function closeSignupModal() { document.getElementById('signupModal').style.display = 'none'; }
-function openProfileModal() { document.getElementById('profileModal').style.display = 'flex'; }
-function closeProfileModal() { document.getElementById('profileModal').style.display = 'none'; }
+function openSignupModal() {
+  const modal = document.getElementById('signupModal');
+  if (modal) {
+    modal.style.display = 'flex';
+    modal.style.zIndex = '1000';
+    modal.addEventListener('click', (e) => e.stopPropagation());
+  }
+}
+
+function closeSignupModal() {
+  const modal = document.getElementById('signupModal');
+  if (modal) modal.style.display = 'none';
+}
+
+function openProfileModal() {
+  const modal = document.getElementById('profileModal');
+  if (modal) {
+    modal.style.display = 'flex';
+    modal.style.zIndex = '1000';
+    modal.addEventListener('click', (e) => e.stopPropagation());
+  }
+}
+
+function closeProfileModal() {
+  const modal = document.getElementById('profileModal');
+  if (modal) modal.style.display = 'none';
+}
 
 if (document.getElementById('signupForm')) {
   document.getElementById('signupForm').addEventListener('submit', async function(e) {
@@ -68,6 +91,7 @@ if (document.getElementById('signupForm')) {
       }
     } catch (err) {
       errorP.textContent = "Registration error.";
+      console.error("Signup error:", err);
     }
   });
 }
@@ -101,6 +125,7 @@ if (document.getElementById('profileForm')) {
       }
     } catch (err) {
       errorP.textContent = "Profile update error.";
+      console.error("Profile update error:", err);
     }
   });
 }
@@ -127,7 +152,11 @@ function resizeCanvas() {
       canvas.width = window.innerWidth * 0.9;
       canvas.height = window.innerHeight * 0.5;
     }
-    console.log(`Canvas resized to ${canvas.width}x${canvas.height}`);
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width *= dpr;
+    canvas.height *= dpr;
+    ctx.scale(dpr, dpr);
+    console.log(`Canvas resized to ${canvas.width}x${canvas.height} (DPR: ${dpr})`);
   } else {
     console.error("Canvas with ID 'game-bg' not found.");
   }
@@ -175,7 +204,9 @@ function drawRadiatingLines() {
 
 function animateBackground() {
   try {
+    if (!ctx) return;
     rotationAngle += 0.003;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawRadiatingLines();
     requestAnimationFrame(animateBackground);
   } catch (error) {
@@ -224,16 +255,15 @@ let userBetId2 = null;
 let gameRunning = false;
 let bounceStartTime = null;
 let isBouncing = false;
-let betCounter = 0; // For generating unique bet IDs
-let isExiting = false; // Track if plane is flying away
-let exitStartTime = null; // Timestamp when fly-away starts
-const exitDuration = 300; // Very fast fly-away duration (300ms)
-
+let betCounter = 0;
+let isExiting = false;
+let exitStartTime = null;
+const exitDuration = 300;
 const trail = [];
 
 function getNextCrashPoint() {
   if (crashIndex >= crashPointList.length) {
-    crashIndex = 0; // Reset if we reach the end
+    crashIndex = 0;
   }
   const point = crashPointList[crashIndex];
   crashIndex++;
@@ -257,16 +287,13 @@ function resetRound() {
     if (multiplierElement) {
       multiplierElement.textContent = "1.00x";
       multiplierElement.style.color = "#ffffff";
-    } else {
-      console.error("Element with ID 'multiplier' not found.");
     }
     if (crashMessage) {
       crashMessage.style.display = "none";
-    } else {
-      console.error("Element with ID 'crash-message' not found.");
     }
 
     gameRunning = true;
+    if (ctx) resizeCanvas();
     animationFrame = requestAnimationFrame(animate);
   } catch (error) {
     console.error("Error in resetRound:", error);
@@ -275,7 +302,7 @@ function resetRound() {
 
 function animate(timestamp) {
   try {
-    console.log(`Animating at timestamp ${timestamp}, multiplier: ${multiplier.toFixed(2)}`);
+    if (!ctx || !canvas) return;
     if (!startTime) startTime = timestamp;
     const elapsed = (timestamp - startTime) / 1000;
 
@@ -284,7 +311,7 @@ function animate(timestamp) {
     if (multiplierElement) {
       multiplierElement.textContent = multiplier.toFixed(2) + "x";
     } else {
-      console.error("Element with ID 'multiplier' not found.");
+      console.warn("Element with ID 'multiplier' not found.");
     }
     updateActivePlayers();
 
@@ -294,40 +321,34 @@ function animate(timestamp) {
       trail.length = 0;
     }
 
-    if (ctx) {
-      resizeCanvas();
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      drawRadiatingLines();
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawRadiatingLines();
+    if (!isExiting) {
+      drawTrail(multiplier);
+    }
+    if (!isExiting || (isExiting && timestamp - exitStartTime < exitDuration)) {
+      drawPlane(multiplier, timestamp);
+    }
 
-      if (!isExiting) {
-        drawTrail(multiplier);
-      }
-      if (!isExiting || (isExiting && timestamp - exitStartTime < exitDuration)) {
-        drawPlane(multiplier, timestamp);
-      }
-
-      if (isExiting && timestamp - exitStartTime >= exitDuration) {
-        crashGame();
-        return;
-      }
+    if (isExiting && timestamp - exitStartTime >= exitDuration) {
+      crashGame();
+      return;
     }
 
     animationFrame = requestAnimationFrame(animate);
 
     if (userHasBet1 && gameRunning) {
       const cashoutSection = document.getElementById("cashout-section-1");
-      if (cashoutSection && cashoutSection.style.display !== "flex") {
-        cashoutSection.style.display = "flex";
-      }
+      if (cashoutSection) cashoutSection.style.display = "flex";
     }
     if (userHasBet2 && gameRunning) {
       const cashoutSection = document.getElementById("cashout-section-2");
-      if (cashoutSection && cashoutSection.style.display !== "flex") {
-        cashoutSection.style.display = "flex";
-      }
+      if (cashoutSection) cashoutSection.style.display = "flex";
     }
+    console.log(`Animating: multiplier=${multiplier.toFixed(2)}, canvas=${canvas.width}x${canvas.height}`);
   } catch (error) {
     console.error("Error in animate:", error);
+    cancelAnimationFrame(animationFrame);
   }
 }
 
@@ -388,14 +409,18 @@ function crashGame() {
     addMultiplierToHistory(multiplier);
     const multiplierElement = document.getElementById("multiplier");
     const crashMessage = document.getElementById("crash-message");
-    if (multiplierElement) multiplierElement.style.color = "red";
-    if (crashMessage) crashMessage.style.display = "block";
+    if (multiplierElement) {
+      multiplierElement.textContent = multiplier.toFixed(2) + "x";
+      multiplierElement.style.color = "red";
+    }
+    if (crashMessage) {
+      crashMessage.textContent = `Crashed @ ${multiplier.toFixed(2)}x`;
+      crashMessage.style.display = "block";
+    }
 
     document.dispatchEvent(new Event('gameCrash'));
 
-    console.log("Scheduling resetRound in 3 seconds");
     setTimeout(() => {
-      console.log("Executing resetRound");
       resetRound();
     }, 3000);
   } catch (error) {
@@ -547,7 +572,7 @@ function drawTrail(multiplier) {
 // PLANE IMAGE & DRAWING
 // =========================
 const planeImage = new Image();
-planeImage.src = 'plane pink.png'; // Adjust path as needed 
+planeImage.src = 'plane pink.png'; // Adjust path as needed
 planeImage.onload = () => {
   console.log("Plane image loaded successfully");
 };
@@ -556,17 +581,17 @@ planeImage.onerror = () => {
 };
 
 function drawPlane(multiplier, timestamp) {
-  if (!ctx) return;
+  if (!ctx || !canvas) return;
   const planeSize = 70;
   const { x, y } = getPlanePosition(multiplier, timestamp);
 
   ctx.save();
   ctx.translate(x, y);
   if (planeImage.complete && planeImage.naturalWidth !== 0) {
-    ctx.drawImage(planeImage, 0, -planeSize, planeSize, planeSize);
+    ctx.drawImage(planeImage, -planeSize / 2, -planeSize / 2, planeSize, planeSize);
   } else {
     ctx.fillStyle = "blue";
-    ctx.fillRect(0, -planeSize, planeSize, planeSize);
+    ctx.fillRect(-planeSize / 2, -planeSize / 2, planeSize, planeSize);
     console.warn("Plane image not loaded; using fallback rectangle.");
   }
   ctx.restore();
@@ -1034,7 +1059,11 @@ function openBetHistoryModal() {
   try {
     renderBetHistory();
     const modal = document.getElementById('betHistoryModal');
-    if (modal) modal.style.display = 'flex';
+    if (modal) {
+      modal.style.display = 'flex';
+      modal.style.zIndex = '1000';
+      modal.addEventListener('click', (e) => e.stopPropagation());
+    }
   } catch (error) {
     console.error("Error in openBetHistoryModal:", error);
   }
@@ -1113,50 +1142,24 @@ function openModal(id) {
       modal = document.getElementById('auth-modal');
       if (modal) {
         modal.style.display = 'block';
-        modal.style.position = 'fixed';
-        modal.style.top = '0';
-        modal.style.left = '0';
-        modal.style.width = '100%';
-        modal.style.height = '100%';
-        modal.style.background = 'rgba(0, 0, 0, 0.5)';
         modal.style.zIndex = '1000';
-        modal.style.opacity = '1';
-        console.log("auth-modal found and set to display: block");
+        modal.addEventListener('click', (e) => e.stopPropagation());
         const modalTitle = document.getElementById('modal-title');
         if (modalTitle) {
           modalTitle.textContent = id === 'login' ? 'Login' : 'Signup';
-          console.log(`Modal title set to: ${modalTitle.textContent}`);
-        } else {
-          console.error("Element with ID 'modal-title' not found.");
         }
         const modalContent = modal.querySelector('.modal-content');
         if (modalContent) {
           modalContent.style.display = 'block';
-          modalContent.style.background = 'white';
-          modalContent.style.padding = '20px';
-          modalContent.style.margin = '15% auto';
-          modalContent.style.width = '300px';
-          console.log("Modal content styled and visible");
-        } else {
-          console.error("Modal content with class 'modal-content' not found in auth-modal.");
+          modalContent.addEventListener('click', (e) => e.stopPropagation());
         }
-      } else {
-        console.error("Element with ID 'auth-modal' not found.");
       }
     } else {
       modal = document.getElementById(id + '-modal') || document.getElementById(id);
       if (modal) {
         modal.style.display = id === 'freeBetsModal' ? 'block' : 'flex';
-        modal.style.position = 'fixed';
-        modal.style.top = '0';
-        modal.style.left = '0';
-        modal.style.width = '100%';
-        modal.style.height = '100%';
         modal.style.zIndex = '1000';
-        modal.style.opacity = '1';
-        console.log(`Modal ${id} set to display`);
-      } else {
-        console.error(`Element with ID '${id}-modal' or '${id}' not found.`);
+        modal.addEventListener('click', (e) => e.stopPropagation());
       }
     }
   } catch (error) {
@@ -1169,9 +1172,6 @@ function closeModal(modalId) {
     const modal = document.getElementById(modalId + '-modal') || document.getElementById(modalId);
     if (modal) {
       modal.style.display = 'none';
-      console.log(`Modal ${modalId} closed`);
-    } else {
-      console.error(`Element with ID '${modalId}-modal' or '${modalId}' not found.`);
     }
   } catch (error) {
     console.error(`Error closing modal (${modalId}):`, error);
@@ -1232,7 +1232,6 @@ function updateTopBar() {
       console.error("Element with ID top-bar-button not found.");
       return;
     }
-    console.log("top-bar-button found");
     topBar.innerHTML = '';
 
     const link = document.createElement('a');
@@ -1261,7 +1260,6 @@ function updateTopBar() {
     }
 
     topBar.appendChild(link);
-    console.log(`Top bar updated with link: ${link.textContent}`);
   } catch (error) {
     console.error("Error in updateTopBar:", error);
   }
@@ -1276,7 +1274,6 @@ if (freeBetsMenuItem) {
   });
 }
 
-// Login form submission handler
 document.getElementById('login-form').addEventListener('submit', function(event) {
   event.preventDefault();
   const phone = document.getElementById('login-phone').value;
@@ -1292,9 +1289,9 @@ document.getElementById('login-form').addEventListener('submit', function(event)
 });
 
 function openTicketsModal() {
-    document.getElementById("ticketsModal").style.display = "block";
+  document.getElementById("ticketsModal").style.display = "block";
 }
 
 function closeTicketsModal() {
-    document.getElementById("ticketsModal").style.display = "none";
+  document.getElementById("ticketsModal").style.display = "none";
 }
