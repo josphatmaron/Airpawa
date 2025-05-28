@@ -1,7 +1,6 @@
 function showCrashMessage(msg, color = "white", duration = 1500) {
   const crashMessage = document.getElementById("crash-message");
   if (crashMessage) {
-    console.log(`Showing crash message: ${msg} in color ${color}`);
     crashMessage.textContent = msg;
     crashMessage.style.display = msg ? "block" : "none";
     crashMessage.style.color = color + " !important";
@@ -10,8 +9,6 @@ function showCrashMessage(msg, color = "white", duration = 1500) {
         crashMessage.style.display = "none";
       }, duration);
     }
-  } else {
-    console.error("Crash message element not found");
   }
 }
 
@@ -55,30 +52,25 @@ if (ctx) {
 let rotationAngle = 0;
 function resizeCanvas() {
   if (canvas && ctx) {
-    const parent = canvas.parentElement;
-    canvas.width = parent ? parent.offsetWidth : window.innerWidth * 0.9;
-    canvas.height = parent ? parent.offsetHeight : window.innerHeight * 0.5;
-    if (canvas.width === 0 || canvas.height === 0) {
-      canvas.width = window.innerWidth * 0.9;
-      canvas.height = window.innerHeight * 0.5;
-    }
+    // Always use the rendered size for scaling, for mobile correctness
+    const displayWidth = canvas.clientWidth;
+    const displayHeight = canvas.clientHeight;
     const dpr = window.devicePixelRatio || 1;
-    canvas.width *= dpr;
-    canvas.height *= dpr;
-    ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transform before scaling!
+    canvas.width = displayWidth * dpr;
+    canvas.height = displayHeight * dpr;
+    ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transform!
     ctx.scale(dpr, dpr);
-    console.log(`Canvas resized: ${canvas.width/dpr}x${canvas.height/dpr}`);
-  } else {
-    console.error("Cannot resize canvas: canvas or ctx missing");
   }
 }
 function calculateMaxRadius(centerX, centerY) {
   if (!canvas) return 0;
+  const logicalWidth = canvas.width / (window.devicePixelRatio || 1);
+  const logicalHeight = canvas.height / (window.devicePixelRatio || 1);
   const corners = [
     { x: 0, y: 0 },
-    { x: canvas.width, y: 0 },
-    { x: 0, y: canvas.height },
-    { x: canvas.width, y: canvas.height }
+    { x: logicalWidth, y: 0 },
+    { x: 0, y: logicalHeight },
+    { x: logicalWidth, y: logicalHeight }
   ];
   return Math.max(...corners.map(corner => {
     const dx = corner.x - centerX;
@@ -88,9 +80,10 @@ function calculateMaxRadius(centerX, centerY) {
 }
 function drawRadiatingLines() {
   if (!ctx) return;
-  // Origin at bottom left
+  const dpr = window.devicePixelRatio || 1;
+  const logicalHeight = canvas.height / dpr;
   const centerX = 0;
-  const centerY = canvas.height;
+  const centerY = logicalHeight;
   const radius = calculateMaxRadius(centerX, centerY);
   const lineCount = 36;
   const angleStep = (2 * Math.PI) / lineCount;
@@ -110,10 +103,7 @@ function drawRadiatingLines() {
 }
 function animateBackground() {
   try {
-    if (!ctx || !canvas) {
-      console.error("animateBackground: Canvas or context missing");
-      return;
-    }
+    if (!ctx || !canvas) return;
     rotationAngle += 0.003;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawRadiatingLines();
@@ -182,7 +172,6 @@ function getNextCrashPoint() {
 }
 
 function resetRound() {
-  console.log("Starting new round");
   multiplier = 1.0;
   crashPoint = getNextCrashPoint();
   startTime = null;
@@ -198,50 +187,28 @@ function resetRound() {
   if (multiplierElement) {
     multiplierElement.textContent = "1.00x";
     multiplierElement.style.color = "#ffffff";
-  } else {
-    console.error("Multiplier element not found");
   }
   gameRunning = true;
-  if (ctx) {
-    resizeCanvas();
-  } else {
-    console.error("Canvas context not available for resetRound");
-  }
-  if (animationFrame) {
-    cancelAnimationFrame(animationFrame);
-  }
+  if (ctx) resizeCanvas();
+  if (animationFrame) cancelAnimationFrame(animationFrame);
   animationFrame = requestAnimationFrame(animate);
 }
 
 function animate(timestamp) {
   try {
-    if (!ctx || !canvas) {
-      console.error("animate: Canvas or context missing");
-      return;
-    }
-    if (!gameRunning) {
-      console.log("Animation stopped: gameRunning is false");
-      return;
-    }
-    if (!startTime) {
-      startTime = timestamp;
-      console.log("Animation started, timestamp:", timestamp);
-    }
+    if (!ctx || !canvas || !gameRunning) return;
+    if (!startTime) startTime = timestamp;
     const elapsed = (timestamp - startTime) / 1000;
     multiplier = 1 + (elapsed / 3.5);
     const multiplierElement = document.getElementById("multiplier");
     if (multiplierElement) {
       multiplierElement.textContent = multiplier.toFixed(2) + "x";
-    } else {
-      console.error("Multiplier element not found in animate");
     }
-    console.log(`Animating: multiplier=${multiplier.toFixed(2)}, elapsed=${elapsed.toFixed(2)}s`);
     updateActivePlayers();
     if (crashPoint && multiplier >= crashPoint && !isExiting) {
       isExiting = true;
       exitStartTime = timestamp;
       trail.length = 0;
-      console.log(`Crash triggered at ${multiplier.toFixed(2)}x`);
     }
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawRadiatingLines();
@@ -265,15 +232,13 @@ function animate(timestamp) {
       if (cashoutSection) cashoutSection.style.display = "flex";
     }
   } catch (error) {
-    console.error("Error in animate:", error);
-    cancelAnimationFrame(animationFrame);
+    if (animationFrame) cancelAnimationFrame(animationFrame);
   }
 }
 
 function crashGame() {
   try {
-    console.log("Crashing game");
-    cancelAnimationFrame(animationFrame);
+    if (animationFrame) cancelAnimationFrame(animationFrame);
     gameRunning = false;
     isExiting = false;
     exitStartTime = null;
@@ -284,15 +249,6 @@ function crashGame() {
     }
     if (userHasBet1) {
       addBetToTable("You", userBetAmount1, multiplier.toFixed(2), null);
-      const betIndex1 = betHistoryData.findIndex(
-        item => item.panelId === 1 && item.betId === userBetId1
-      );
-      if (betIndex1 !== -1) {
-        betHistoryData[betIndex1].multiplier = multiplier.toFixed(2) + 'x';
-        betHistoryData[betIndex1].cashout = null;
-        delete betHistoryData[betIndex1].panelId;
-        delete betHistoryData[betIndex1].betId;
-      }
       userHasBet1 = false;
       userBetAmount1 = 0;
       userBetId1 = null;
@@ -303,15 +259,6 @@ function crashGame() {
     }
     if (userHasBet2) {
       addBetToTable("You", userBetAmount2, multiplier.toFixed(2), null);
-      const betIndex2 = betHistoryData.findIndex(
-        item => item.panelId === 2 && item.betId === userBetId2
-      );
-      if (betIndex2 !== -1) {
-        betHistoryData[betIndex2].multiplier = multiplier.toFixed(2) + 'x';
-        betHistoryData[betIndex2].cashout = null;
-        delete betHistoryData[betIndex2].panelId;
-        delete betHistoryData[betIndex2].betId;
-      }
       userHasBet2 = false;
       userBetAmount2 = 0;
       userBetId2 = null;
@@ -332,62 +279,48 @@ function crashGame() {
     setTimeout(() => {
       resetRound();
     }, 3000);
-  } catch (error) {
-    console.error("Error in crashGame:", error);
-  }
+  } catch (error) {}
 }
 
 function resetGameUI() {
-  try {
-    userHasBet1 = false;
-    userBetAmount1 = 0;
-    userBetId1 = null;
-    userHasBet2 = false;
-    userBetAmount2 = 0;
-    userBetId2 = null;
-    const cashoutSection1 = document.getElementById("cashout-section-1");
-    const cashoutSection2 = document.getElementById("cashout-section-2");
-    if (!userHasBet1 && cashoutSection1) {
-      cashoutSection1.style.display = "none";
-    }
-    if (!userHasBet2 && cashoutSection2) {
-      cashoutSection2.style.display = "none";
-    }
-    const betInput1 = document.getElementById("bet-amount-1");
-    const betButton1 = document.getElementById("place-bet-button-1");
-    if (betInput1 && betButton1) {
-      betButton1.innerHTML = 'Bet<br><span class="bet-amount" id="bet-amount-text-1">8.00 MZN</span>';
-      betButton1.style.display = "flex";
-      const betAmountText1 = document.getElementById("bet-amount-text-1");
-      if (betAmountText1) betAmountText1.textContent = `${parseFloat(betInput1.value).toFixed(2)} MZN`;
-    }
-    const betInput2 = document.getElementById("bet-amount-2");
-    const betButton2 = document.getElementById("place-bet-button-2");
-    if (betInput2 && betButton2) {
-      betButton2.innerHTML = 'Bet<br><span class="bet-amount" id="bet-amount-text-2">8.00 MZN</span>';
-      betButton2.style.display = "flex";
-      const betAmountText2 = document.getElementById("bet-amount-text-2");
-      if (betAmountText2) betAmountText2.textContent = `${parseFloat(betInput2.value).toFixed(2)} MZN`;
-    }
-  } catch (error) {
-    console.error("Error in resetGameUI:", error);
+  userHasBet1 = false;
+  userBetAmount1 = 0;
+  userBetId1 = null;
+  userHasBet2 = false;
+  userBetAmount2 = 0;
+  userBetId2 = null;
+  const cashoutSection1 = document.getElementById("cashout-section-1");
+  const cashoutSection2 = document.getElementById("cashout-section-2");
+  if (!userHasBet1 && cashoutSection1) cashoutSection1.style.display = "none";
+  if (!userHasBet2 && cashoutSection2) cashoutSection2.style.display = "none";
+  const betInput1 = document.getElementById("bet-amount-1");
+  const betButton1 = document.getElementById("place-bet-button-1");
+  if (betInput1 && betButton1) {
+    betButton1.innerHTML = 'Bet<br><span class="bet-amount" id="bet-amount-text-1">8.00 MZN</span>';
+    betButton1.style.display = "flex";
+    const betAmountText1 = document.getElementById("bet-amount-text-1");
+    if (betAmountText1) betAmountText1.textContent = `${parseFloat(betInput1.value).toFixed(2)} MZN`;
+  }
+  const betInput2 = document.getElementById("bet-amount-2");
+  const betButton2 = document.getElementById("place-bet-button-2");
+  if (betInput2 && betButton2) {
+    betButton2.innerHTML = 'Bet<br><span class="bet-amount" id="bet-amount-text-2">8.00 MZN</span>';
+    betButton2.style.display = "flex";
+    const betAmountText2 = document.getElementById("bet-amount-text-2");
+    if (betAmountText2) betAmountText2.textContent = `${parseFloat(betInput2.value).toFixed(2)} MZN`;
   }
 }
 
 function updateActivePlayers() {
-  try {
-    if (userHasBet1) {
-      const winnings = userBetAmount1 * multiplier;
-      const cashoutText = document.getElementById("cashout-amount-text-1");
-      if (cashoutText) cashoutText.textContent = `MZN ${winnings.toFixed(2)}`;
-    }
-    if (userHasBet2) {
-      const winnings = userBetAmount2 * multiplier;
-      const cashoutText = document.getElementById("cashout-amount-text-2");
-      if (cashoutText) cashoutText.textContent = `MZN ${winnings.toFixed(2)}`;
-    }
-  } catch (error) {
-    console.error("Error in updateActivePlayers:", error);
+  if (userHasBet1) {
+    const winnings = userBetAmount1 * multiplier;
+    const cashoutText = document.getElementById("cashout-amount-text-1");
+    if (cashoutText) cashoutText.textContent = `MZN ${winnings.toFixed(2)}`;
+  }
+  if (userHasBet2) {
+    const winnings = userBetAmount2 * multiplier;
+    const cashoutText = document.getElementById("cashout-amount-text-2");
+    if (cashoutText) cashoutText.textContent = `MZN ${winnings.toFixed(2)}`;
   }
 }
 
@@ -395,24 +328,27 @@ function updateActivePlayers() {
 // PLANE POSITION CALCULATION
 // =========================
 function getPlanePosition(multiplier, timestamp) {
+  const dpr = window.devicePixelRatio || 1;
+  const logicalHeight = canvas.height / dpr;
+  const logicalWidth = canvas.width / dpr;
   const bounceStartMultiplier = 2.01;
-  const targetX = canvas ? canvas.width * 0.75 : 0;
+  const targetX = logicalWidth * 0.75;
   let x, y;
   if (isExiting && timestamp && exitStartTime) {
     const exitProgress = (timestamp - exitStartTime) / exitDuration;
-    x = targetX + (canvas.width * 2 * exitProgress);
-    const bounceMid = (canvas.height * 0.2 + canvas.height * 0.6) / 2;
+    x = targetX + (logicalWidth * 2 * exitProgress);
+    const bounceMid = (logicalHeight * 0.2 + logicalHeight * 0.6) / 2;
     y = bounceMid;
   } else if (multiplier < bounceStartMultiplier) {
     const progress = Math.min((multiplier - 1) / (bounceStartMultiplier - 1), 1);
-    x = progress * targetX; // starts at 0 (left edge)
-    const startY = canvas ? canvas.height : 0; // bottom
-    const targetY = canvas ? canvas.height * 0.25 : 0; // up
+    x = progress * targetX;
+    const startY = logicalHeight;
+    const targetY = logicalHeight * 0.25;
     y = startY - (progress * (startY - targetY));
   } else {
     x = targetX;
-    const bounceMin = canvas ? canvas.height * 0.2 : 0;
-    const bounceMax = canvas ? canvas.height * 0.6 : 0;
+    const bounceMin = logicalHeight * 0.2;
+    const bounceMax = logicalHeight * 0.6;
     const bounceMid = (bounceMin + bounceMax) / 2;
     const bounceRange = (bounceMax - bounceMin) / 2;
     const elapsed = (performance.now() - startTime) / 1000;
@@ -427,6 +363,8 @@ function getPlanePosition(multiplier, timestamp) {
 // =========================
 function drawTrail(multiplier) {
   if (!ctx) return;
+  const dpr = window.devicePixelRatio || 1;
+  const logicalHeight = canvas.height / dpr;
   const bounceStartMultiplier = 2.01;
   if (multiplier < bounceStartMultiplier) {
     const { x, y } = getPlanePosition(multiplier, null);
@@ -435,12 +373,12 @@ function drawTrail(multiplier) {
   if (trail.length === 0) return;
   ctx.save();
   ctx.beginPath();
-  ctx.moveTo(0, canvas.height); // Start at bottom left
+  ctx.moveTo(0, logicalHeight);
   for (let i = 0; i < trail.length; i++) {
     const point = trail[i];
     ctx.lineTo(point.x, point.y);
   }
-  ctx.lineTo(trail[trail.length - 1].x, canvas.height); // Return to base at last x
+  ctx.lineTo(trail[trail.length - 1].x, logicalHeight);
   ctx.closePath();
   ctx.fillStyle = "rgba(255, 0, 0, 0.15)";
   ctx.fill();
@@ -470,19 +408,14 @@ function drawTrail(multiplier) {
 // =========================
 const planeImage = new Image();
 planeImage.src = 'plane pink.png';
-planeImage.onload = () => {
-  console.log("Plane image loaded successfully");
-};
-planeImage.onerror = () => {
-  console.error("Failed to load plane image");
-};
+planeImage.onload = () => {};
+planeImage.onerror = () => {};
 function drawPlane(multiplier, timestamp) {
   if (!ctx || !canvas) return;
   const planeSize = 70;
   const { x, y } = getPlanePosition(multiplier, timestamp);
   ctx.save();
   ctx.translate(x, y);
-  // Anchor plane at bottom left: (0, -planeSize)
   if (planeImage.complete && planeImage.naturalWidth !== 0) {
     ctx.drawImage(planeImage, 0, -planeSize, planeSize, planeSize);
   } else {
@@ -502,9 +435,7 @@ function updateTotalBets() {
     if (totalBetsCount) {
       totalBetsCount.textContent = `Total: ${bets.length}`;
     }
-  } catch (error) {
-    console.error("Error in updateTotalBets:", error);
-  }
+  } catch (error) {}
 }
 updateTotalBets();
 
@@ -556,9 +487,7 @@ function startGame(panelId) {
     const cashoutSection = document.getElementById(`cashout-section-${panelId}`);
     if (betButton) betButton.style.display = "none";
     if (cashoutSection) cashoutSection.style.display = "flex";
-  } catch (error) {
-    console.error(`Error in startGame for panel ${panelId}:`, error);
-  }
+  } catch (error) {}
 }
 
 function cashOut(panelId) {
@@ -606,20 +535,11 @@ function cashOut(panelId) {
     }
     const cashoutSection = document.getElementById(`cashout-section-${panelId}`);
     const betButton = document.getElementById(`place-bet-button-${panelId}`);
-    if (cashoutSection) {
-      cashoutSection.style.display = "none";
-    }
-    if (betButton) {
-      betButton.style.display = "flex";
-    }
-  } catch (error) {
-    console.error(`Error in cashOut for panel ${panelId}:`, error);
-  }
+    if (cashoutSection) cashoutSection.style.display = "none";
+    if (betButton) betButton.style.display = "flex";
+  } catch (error) {}
 }
 
-// =========================
-// BALANCE FUNCTIONS
-// =========================
 const refreshButton = document.getElementById("refresh-balance");
 if (refreshButton) {
   refreshButton.addEventListener("click", () => {
@@ -629,9 +549,7 @@ if (refreshButton) {
       if (userBalance) {
         userBalance.textContent = `MZN ${newBalance}`;
       }
-    } catch (error) {
-      console.error("Error in refreshBalance:", error);
-    }
+    } catch (error) {}
   });
 }
 function getBalance() {
@@ -642,7 +560,6 @@ function getBalance() {
     }
     return 0;
   } catch (error) {
-    console.error("Error in getBalance:", error);
     return 0;
   }
 }
@@ -652,9 +569,7 @@ function setBalance(amount) {
     if (userBalance) {
       userBalance.textContent = `MZN ${amount.toFixed(2)}`;
     }
-  } catch (error) {
-    console.error("Error in setBalance:", error);
-  }
+  } catch (error) {}
 }
 
 // =========================
@@ -662,25 +577,12 @@ function setBalance(amount) {
 // =========================
 document.addEventListener("DOMContentLoaded", () => {
   try {
-    console.log("DOM loaded, initializing game");
     const betButton1 = document.getElementById("place-bet-button-1");
     const cashoutButton1 = document.getElementById("cashout-button-1");
     const betInput1 = document.getElementById("bet-amount-1");
     const betButton2 = document.getElementById("place-bet-button-2");
     const cashoutButton2 = document.getElementById("cashout-button-2");
     const betInput2 = document.getElementById("bet-amount-2");
-    document.querySelectorAll('.bet-panel').forEach(panel => {
-      const autoOptions = panel.querySelector('.auto-bet-cashout-options');
-      const betBtn = panel.querySelector('.toggle-bet');
-      const autoBtn = panel.querySelector('.toggle-auto');
-      if (betBtn && autoBtn && autoOptions) {
-        if (betBtn.classList.contains('active')) {
-          autoOptions.style.display = 'none';
-        } else if (autoBtn.classList.contains('active')) {
-          autoOptions.style.display = 'block';
-        }
-      }
-    });
     if (betButton1) {
       betButton1.replaceWith(betButton1.cloneNode(true));
       document.getElementById("place-bet-button-1").addEventListener('click', (e) => {
@@ -759,9 +661,7 @@ document.addEventListener("DOMContentLoaded", () => {
     animateBackground();
     resetRound();
     updateTopBar();
-  } catch (error) {
-    console.error("Error in DOMContentLoaded:", error);
-  }
+  } catch (error) {}
 });
 
 window.addEventListener("resize", resizeCanvas);
@@ -787,9 +687,7 @@ function addMultiplierToHistory(multiplier) {
     if (history.children.length > 100) {
       history.removeChild(history.lastChild);
     }
-  } catch (error) {
-    console.error("Error in addMultiplierToHistory:", error);
-  }
+  } catch (error) {}
 }
 
 function addBetToTable(username, betAmount, multiplier = null, winAmount = null) {
@@ -809,26 +707,12 @@ function addBetToTable(username, betAmount, multiplier = null, winAmount = null)
     while (table.children.length > 21) {
       table.removeChild(table.lastChild);
     }
-  } catch (error) {
-    console.error("Error in addBetToTable:", error);
-  }
+  } catch (error) {}
 }
 
 // =========================
 // BET HISTORY
 // =========================
-const betHistoryButton = document.getElementById('bet-history-button');
-const betHistoryPanel = document.getElementById('bet-history-panel');
-if (betHistoryButton && betHistoryPanel) {
-  betHistoryButton.addEventListener('click', () => {
-    try {
-      const isVisible = betHistoryPanel.style.display === 'block';
-      betHistoryPanel.style.display = isVisible ? 'none' : 'block';
-    } catch (error) {
-      console.error("Error in betHistoryButton click:", error);
-    }
-  });
-}
 let betHistoryData = [
   { date: '21-05-25 19:26', bet: 1.00, multiplier: '1.09x', cashout: 1.09 },
   { date: '21-05-25 19:24', bet: 50.00, multiplier: '1.07x', cashout: 53.50 },
@@ -861,9 +745,7 @@ function renderBetHistory() {
       `;
       container.appendChild(row);
     });
-  } catch (error) {
-    console.error("Error in renderBetHistory:", error);
-  }
+  } catch (error) {}
 }
 
 // =========================
@@ -891,9 +773,7 @@ document.querySelectorAll(".bet-toggle").forEach(toggle => {
         if (autoOptions) autoOptions.style.display = "block";
       });
     }
-  } catch (error) {
-    console.error("Error in bet-toggle setup:", error);
-  }
+  } catch (error) {}
 });
 
 // =========================
@@ -929,8 +809,6 @@ function updateTopBar() {
       };
     }
     topBar.appendChild(link);
-  } catch (error) {
-    console.error("Error in updateTopBar:", error);
-  }
+  } catch (error) {}
 }
 document.addEventListener('DOMContentLoaded', updateTopBar);
