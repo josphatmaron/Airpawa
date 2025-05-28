@@ -1,4 +1,3 @@
-// ======= MESSAGE DISPLAY HELPER =======
 function showCrashMessage(msg, color = "white", duration = 1500) {
   const crashMessage = document.getElementById("crash-message");
   if (crashMessage) {
@@ -55,7 +54,7 @@ function resizeCanvas() {
     canvas.width = parent ? parent.offsetWidth : window.innerWidth * 0.9;
     canvas.height = parent ? parent.offsetHeight : window.innerHeight * 0.5;
     if (canvas.width === 0 || canvas.height === 0) {
-      canvas.width = window.innerWidth * 0.9;
+      canvas sre.width = window.innerWidth * 0.9;
       canvas.height = window.innerHeight * 0.5;
     }
     const dpr = window.devicePixelRatio || 1;
@@ -291,7 +290,7 @@ function crashGame() {
       multiplierElement.textContent = multiplier.toFixed(2) + "x";
       multiplierElement.style.color = "red";
     }
-    showCrashMessage(`Crashed @ ${multiplier.toFixed(2)}x`, "red", 3000);
+    showCrashMessage(`Crashed @ ${multiplier.toFixed(2)}x`, "white", 3000); // Updated to white
     document.dispatchEvent(new Event('gameCrash'));
     setTimeout(() => {
       resetRound();
@@ -892,5 +891,3 @@ function updateTopBar() {
   }
 }
 document.addEventListener('DOMContentLoaded', updateTopBar);
-
-// ... (Add your other modal and event logic as needed) ...
