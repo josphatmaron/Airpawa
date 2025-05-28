@@ -87,9 +87,9 @@ function calculateMaxRadius(centerX, centerY) {
 }
 function drawRadiatingLines() {
   if (!ctx) return;
-  const offsetX = -100, offsetY = 100;
-  const centerX = offsetX;
-  const centerY = canvas.height + offsetY;
+ // NEW (always contained):
+const centerX = canvas.width / 2;
+const centerY = canvas.height / 2;
   const radius = calculateMaxRadius(centerX, centerY);
   const lineCount = 36;
   const angleStep = (2 * Math.PI) / lineCount;
