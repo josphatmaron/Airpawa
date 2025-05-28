@@ -1,14 +1,17 @@
 function showCrashMessage(msg, color = "white", duration = 1500) {
   const crashMessage = document.getElementById("crash-message");
   if (crashMessage) {
+    console.log(`Showing crash message: ${msg} in color ${color}`); // Debug log
     crashMessage.textContent = msg;
     crashMessage.style.display = msg ? "block" : "none";
-    crashMessage.style.color = color + " !important"; // Force color with !important
+    crashMessage.style.color = color + " !important";
     if (duration > 0 && msg) {
       setTimeout(() => {
         crashMessage.style.display = "none";
       }, duration);
     }
+  } else {
+    console.error("Crash message element not found");
   }
 }
 
@@ -46,21 +49,26 @@ const canvas = document.getElementById("game-bg");
 const ctx = canvas ? canvas.getContext("2d") : null;
 if (ctx) {
   ctx.imageSmoothingEnabled = true;
+} else {
+  console.error("Canvas or context not available");
 }
 let rotationAngle = 0;
 function resizeCanvas() {
-  if (canvas) {
+  if (canvas && ctx) {
     const parent = canvas.parentElement;
     canvas.width = parent ? parent.offsetWidth : window.innerWidth * 0.9;
     canvas.height = parent ? parent.offsetHeight : window.innerHeight * 0.5;
     if (canvas.width === 0 || canvas.height === 0) {
-      canvas.width = window.innerWidth * 0.9; // Fixed typo
+      canvas.width = window.innerWidth * 0.9;
       canvas.height = window.innerHeight * 0.5;
     }
     const dpr = window.devicePixelRatio || 1;
     canvas.width *= dpr;
     canvas.height *= dpr;
     ctx.scale(dpr, dpr);
+    console.log(`Canvas resized: ${canvas.width/dpr}x${canvas.height/dpr}`); // Debug log
+  } else {
+    console.error("Cannot resize canvas: canvas or ctx missing");
   }
 }
 function calculateMaxRadius(centerX, centerY) {
@@ -101,7 +109,10 @@ function drawRadiatingLines() {
 }
 function animateBackground() {
   try {
-    if (!ctx) return;
+    if (!ctx || !canvas) {
+      console.error("animateBackground: Canvas or context missing");
+      return;
+    }
     rotationAngle += 0.003;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawRadiatingLines();
@@ -170,6 +181,7 @@ function getNextCrashPoint() {
 }
 
 function resetRound() {
+  console.log("Starting new round"); // Debug log
   multiplier = 1.0;
   crashPoint = getNextCrashPoint();
   startTime = null;
@@ -179,33 +191,56 @@ function resetRound() {
   isExiting = false;
   exitStartTime = null;
 
-  showCrashMessage("", "white", 0); // Hide crash message at round start
+  showCrashMessage("", "white", 0);
 
   const multiplierElement = document.getElementById("multiplier");
   if (multiplierElement) {
     multiplierElement.textContent = "1.00x";
     multiplierElement.style.color = "#ffffff";
+  } else {
+    console.error("Multiplier element not found");
   }
   gameRunning = true;
-  if (ctx) resizeCanvas();
+  if (ctx) {
+    resizeCanvas();
+  } else {
+    console.error("Canvas context not available for resetRound");
+  }
+  if (animationFrame) {
+    cancelAnimationFrame(animationFrame);
+  }
   animationFrame = requestAnimationFrame(animate);
 }
 
 function animate(timestamp) {
   try {
-    if (!ctx || !canvas) return;
-    if (!startTime) startTime = timestamp;
+    if (!ctx || !canvas) {
+      console.error("animate: Canvas or context missing");
+      return;
+    }
+    if (!gameRunning) {
+      console.log("Animation stopped: gameRunning is false");
+      return;
+    }
+    if (!startTime) {
+      startTime = timestamp;
+      console.log("Animation started, timestamp:", timestamp); // Debug log
+    }
     const elapsed = (timestamp - startTime) / 1000;
     multiplier = 1 + (elapsed / 3.5);
     const multiplierElement = document.getElementById("multiplier");
     if (multiplierElement) {
       multiplierElement.textContent = multiplier.toFixed(2) + "x";
+    } else {
+      console.error("Multiplier element not found in animate");
     }
+    console.log(`Animating: multiplier=${multiplier.toFixed(2)}, elapsed=${elapsed.toFixed(2)}s`); // Debug log
     updateActivePlayers();
     if (crashPoint && multiplier >= crashPoint && !isExiting) {
       isExiting = true;
       exitStartTime = timestamp;
       trail.length = 0;
+      console.log(`Crash triggered at ${multiplier.toFixed(2)}x`); // Debug log
     }
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawRadiatingLines();
@@ -236,6 +271,7 @@ function animate(timestamp) {
 
 function crashGame() {
   try {
+    console.log("Crashing game"); // Debug log
     cancelAnimationFrame(animationFrame);
     gameRunning = false;
     isExiting = false;
@@ -288,7 +324,7 @@ function crashGame() {
     const multiplierElement = document.getElementById("multiplier");
     if (multiplierElement) {
       multiplierElement.textContent = multiplier.toFixed(2) + "x";
-      multiplierElement.style.color = "white"; // Updated to white
+      multiplierElement.style.color = "white";
     }
     showCrashMessage(`Crashed @ ${multiplier.toFixed(2)}x`, "white", 3000);
     document.dispatchEvent(new Event('gameCrash'));
@@ -432,9 +468,13 @@ function drawTrail(multiplier) {
 // PLANE IMAGE & DRAWING
 // =========================
 const planeImage = new Image();
-planeImage.src = 'plane pink.png'; // Adjust path as needed
-planeImage.onload = () => {};
-planeImage.onerror = () => {};
+planeImage.src = 'plane pink.png';
+planeImage.onload = () => {
+  console.log("Plane image loaded successfully");
+};
+planeImage.onerror = () => {
+  console.error("Failed to load plane image");
+};
 function drawPlane(multiplier, timestamp) {
   if (!ctx || !canvas) return;
   const planeSize = 70;
@@ -620,6 +660,7 @@ function setBalance(amount) {
 // =========================
 document.addEventListener("DOMContentLoaded", () => {
   try {
+    console.log("DOM loaded, initializing game"); // Debug log
     const betButton1 = document.getElementById("place-bet-button-1");
     const cashoutButton1 = document.getElementById("cashout-button-1");
     const betInput1 = document.getElementById("bet-amount-1");
