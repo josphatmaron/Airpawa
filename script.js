@@ -862,7 +862,7 @@ document.addEventListener('DOMContentLoaded', function () {
       return;
     }
     try {
-      const response = await fetch('http://localhost:3000/register', {
+      const response = await fetch('https://my-backend.onrender.com/register', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({ phone, password, referralCode })
