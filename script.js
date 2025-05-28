@@ -65,6 +65,7 @@ function resizeCanvas() {
     const dpr = window.devicePixelRatio || 1;
     canvas.width *= dpr;
     canvas.height *= dpr;
+    ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transform before scaling!
     ctx.scale(dpr, dpr);
     console.log(`Canvas resized: ${canvas.width/dpr}x${canvas.height/dpr}`);
   } else {
@@ -404,9 +405,9 @@ function getPlanePosition(multiplier, timestamp) {
     y = bounceMid;
   } else if (multiplier < bounceStartMultiplier) {
     const progress = Math.min((multiplier - 1) / (bounceStartMultiplier - 1), 1);
-    x = progress * targetX;
-    const startY = canvas ? canvas.height : 0;
-    const targetY = canvas ? canvas.height * 0.25 : 0;
+    x = progress * targetX; // starts at 0 (left edge)
+    const startY = canvas ? canvas.height : 0; // bottom
+    const targetY = canvas ? canvas.height * 0.25 : 0; // up
     y = startY - (progress * (startY - targetY));
   } else {
     x = targetX;
@@ -434,12 +435,12 @@ function drawTrail(multiplier) {
   if (trail.length === 0) return;
   ctx.save();
   ctx.beginPath();
-  ctx.moveTo(trail[0].x, canvas.height);
+  ctx.moveTo(0, canvas.height); // Start at bottom left
   for (let i = 0; i < trail.length; i++) {
     const point = trail[i];
     ctx.lineTo(point.x, point.y);
   }
-  ctx.lineTo(trail[trail.length - 1].x, canvas.height);
+  ctx.lineTo(trail[trail.length - 1].x, canvas.height); // Return to base at last x
   ctx.closePath();
   ctx.fillStyle = "rgba(255, 0, 0, 0.15)";
   ctx.fill();
@@ -481,11 +482,12 @@ function drawPlane(multiplier, timestamp) {
   const { x, y } = getPlanePosition(multiplier, timestamp);
   ctx.save();
   ctx.translate(x, y);
+  // Anchor plane at bottom left: (0, -planeSize)
   if (planeImage.complete && planeImage.naturalWidth !== 0) {
-    ctx.drawImage(planeImage, -planeSize / 2, -planeSize / 2, planeSize, planeSize);
+    ctx.drawImage(planeImage, 0, -planeSize, planeSize, planeSize);
   } else {
     ctx.fillStyle = "blue";
-    ctx.fillRect(-planeSize / 2, -planeSize / 2, planeSize, planeSize);
+    ctx.fillRect(0, -planeSize, planeSize, planeSize);
   }
   ctx.restore();
 }
