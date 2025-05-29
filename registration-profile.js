@@ -1,4 +1,4 @@
-<script>
+
   // Set your backend base URL once, use everywhere
   const BASE_URL = 'https://backend-4lrl.onrender.com';
 
@@ -93,4 +93,3 @@
       errorP.textContent = "Profile update error: " + err.message;
     }
   });
-</script>
