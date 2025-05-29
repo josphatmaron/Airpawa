@@ -6,318 +6,354 @@
   <title>Airpawa</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="icon" href="plane.png" type="image/png" />
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #111;
-      color: white;
-      overflow-x: hidden;
-    }
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
-    .modal-content {
-      background: #1c1c1c;
-      padding: 20px;
-      border-radius: 10px;
-      width: 300px;
-      color: white;
-      position: relative;
-    }
-    .modal-content label {
-      display: block;
-      margin: 5px 0;
-    }
-    .modal-content input {
-      width: 100%;
-      padding: 10px;
-      margin: 5px 0;
-      border-radius: 5px;
-      border: none;
-      box-sizing: border-box;
-    }
-    .modal-content button {
-      width: 100%;
-      padding: 10px;
-      background: red;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    .close {
-      position: absolute;
-      right: 10px;
-      top: 10px;
-      font-size: 20px;
-      cursor: pointer;
-    }
-    .toggle-container {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 15px;
-    }
-    .toggle-label {
-      margin: 0 10px;
-      cursor: pointer;
-      padding: 5px 10px;
-      border-radius: 5px;
-      background: #333;
-      color: white;
-    }
-    .toggle-label.active {
-      background: red;
-    }
-    .toggle-input {
-      display: none;
-    }
-    .input-field {
-      display: none;
-    }
-    .input-field.active {
-      display: block;
-    }
-    #game-bg {
-      width: 100%;
-      height: 400px;
-      display: block;
-    }
-    #multiplier {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 2em;
-      color: white;
-    }
-    #crash-message {
-      position: absolute;
-      top: 60%;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 1.5em;
-      display: none;
-    }
-    .bet-panel {
-      background: #222;
-      padding: 10px;
-      margin: 10px;
-      border-radius: 5px;
-    }
-    .bets-table, .bet-history-table {
-      background: #222;
-      padding: 10px;
-      margin: 10px;
-      border-radius: 5px;
-    }
-    .bets-row, .bet-history-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 5px 0;
-    }
-    #multiplier-history {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 5px;
-      padding: 10px;
-    }
-    .multiplier-item {
-      padding: 5px;
-      border-radius: 3px;
-    }
-    #top-bar-button {
-      position: fixed;
-      top: 10px;
-      right: 10px;
-    }
-    #cashout-banner {
-      position: fixed;
-      bottom: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: green;
-      color: white;
-      padding: 10px;
-      border-radius: 5px;
-      display: none;
-    }
-    @keyframes fadeOut {
-      0% { opacity: 1; }
-      100% { opacity: 0; }
-    }
-  </style>
 </head>
 <body>
+  <div id="cashout-banner" class="cashout-banner" style="display: none;">
+    <div class="cashout-bubble">You have cashed out!</div>
+    <div class="cashout-bubble win">Win MZN <span id="cashout-win-amount">0.00</span></div>
+  </div>
+
   <!-- Top Bar -->
-  <div id="top-bar-button"></div>
+  <header class="top-bar" id="top-bar-button">
+    <!-- Content will be inserted by JavaScript -->
+  </header>
 
-  <!-- Game Canvas -->
-  <canvas id="game-bg"></canvas>
-  <div id="multiplier">1.00x</div>
-  <div id="crash-message"></div>
+  <div class="layout">
+    <div class="main-container">
 
-  <!-- Cashout Banner -->
-  <div id="cashout-banner">
-    You won <span id="cashout-win-amount">0.00</span> MZN!
-  </div>
-
-  <!-- Betting Panels -->
-  <div class="bet-panel">
-    <input type="number" id="bet-amount-1" value="8.00" min="1.00" step="1.00">
-    <button id="place-bet-button-1">Bet<br><span id="bet-amount-text-1">8.00 MZN</span></button>
-    <div id="cashout-section-1" style="display: none;">
-      <button id="cashout-button-1">Cash Out<br><span id="cashout-amount-text-1">MZN 0.00</span></button>
-    </div>
-    <div>
-      <button class="adjust" data-action="increase">+</button>
-      <button class="adjust" data-action="decrease">-</button>
-      <button class="quick-bet" data-bet="10">10</button>
-      <button class="quick-bet" data-bet="50">50</button>
-    </div>
-  </div>
-  <div class="bet-panel">
-    <input type="number" id="bet-amount-2" value="8.00" min="1.00" step="1.00">
-    <button id="place-bet-button-2">Bet<br><span id="bet-amount-text-2">8.00 MZN</span></button>
-    <div id="cashout-section-2" style="display: none;">
-      <button id="cashout-button-2">Cash Out<br><span id="cashout-amount-text-2">MZN 0.00</span></button>
-    </div>
-    <div>
-      <button class="adjust" data-action="increase">+</button>
-      <button class="adjust" data-action="decrease">-</button>
-      <button class="quick-bet" data-bet="10">10</button>
-      <button class="quick-bet" data-bet="50">50</button>
-    </div>
-  </div>
-
-  <!-- Bets Table -->
-  <div class="bets-table">
-    <div class="bets-row header">
-      <span>Player</span><span>Bet</span><span>X</span><span>Win</span>
-    </div>
-    <div id="total-bets-count">Total: 0</div>
-  </div>
-
-  <!-- Bet History -->
-  <div class="bet-history-table"></div>
-
-  <!-- Multiplier History -->
-  <div id="multiplier-history"></div>
-
-  <!-- Menu Toggle -->
-  <div id="menu-toggle">☰</div>
-  <div id="dropdown-menu" style="display: none;">
-    <!-- Menu items -->
-  </div>
-
-  <!-- Balance -->
-  <div>
-    Balance: <span id="user-balance">MZN 1000.00</span>
-    <button id="refresh-balance">Refresh</button>
-  </div>
-
-  <!-- SIGNUP MODAL -->
-  <div id="signupModal" class="modal">
-    <div class="modal-content">
-      <span class="close" onclick="document.getElementById('signupModal').style.display='none'">×</span>
-      <h2 style="text-align: center;">Join Airpawa</h2>
-      <p style="text-align: center; font-size: 0.9em; margin-bottom: 20px;">Home to fast wins and easy bets</p>
-      <form id="signupForm">
-        <div class="toggle-container">
-          <input type="radio" id="toggle-phone" name="registration-type" value="phone" class="toggle-input" checked>
-          <label for="toggle-phone" class="toggle-label active">Phone</label>
-          <input type="radio" id="toggle-email" name="registration-type" value="email" class="toggle-input">
-          <label for="toggle-email" class="toggle-label">Email</label>
+      <!-- Secondary Bar -->
+      <div class="secondary-bar">
+        <div class="logo">
+          <img src="logo.svg" alt="logo" style="height: 20px;" />
         </div>
-        <div id="phone-field" class="input-field active">
-          <label>Phone number</label>
-          <input type="tel" id="signup-phone" />
+        <div class="right-side">
+          <div class="balance-section">
+            <span id="user-balance" class="balance-amount">0.00</span>
+            <span class="balance-currency">MZN</span>
+          </div>
+
+          <div class="dropdown-container">
+            <div class="hamburger" id="menu-toggle">☰</div>
+            <div class="dropdown-menu" id="dropdown-menu">
+              <div class="user-section">
+                <img src="plane pink.png" class="avatar" alt="Avatar" />
+                <div class="auth-buttons">
+                  <button onclick="openModal('login-modal')">Login</button>
+                  <button onclick="openSignupModal()">Signup</button>
+                </div>
+                <button class="change-avatar">Change Avatar</button>
+              </div>
+
+              <div class="toggles">
+                <label class="toggle-item">
+                  <span><i class="icon">🔈</i> Sound</span>
+                  <input type="checkbox" />
+                </label>
+                <label class="toggle-item">
+                  <span><i class="icon">🎵</i> Music</span>
+                  <input type="checkbox" />
+                </label>
+                <label class="toggle-item">
+                  <span><i class="icon">🕺</i> Animation</span>
+                  <input type="checkbox" />
+                </label>
+              </div>
+
+              <ul class="menu-items">
+                <li>⭐ Free Bets</li>
+                <li onclick="openTicketsModal()">🎟 Challenge Tickets</li>
+                <li onclick="openBetHistoryModal()">⏪ My Bet History</li>
+                <li>🛑 Game Limits</li>
+                <li>❓ How To Play</li>
+                <li>📜 Game Rules</li>
+                <li>🛡 Provably Fair Settings</li>
+              </ul>
+
+              <div class="footer-nav" onclick="logoutUser()" style="cursor: pointer;">
+                <i class="icon">🚪</i> Logout
+              </div>
+            </div>
+          </div>
         </div>
-        <div id="email-field" class="input-field">
-          <label>Email address</label>
-          <input type="email" id="signup-email" />
+      </div>
+
+      <div class="content-body">
+        <div class="game-area" id="game-area">
+          <div class="multiplier-history" id="multiplier-history"></div>
+          <canvas id="game-bg"></canvas>
+          <div class="multiplier-container">
+            <span class="multiplier" id="multiplier">1.00x</span>
+          </div>
+          <div class="crash-message" id="crash-message" style="display: none;">FLEW AWAY!</div>
+          <div class="bet-panels-row">
+            <!-- Bet Panel 1 -->
+            <div class="bet-panel">
+              <div class="bet-toggle">
+                <button class="toggle-bet active">Bet</button>
+                <button class="toggle-auto">Auto</button>
+              </div>
+              <div class="bet-content">
+                <div class="bet-controls">
+                  <div class="bet-amount-control">
+                    <button class="adjust" data-action="decrease">−</button>
+                    <input class="amount" id="bet-amount-1" type="number" value="8.00" step="100" min="300" />
+                    <button class="adjust" data-action="increase">+</button>
+                  </div>
+                  <div class="quick-bets">
+                    <button class="quick-bet" data-bet="1000.00">32.00</button>
+                    <button class="quick-bet" data-bet="2000.00">80.00</button>
+                    <button class="quick-bet" data-bet="5000.00">160.00</button>
+                    <button class="quick-bet" data-bet="10000.00">800.00</button>
+                  </div>
+                </div>
+                <div class="bet-button-wrapper" id="bet-action-container-1">
+                  <button class="bet-button" id="place-bet-button-1">
+                    Bet<br><span class="bet-amount" id="bet-amount-text-1">8.00 MZN</span>
+                  </button>
+                  <div class="cashout-section" id="cashout-section-1" style="display: none;">
+                    <button class="cashout-button" id="cashout-button-1">
+                      Cash Out<br><span class="cashout-amount" id="cashout-amount-text-1">MZN 0.00</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div class="auto-options">
+                <label><span>Auto bet</span><input type="checkbox" class="toggle-switch" /></label>
+                <label><span>Auto Cash Out</span><input type="checkbox" class="toggle-switch" /></label>
+                <div class="cashout-input">
+                  <input type="number" min="1" step="10" value="1.10" />
+                </div>
+              </div>
+            </div>
+
+            <!-- Bet Panel 2 -->
+            <div class="bet-panel">
+              <div class="bet-toggle">
+                <button class="toggle-bet active">Bet</button>
+                <button class="toggle-auto">Auto</button>
+              </div>
+              <div class="bet-content">
+                <div class="bet-controls">
+                  <div class="bet-amount-control">
+                    <button class="adjust" data-action="decrease">−</button>
+                    <input class="amount" id="bet-amount-2" type="number" value="8.00" step="100" min="300" />
+                    <button class="adjust" data-action="increase">+</button>
+                  </div>
+                  <div class="quick-bets">
+                    <button class="quick-bet" data-bet="1000.00">32.00</button>
+                    <button class="quick-bet" data-bet="2000.00">80.00</button>
+                    <button class="quick-bet" data-bet="5000.00">160.00</button>
+                    <button class="quick-bet" data-bet="10000.00">800.00</button>
+                  </div>
+                </div>
+                <div class="bet-button-wrapper" id="bet-action-container-2">
+                  <button class="bet-button" id="place-bet-button-2">
+                    Bet<br><span class="bet-amount" id="bet-amount-text-2">8.00 MZN</span>
+                  </button>
+                  <div class="cashout-section" id="cashout-section-2" style="display: none;">
+                    <button class="cashout-button" id="cashout-button-2">Cash Out</button>
+                    <span class="potential-winnings" id="potential-winnings-2">MZN 0.00</span>
+                  </div>
+                </div>
+              </div>
+              <div class="auto-options">
+                <label><span>Auto bet</span><input type="checkbox" class="toggle-switch" /></label>
+                <label><span>Auto Cash Out</span><input type="checkbox" class="toggle-switch" /></label>
+                <div class="cashout-input">
+                  <input type="number" min="1" step="0.01" value="1.10" />
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        <label>Password</label>
-        <input type="password" id="signup-password" required />
-        <label>Confirm password</label>
-        <input type="password" id="signup-confirm-password" required />
-        <label>Referral code (optional)</label>
-        <input type="text" id="signup-referral" placeholder="e.g. ABCDXY" />
-        <button type="submit">Sign Up</button>
-        <p id="signup-error" style="color: #f88; text-align: center;"></p>
-        <p style="text-align: center; margin-top: 10px;">
-          or <a href="#" onclick="document.getElementById('login-modal').style.display='block';document.getElementById('signupModal').style.display='none'" style="color: #00f;">Login</a>
-        </p>
-      </form>
+        <!-- LEFT PANEL (at end of content-body, appears at bottom on mobile) -->
+        <div class="left-panel">
+          <h3 id="all-bets-title">ALL BETS</h3>
+          <p id="total-bets-count">0</p>
+          <div class="bets-table">
+            <div class="bets-header">
+              <span>Player</span>
+              <span>Bet MZN</span>
+              <span>X</span>
+              <span>Win MZN</span>
+            </div>
+            <div class="bets-row">
+              <span>s***e</span><span>10,638.04</span><span>—</span><span>—</span>
+            </div>
+            <div class="bets-row">
+              <span>s***e</span><span>10,638.04</span><span>—</span><span>—</span>
+            </div>
+            <div class="bets-row">
+              <span>2***3</span><span>4,941.52</span><span>—</span><span>—</span>
+            </div>
+            <div class="bets-row">
+              <span>2***3</span><span>4,941.52</span><span>—</span><span>—</span>
+            </div>
+            <div class="bets-row">
+              <span>2***0</span><span>4,150.87</span><span>—</span><span>—</span>
+            </div>
+            <div class="bets-row highlight">
+              <span>b***u</span><span>1,085.08</span><span>1.21x</span><span>1,312.94</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SIGNUP MODAL -->
+      <div id="signupModal" class="modal" style="display: none;">
+        <div class="modal-content" style="background-color: #1c1c1c; padding: 20px; border-radius: 10px; width: 300px; color: white; position: relative;">
+          <span class="close" onclick="closeSignupModal()" style="position: absolute; right: 10px; top: 10px; font-size: 20px; cursor: pointer;">×</span>
+          <h2 style="text-align: center;">Join Airpawa</h2>
+          <p style="text-align: center; font-size: 0.9em; margin-bottom: 20px;">Home to fast wins and easy bets</p>
+          <form id="signupForm">
+            <label>Username</label>
+            <input type="text" id="signup-username" required style="width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: none;" />
+            <label>Email address</label>
+            <input type="email" id="signup-email" required style="width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: none;" />
+            <label>Password</label>
+            <input type="password" id="signup-password" required style="width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: none;" />
+            <label>Confirm password</label>
+            <input type="password" id="signup-confirm-password" required style="width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: none;" />
+            <label>Referral code (optional)</label>
+            <input type="text" id="signup-referral" placeholder="e.g. ABCDXY" style="width: 100%; padding: 10px; margin: 5px 0 15px; border-radius: 5px; border: none;" />
+            <button type="submit" style="width: 100%; padding: 10px; background: red; color: white; border: none; border-radius: 5px;">Sign Up</button>
+            <p id="signup-error" style="color: #f88; text-align:center;"></p>
+            <p style="text-align: center; margin-top: 10px;">
+              or <a href="#" onclick="openLoginModal()" style="color: #00f;">Login</a>
+            </p>
+          </form>
+        </div>
+      </div>
+
+      <!-- PROFILE STEP MODAL -->
+      <div id="profileModal" class="modal" style="display: none;">
+        <div class="modal-content" style="background-color: #1c1c1c; padding: 20px; border-radius: 10px; width: 300px; color: white; position: relative;">
+          <span class="close" onclick="closeProfileModal()" style="position: absolute; right: 10px; top: 10px; font-size: 20px; cursor: pointer;">×</span>
+          <h2 style="text-align: center;">Complete Your Profile</h2>
+          <form id="profileForm">
+            <label>Full name</label>
+            <input type="text" id="profile-fullname" required style="width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: none;" />
+            <label>Email address</label>
+            <input type="email" id="profile-email" required style="width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: none;" />
+            <label>Date of birth</label>
+            <input type="date" id="profile-dob" required style="width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: none;" />
+            <label>Username</label>
+            <input type="text" id="profile-username" required style="width: 100%; padding: 10px; margin: 5px 0 15px; border-radius: 5px; border: none;" />
+            <button type="submit" style="width: 100%; padding: 10px; background: red; color: white; border: none; border-radius: 5px;">Save Profile</button>
+            <p id="profile-error" style="color: #f88; text-align:center;"></p>
+          </form>
+        </div>
+      </div>
+
+      <!-- LOGIN MODAL -->
+      <div id="login-modal" class="modal" style="display: none;">
+        <div class="modal-content dark-modal">
+          <span class="close" onclick="closeModal('login-modal')">×</span>
+          <form id="login-form">
+            <h2>Login</h2>
+            <label for="login-phone">Phone number</label>
+            <input type="text" id="login-phone" placeholder="0700000000" required />
+            <label for="login-password">Password</label>
+            <input type="password" id="login-password" placeholder="Enter password" required />
+            <div class="modal-links">
+              <a href="#">Forgot password?</a>
+              <a href="#">Activate account?</a>
+            </div>
+            <div class="modal-buttons">
+              <button type="button" class="cancel-btn" onclick="closeModal('login-modal')">Cancel</button>
+              <button type="submit" class="login-btn">Login to Airpawa</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Free Bets Lightbox Modal -->
+      <div id="freeBetsModal" class="modal" style="display: none;">
+        <div class="modal-content">
+          <span class="close" onclick="closeModal('freeBetsModal')">×</span>
+          <h2>Free Bets Management</h2>
+          <label>
+            <input type="radio" name="bet-option" checked> Play with cash
+          </label>
+          <h3>ACTIVE FREE BETS</h3>
+          <div class="free-bets-container">
+            <p>No Active Free Bets! Yet!</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bet History Modal -->
+      <div id="betHistoryModal" class="modal" style="display: none;">
+        <div class="modal-content bet-history-box">
+          <span class="close" onclick="closeBetHistoryModal()">×</span>
+          <h2>MY BET HISTORY</h2>
+          <div class="bet-history-table">
+            <div class="bet-history-row header">
+              <span>Date</span><span>Bet KES</span><span>X</span><span>Cash out KES</span>
+            </div>
+            <div class="bet-history-row">
+              <span>21-05-25 19:26</span><span>1.00</span><span>1.09x</span><span>1.09</span>
+            </div>
+          </div>
+          <button class="load-more">Load more</button>
+        </div>
+      </div>
+
+      <!-- Challenge Tickets Modal-->
+      <div id="ticketsModal" class="modal">
+        <div class="modal-content">
+          <span class="close" onclick="closeTicketsModal()">×</span>
+          <div class="modal-body">
+            <img src="ticket-icon.png" alt="Ticket Icon" class="ticket-icon">
+            <p>No Active Tickets. Yet!</p>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- PROFILE MODAL -->
-  <div id="profileModal" class="modal">
-    <div class="modal-content">
-      <span class="close" onclick="document.getElementById('profileModal').style.display='none'">×</span>
-      <h2 style="text-align: center;">Complete Profile</h2>
-      <form id="profileForm">
-        <label>Full Name</label>
-        <input type="text" id="profile-fullname" required />
-        <label>Email</label>
-        <input type="email" id="profile-email" required />
-        <label>Date of Birth</label>
-        <input type="date" id="profile-dob" required />
-        <label>Username</label>
-        <input type="text" id="profile-username" required />
-        <button type="submit">Submit</button>
-        <p id="profile-error" style="color: #f88; text-align: center;"></p>
-      </form>
-    </div>
-  </div>
+  <script>
+    // Modal open/close logic
+    function openSignupModal() { document.getElementById('signupModal').style.display = 'flex'; }
+    function closeSignupModal() { document.getElementById('signupModal').style.display = 'none'; }
+    function openProfileModal() { document.getElementById('profileModal').style.display = 'flex'; }
+    function closeProfileModal() { document.getElementById('profileModal').style.display = 'none'; }
+    function openModal(modalId) { document.getElementById(modalId).style.display = 'block'; }
+    function closeModal(modalId) { document.getElementById(modalId).style.display = 'none'; }
+    function openLoginModal() { openModal('login-modal'); }
+    function closeTicketsModal() { closeModal('ticketsModal'); }
+    function openTicketsModal() { openModal('ticketsModal'); }
+    function openBetHistoryModal() { openModal('betHistoryModal'); }
+    function closeBetHistoryModal() { closeModal('betHistoryModal'); }
 
-  <!-- LOGIN MODAL (Placeholder) -->
-  <div id="login-modal" class="modal">
-    <div class="modal-content">
-      <span class="close" onclick="document.getElementById('login-modal').style.display='none'">×</span>
-      <h2 style="text-align: center;">Login to Airpawa</h2>
-      <form id="login-form">
-        <label>Phone number</label>
-        <input type="tel" id="login-phone" required />
-        <label>Password</label>
-        <input type="password" id="login-password" required />
-        <button type="submit">Login</button>
-        <p id="login-error" style="color: #f88; text-align: center;"></p>
-        <p style="text-align: center; margin-top: 10px;">
-          or <a href="#" onclick="document.getElementById('signupModal').style.display='block';document.getElementById('login-modal').style.display='none'" style="color: #00f;">Sign Up</a>
-        </p>
-      </form>
-    </div>
-  </div>
+    // Toggle for bet/auto
+    document.querySelectorAll('.bet-toggle').forEach(toggle => {
+      const betButton = toggle.querySelector('.toggle-bet');
+      const autoButton = toggle.querySelector('.toggle-auto');
+      betButton.addEventListener('click', () => {
+        betButton.classList.add('active');
+        autoButton.classList.remove('active');
+      });
+      autoButton.addEventListener('click', () => {
+        autoButton.classList.add('active');
+        betButton.classList.remove('active');
+      });
+    });
 
-  <!-- DEPOSIT MODAL (Placeholder) -->
-  <div id="deposit" class="modal">
-    <div class="modal-content">
-      <span class="close" onclick="document.getElementById('deposit').style.display='none'">×</span>
-      <h2>Deposit</h2>
-      <p>Deposit functionality to be implemented.</p>
-    </div>
-  </div>
+    // Free bets menu
+    document.addEventListener('DOMContentLoaded', function () {
+      var menu = document.querySelector('.menu-items li:first-child');
+      if (menu) menu.addEventListener('click', function () { openModal('freeBetsModal'); });
+    });
 
-  <!-- FREE BETS MODAL (Placeholder) -->
-  <div id="freeBetsModal" class="modal">
-    <div class="modal-content">
-      <span class="close" onclick="document.getElementById('freeBetsModal').style.display='none'">×</span>
-      <h2>Free Bets</h2>
-      <p>Free bets functionality to be implemented.</p>
-    </div>
-  </div>
-
+    // Modal close on outside click
+    window.addEventListener('click', function (event) {
+      ['signupModal', 'freeBetsModal', 'profileModal'].forEach(function (id) {
+        var modal = document.getElementById(id);
+        if (modal && event.target === modal) { closeModal(id); }
+      });
+    });
+  </script>
   <script src="script.js"></script>
   <script src="registration-profile.js"></script>
 </body>
