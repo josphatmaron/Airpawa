@@ -1,19 +1,16 @@
 // Modal open/close logic
 function openSignupModal() { document.getElementById('signupModal').style.display = 'flex'; }
 function closeSignupModal() { document.getElementById('signupModal').style.display = 'none'; }
-function openProfileModal() { document.getElementById('profileModal').style.display = 'flex'; }
-function closeProfileModal() { document.getElementById('profileModal').style.display = 'none'; }
-function openModal(modalId) { document.getElementById(modalId).style.display = 'block'; }
+function openLoginModal() { document.getElementById('login-modal').style.display = 'block'; }
 function closeModal(modalId) { document.getElementById(modalId).style.display = 'none'; }
-function openLoginModal() { openModal('login-modal'); }
-function closeTicketsModal() { closeModal('ticketsModal'); }
-function openTicketsModal() { openModal('ticketsModal'); }
-function openBetHistoryModal() { openModal('betHistoryModal'); }
-function closeBetHistoryModal() { closeModal('betHistoryModal'); }
+function openTicketsModal() { document.getElementById('ticketsModal').style.display = 'block'; }
+function closeTicketsModal() { document.getElementById('ticketsModal').style.display = 'none'; }
+function openBetHistoryModal() { document.getElementById('betHistoryModal').style.display = 'block'; }
+function closeBetHistoryModal() { document.getElementById('betHistoryModal').style.display = 'none'; }
 
-// Modal close on outside click (signup/profile/freebets)
+// Modal close on outside click (signup/freebets)
 window.addEventListener('click', function (event) {
-  ['signupModal', 'freeBetsModal', 'profileModal'].forEach(function (id) {
+  ['signupModal', 'freeBetsModal'].forEach(function (id) {
     var modal = document.getElementById(id);
     if (modal && event.target === modal) { closeModal(id); }
   });
@@ -21,9 +18,7 @@ window.addEventListener('click', function (event) {
 
 // ========== SIGNUP JS ==========
 
-let registeredUserId = null;
-
-// SIGNUP: Step 1 (POST to /register with username/email/password)
+// SIGNUP: Only Step (POST to /register with username/email/password/referralCode)
 document.getElementById('signupForm').addEventListener('submit', async function(e) {
   e.preventDefault();
   const username = document.getElementById('signup-username').value;
@@ -38,6 +33,7 @@ document.getElementById('signupForm').addEventListener('submit', async function(
     errorP.textContent = "Passwords don't match.";
     return;
   }
+
   try {
     const response = await fetch('https://backend-4lrl.onrender.com/register', {
       method: 'POST',
@@ -46,50 +42,14 @@ document.getElementById('signupForm').addEventListener('submit', async function(
     });
     const result = await response.json();
     if (response.ok && result.user && result.user._id) {
-      registeredUserId = result.user._id;
-      // Registration successful! You can now log in or show a success message/modal.
       alert('Registration successful! You can now log in.');
       closeSignupModal();
-      // Optionally, you can open the login modal here
+      // Optionally open the login modal here:
       // openLoginModal();
     } else {
       errorP.textContent = result.error || "Registration failed.";
     }
   } catch (err) {
     errorP.textContent = "Registration error.";
-  }
-});
-
-// If you want to keep profile completion as a separate step, ensure your backend supports /complete-profile.
-// If NOT, remove the profile step below and only use /register for all user data.
-
-document.getElementById('profileForm')?.addEventListener('submit', async function(e) {
-  e.preventDefault();
-  const fullName = document.getElementById('profile-fullname').value;
-  const email = document.getElementById('profile-email').value;
-  const dob = document.getElementById('profile-dob').value;
-  const username = document.getElementById('profile-username').value;
-  const errorP = document.getElementById('profile-error');
-  errorP.textContent = '';
-
-  if (!registeredUserId) {
-    errorP.textContent = "No user registered.";
-    return;
-  }
-  try {
-    const response = await fetch('https://backend-4lrl.onrender.com/complete-profile', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ userId: registeredUserId, fullName, email, dob, username })
-    });
-    const result = await response.json();
-    if (response.ok && result.user) {
-      closeProfileModal();
-      alert('Profile completed! You can now play or log in.');
-    } else {
-      errorP.textContent = result.error || "Profile update failed.";
-    }
-  } catch (err) {
-    errorP.textContent = "Profile update error.";
   }
 });
