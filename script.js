@@ -1,16 +1,25 @@
-function showCrashMessage(msg, color = "white", duration = 1500) {
-  const crashMessage = document.getElementById("crash-message");
-  if (crashMessage) {
-    crashMessage.textContent = msg;
-    crashMessage.style.display = msg ? "block" : "none";
-    crashMessage.style.color = color + " !important";
-    if (duration > 0 && msg) {
-      setTimeout(() => {
-        crashMessage.style.display = "none";
-      }, duration);
-    }
-  }
+const API_BASE_URL = 'https://backend-4lrl.onrender.com';
+
+// =========================
+// MODAL HANDLING
+// =========================
+function openModal(modalId) {
+  const modal = document.getElementById(modalId);
+  if (modal) modal.style.display = modalId === 'signupModal' || modalId === 'profileModal' || modalId === 'ticketsModal' ? 'flex' : 'block';
 }
+
+function closeModal(modalId) {
+  const modal = document.getElementById(modalId);
+  if (modal) modal.style.display = 'none';
+}
+
+// Close modals on outside click
+document.addEventListener('click', (event) => {
+  const modal = event.target.closest('.modal');
+  if (modal && event.target === modal) {
+    closeModal(modal.id);
+  }
+});
 
 // =========================
 // MENU TOGGLE
@@ -20,48 +29,198 @@ const dropdownMenu = document.getElementById('dropdown-menu');
 if (menuToggle && dropdownMenu) {
   menuToggle.addEventListener('click', (e) => {
     e.stopPropagation();
-    const isVisible = dropdownMenu.style.display === 'flex';
-    dropdownMenu.style.display = isVisible ? 'none' : 'flex';
+    dropdownMenu.style.display = dropdownMenu.style.display === 'flex' ? 'none' : 'flex';
+  });
+  document.addEventListener('click', (e) => {
+    const safeZones = [
+      menuToggle,
+      dropdownMenu,
+      document.getElementById('cashout-section-1'),
+      document.getElementById('place-bet-button-1'),
+      document.getElementById('cashout-section-2'),
+      document.getElementById('place-bet-button-2')
+    ].filter(zone => zone);
+    if (!safeZones.some(zone => zone.contains(e.target))) {
+      dropdownMenu.style.display = 'none';
+    }
   });
 }
-document.addEventListener('click', (e) => {
-  const safeZones = [
-    menuToggle,
-    dropdownMenu,
-    document.getElementById('cashout-section-1'),
-    document.getElementById('place-bet-button-1'),
-    document.getElementById('cashout-section-2'),
-    document.getElementById('place-bet-button-2')
-  ].filter(zone => zone);
-  const clickedInsideSafeZone = safeZones.some(zone => zone.contains(e.target));
-  if (!clickedInsideSafeZone && dropdownMenu) {
-    dropdownMenu.style.display = 'none';
+
+// =========================
+// FORM SUBMISSION
+// =========================
+let registeredUserId = null;
+
+async function handleFormSubmit(formId, url, data, successCallback, errorElementId) {
+  const errorP = document.getElementById(errorElementId);
+  errorP.textContent = '';
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    const result = await response.json();
+    if (result.user) {
+      successCallback(result);
+    } else {
+      errorP.textContent = result.error || 'Submission failed.';
+    }
+  } catch (err) {
+    errorP.textContent = `Submission error: ${err.message}`;
+  }
+}
+
+document.getElementById('signupForm')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const phone = document.getElementById('signup-phone').value;
+  const password = document.getElementById('signup-password').value;
+  const confirmPassword = document.getElementById('signup-confirm-password').value;
+  const referralCode = document.getElementById('signup-referral').value;
+
+  if (password !== confirmPassword) {
+    document.getElementById('signup-error').textContent = "Passwords don't match.";
+    return;
+  }
+
+  await handleFormSubmit('signupForm', `${API_BASE_URL}/complete-profile`, 
+    { phone, password, referralCode }, 
+    (result) => {
+      registeredUserId = result.user._id;
+      closeModal('signupModal');
+      openModal('profileModal');
+    }, 
+    'signup-error'
+  );
+});
+
+document.getElementById('profileForm')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const fullName = document.getElementById('profile-fullname').value;
+  const email = document.getElementById('profile-email').value;
+  const dob = document.getElementById('profile-dob').value;
+  const username = document.getElementById('profile-username').value;
+
+  if (!registeredUserId) {
+    document.getElementById('profile-error').textContent = "No user registered.";
+    return;
+  }
+
+  await handleFormSubmit('profileForm', `${API_BASE_URL}/complete-profile`, 
+    { userId: registeredUserId, fullName, email, dob, username }, 
+    () => {
+      closeModal('profileModal');
+      alert('Profile completed! You can now play or log in.');
+    }, 
+    'profile-error'
+  );
+});
+
+// =========================
+// BET PANEL RENDERING
+// =========================
+const betPanelTemplate = (panelId) => `
+  <div class="bet-panel">
+    <div class="bet-toggle">
+      <button class="toggle-bet active">Bet</button>
+      <button class="toggle-auto">Auto</button>
+    </div>
+    <div class="bet-content">
+      <div class="bet-controls">
+        <div class="bet-amount-control">
+          <button class="adjust" data-action="decrease">−</button>
+          <input class="amount" id="bet-amount-${panelId}" type="number" value="8.00" step="100" min="300" />
+          <button class="adjust" data-action="increase">+</button>
+        </div>
+        <div class="quick-bets">
+          <button class="quick-bet" data-bet="1000.00">32.00</button>
+          <button class="quick-bet" data-bet="2000.00">80.00</button>
+          <button class="quick-bet" data-bet="5000.00">160.00</button>
+          <button class="quick-bet" data-bet="10000.00">800.00</button>
+        </div>
+      </div>
+      <div class="bet-button-wrapper" id="bet-action-container-${panelId}">
+        <button class="bet-button" id="place-bet-button-${panelId}">
+          Bet<br><span class="bet-amount" id="bet-amount-text-${panelId}">8.00 MZN</span>
+        </button>
+        <div class="cashout-section" id="cashout-section-${panelId}" style="display: none;">
+          <button class="cashout-button" id="cashout-button-${panelId}">
+            Cash Out<br><span class="cashout-amount" id="cashout-amount-text-${panelId}">MZN 0.00</span>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="auto-options">
+      <label><span>Auto bet</span><input type="checkbox" class="toggle-switch" /></label>
+      <label><span>Auto Cash Out</span><input type="checkbox" class="toggle-switch" /></label>
+      <div class="cashout-input">
+        <input type="number" min="1" step="0.01" value="1.10" />
+      </div>
+    </div>
+  </div>
+`;
+
+// =========================
+// BET TOGGLE
+// =========================
+function setupBetToggles() {
+  document.querySelectorAll('.bet-panel').forEach((panel, index) => {
+    const panelId = index + 1;
+    const betBtn = panel.querySelector('.toggle-bet');
+    const autoBtn = panel.querySelector('.toggle-auto');
+    const autoOptions = panel.querySelector('.auto-options');
+    if (betBtn && autoBtn) {
+      if (betBtn.classList.contains('active')) {
+        autoOptions.style.display = 'none';
+      }
+      betBtn.addEventListener('click', () => {
+        betBtn.classList.add('active');
+        autoBtn.classList.remove('active');
+        autoOptions.style.display = 'none';
+      });
+      autoBtn.addEventListener('click', () => {
+        autoBtn.classList.add('active');
+        betBtn.classList.remove('active');
+        autoOptions.style.display = 'block';
+      });
+    }
+  });
+}
+
+// =========================
+// FREE BETS MENU
+// =========================
+document.addEventListener('DOMContentLoaded', () => {
+  const freeBetsMenu = document.querySelector('.menu-items li:first-child');
+  if (freeBetsMenu) {
+    freeBetsMenu.addEventListener('click', () => openModal('freeBetsModal'));
   }
 });
 
 // =========================
 // CANVAS BACKGROUND
 // =========================
-const canvas = document.getElementById("game-bg");
-const ctx = canvas ? canvas.getContext("2d") : null;
+const canvas = document.getElementById('game-bg');
+const ctx = canvas ? canvas.getContext('2d') : null;
 if (ctx) {
   ctx.imageSmoothingEnabled = true;
 } else {
-  console.error("Canvas or context not available");
+  console.error('Canvas or context not available');
 }
 let rotationAngle = 0;
+
 function resizeCanvas() {
   if (canvas && ctx) {
-    // Always use the rendered size for scaling, for mobile correctness
     const displayWidth = canvas.clientWidth;
     const displayHeight = canvas.clientHeight;
     const dpr = window.devicePixelRatio || 1;
     canvas.width = displayWidth * dpr;
     canvas.height = displayHeight * dpr;
-    ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transform!
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.scale(dpr, dpr);
   }
 }
+
 function calculateMaxRadius(centerX, centerY) {
   if (!canvas) return 0;
   const logicalWidth = canvas.width / (window.devicePixelRatio || 1);
@@ -78,6 +237,7 @@ function calculateMaxRadius(centerX, centerY) {
     return Math.sqrt(dx * dx + dy * dy);
   }));
 }
+
 function drawRadiatingLines() {
   if (!ctx) return;
   const dpr = window.devicePixelRatio || 1;
@@ -96,11 +256,12 @@ function drawRadiatingLines() {
     ctx.beginPath();
     ctx.moveTo(0, 0);
     ctx.lineTo(radius * Math.cos(angle), radius * Math.sin(angle));
-    ctx.strokeStyle = "#222222";
+    ctx.strokeStyle = '#222222';
     ctx.stroke();
   }
   ctx.restore();
 }
+
 function animateBackground() {
   try {
     if (!ctx || !canvas) return;
@@ -109,7 +270,24 @@ function animateBackground() {
     drawRadiatingLines();
     requestAnimationFrame(animateBackground);
   } catch (error) {
-    console.error("Error in animateBackground:", error);
+    console.error('Error in animateBackground:', error);
+  }
+}
+
+// =========================
+// CRASH MESSAGE
+// =========================
+function showCrashMessage(msg, color = 'white', duration = 1500) {
+  const crashMessage = document.getElementById('crash-message');
+  if (crashMessage) {
+    crashMessage.textContent = msg;
+    crashMessage.style.display = msg ? 'block' : 'none';
+    crashMessage.style.color = color + ' !important';
+    if (duration > 0 && msg) {
+      setTimeout(() => {
+        crashMessage.style.display = 'none';
+      }, duration);
+    }
   }
 }
 
@@ -147,7 +325,7 @@ let multiplier = 1.0;
 let crashPoint = getNextCrashPoint();
 let animationFrame;
 let startTime;
-let userHasBet1 = false;
+let userHasでも1 = false;
 let userBetAmount1 = 0;
 let userBetId1 = null;
 let userHasBet2 = false;
@@ -180,13 +358,11 @@ function resetRound() {
   isBouncing = false;
   isExiting = false;
   exitStartTime = null;
-
-  showCrashMessage("", "white", 0);
-
-  const multiplierElement = document.getElementById("multiplier");
+  showCrashMessage('', 'white', 0);
+  const multiplierElement = document.getElementById('multiplier');
   if (multiplierElement) {
-    multiplierElement.textContent = "1.00x";
-    multiplierElement.style.color = "#ffffff";
+    multiplierElement.textContent = '1.00x';
+    multiplierElement.style.color = '#ffffff';
   }
   gameRunning = true;
   if (ctx) resizeCanvas();
@@ -200,12 +376,13 @@ function animate(timestamp) {
     if (!startTime) startTime = timestamp;
     const elapsed = (timestamp - startTime) / 1000;
     multiplier = 1 + (elapsed / 3.5);
-    const multiplierElement = document.getElementById("multiplier");
+    const multiplierElement = document.getElementById('multiplier');
     if (multiplierElement) {
-      multiplierElement.textContent = multiplier.toFixed(2) + "x";
+      multiplierElement.textContent = multiplier.toFixed(2) + 'x';
     }
     updateActivePlayers();
     if (crashPoint && multiplier >= crashPoint && !isExiting) {
+     -analytics.js
       isExiting = true;
       exitStartTime = timestamp;
       trail.length = 0;
@@ -224,12 +401,12 @@ function animate(timestamp) {
     }
     animationFrame = requestAnimationFrame(animate);
     if (userHasBet1 && gameRunning) {
-      const cashoutSection = document.getElementById("cashout-section-1");
-      if (cashoutSection) cashoutSection.style.display = "flex";
+      const cashoutSection = document.getElementById('cashout-section-1');
+      if (cashoutSection) cashoutSection.style.display = 'flex';
     }
     if (userHasBet2 && gameRunning) {
-      const cashoutSection = document.getElementById("cashout-section-2");
-      if (cashoutSection) cashoutSection.style.display = "flex";
+      const cashoutSection = document.getElementById('cashout-section-2');
+      if (cashoutSection) cashoutSection.style.display = 'flex';
     }
   } catch (error) {
     if (animationFrame) cancelAnimationFrame(animationFrame);
@@ -248,33 +425,33 @@ function crashGame() {
       drawRadiatingLines();
     }
     if (userHasBet1) {
-      addBetToTable("You", userBetAmount1, multiplier.toFixed(2), null);
+      addBetToTable('You', userBetAmount1, multiplier.toFixed(2), null);
       userHasBet1 = false;
       userBetAmount1 = 0;
       userBetId1 = null;
-      const cashoutSection = document.getElementById("cashout-section-1");
-      const betButton = document.getElementById("place-bet-button-1");
-      if (cashoutSection) cashoutSection.style.display = "none";
-      if (betButton) betButton.style.display = "flex";
+      const cashoutSection = document.getElementById('cashout-section-1');
+      const betButton = document.getElementById('place-bet-button-1');
+      if (cashoutSection) cashoutSection.style.display = 'none';
+      if (betButton) betButton.style.display = 'flex';
     }
     if (userHasBet2) {
-      addBetToTable("You", userBetAmount2, multiplier.toFixed(2), null);
+      addBetToTable('You', userBetAmount2, multiplier.toFixed(2), null);
       userHasBet2 = false;
       userBetAmount2 = 0;
       userBetId2 = null;
-      const cashoutSection = document.getElementById("cashout-section-2");
-      const betButton = document.getElementById("place-bet-button-2");
-      if (cashoutSection) cashoutSection.style.display = "none";
-      if (betButton) betButton.style.display = "flex";
+      const cashoutSection = document.getElementById('cashout-section-2');
+      const betButton = document.getElementById('place-bet-button-2');
+      if (cashoutSection) cashoutSection.style.display = 'none';
+      if (betButton) betButton.style.display = 'flex';
     }
     renderBetHistory();
     addMultiplierToHistory(multiplier);
-    const multiplierElement = document.getElementById("multiplier");
+    const multiplierElement = document.getElementById('multiplier');
     if (multiplierElement) {
-      multiplierElement.textContent = multiplier.toFixed(2) + "x";
-      multiplierElement.style.color = "white";
+      multiplierElement.textContent = multiplier.toFixed(2) + 'x';
+      multiplierElement.style.color = 'white';
     }
-    showCrashMessage("FLEW AWAY!", "white", 3000);
+    showCrashMessage('FLEW AWAY!', 'white', 3000);
     document.dispatchEvent(new Event('gameCrash'));
     setTimeout(() => {
       resetRound();
@@ -289,24 +466,24 @@ function resetGameUI() {
   userHasBet2 = false;
   userBetAmount2 = 0;
   userBetId2 = null;
-  const cashoutSection1 = document.getElementById("cashout-section-1");
-  const cashoutSection2 = document.getElementById("cashout-section-2");
-  if (!userHasBet1 && cashoutSection1) cashoutSection1.style.display = "none";
-  if (!userHasBet2 && cashoutSection2) cashoutSection2.style.display = "none";
-  const betInput1 = document.getElementById("bet-amount-1");
-  const betButton1 = document.getElementById("place-bet-button-1");
+  const cashoutSection1 = document.getElementById('cashout-section-1');
+  const cashoutSection2 = document.getElementById('cashout-section-2');
+  if (!userHasBet1 && cashoutSection1) cashoutSection1.style.display = 'none';
+  if (!userHasBet2 && cashoutSection2) cashoutSection2.style.display = 'none';
+  const betInput1 = document.getElementById('bet-amount-1');
+  const betButton1 = document.getElementById('place-bet-button-1');
   if (betInput1 && betButton1) {
     betButton1.innerHTML = 'Bet<br><span class="bet-amount" id="bet-amount-text-1">8.00 MZN</span>';
-    betButton1.style.display = "flex";
-    const betAmountText1 = document.getElementById("bet-amount-text-1");
+    betButton1.style.display = 'flex';
+    const betAmountText1 = document.getElementById('bet-amount-text-1');
     if (betAmountText1) betAmountText1.textContent = `${parseFloat(betInput1.value).toFixed(2)} MZN`;
   }
-  const betInput2 = document.getElementById("bet-amount-2");
-  const betButton2 = document.getElementById("place-bet-button-2");
+  const betInput2 = document.getElementById('bet-amount-2');
+  const betButton2 = document.getElementById('place-bet-button-2');
   if (betInput2 && betButton2) {
     betButton2.innerHTML = 'Bet<br><span class="bet-amount" id="bet-amount-text-2">8.00 MZN</span>';
-    betButton2.style.display = "flex";
-    const betAmountText2 = document.getElementById("bet-amount-text-2");
+    betButton2.style.display = 'flex';
+    const betAmountText2 = document.getElementById('bet-amount-text-2');
     if (betAmountText2) betAmountText2.textContent = `${parseFloat(betInput2.value).toFixed(2)} MZN`;
   }
 }
@@ -314,12 +491,12 @@ function resetGameUI() {
 function updateActivePlayers() {
   if (userHasBet1) {
     const winnings = userBetAmount1 * multiplier;
-    const cashoutText = document.getElementById("cashout-amount-text-1");
+    const cashoutText = document.getElementById('cashout-amount-text-1');
     if (cashoutText) cashoutText.textContent = `MZN ${winnings.toFixed(2)}`;
   }
   if (userHasBet2) {
     const winnings = userBetAmount2 * multiplier;
-    const cashoutText = document.getElementById("cashout-amount-text-2");
+    const cashoutText = document.getElementById('cashout-amount-text-2');
     if (cashoutText) cashoutText.textContent = `MZN ${winnings.toFixed(2)}`;
   }
 }
@@ -380,10 +557,10 @@ function drawTrail(multiplier) {
   }
   ctx.lineTo(trail[trail.length - 1].x, logicalHeight);
   ctx.closePath();
-  ctx.fillStyle = "rgba(255, 0, 0, 0.15)";
+  ctx.fillStyle = 'rgba(255, 0, 0, 0.15)';
   ctx.fill();
   ctx.lineWidth = 7;
-  ctx.strokeStyle = "rgba(255, 0, 0, 0.2)";
+  ctx.strokeStyle = 'rgba(255, 0, 0, 0.2)';
   ctx.beginPath();
   for (let i = 0; i < trail.length; i++) {
     const point = trail[i];
@@ -392,7 +569,7 @@ function drawTrail(multiplier) {
   }
   ctx.stroke();
   ctx.lineWidth = 3;
-  ctx.strokeStyle = "red";
+  ctx.strokeStyle = 'red';
   ctx.beginPath();
   for (let i = 0; i < trail.length; i++) {
     const point = trail[i];
@@ -419,7 +596,7 @@ function drawPlane(multiplier, timestamp) {
   if (planeImage.complete && planeImage.naturalWidth !== 0) {
     ctx.drawImage(planeImage, 0, -planeSize, planeSize, planeSize);
   } else {
-    ctx.fillStyle = "blue";
+    ctx.fillStyle = 'blue';
     ctx.fillRect(0, -planeSize, planeSize, planeSize);
   }
   ctx.restore();
@@ -437,7 +614,6 @@ function updateTotalBets() {
     }
   } catch (error) {}
 }
-updateTotalBets();
 
 function startGame(panelId) {
   try {
@@ -446,11 +622,11 @@ function startGame(panelId) {
     const bet = parseFloat(betInput.value);
     const balance = getBalance();
     if (bet > balance || isNaN(bet)) {
-      alert("Invalid or insufficient balance.");
+      alert('Invalid or insufficient balance.');
       return;
     }
     if (gameRunning) {
-      alert("Game already started. Please wait for the next round.");
+      alert('Game already started. Please wait for the next round.');
       return;
     }
     const existingBet = betHistoryData.find(
@@ -468,7 +644,7 @@ function startGame(panelId) {
       userBetAmount2 = bet;
       userBetId2 = betId;
     }
-    addBetToTable("You", bet, null, null);
+    addBetToTable('You', bet, null, null);
     const now = new Date();
     const dateStr = `${String(now.getDate()).padStart(2, '0')}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getFullYear()).slice(-2)} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
     betHistoryData.unshift({
@@ -485,8 +661,8 @@ function startGame(panelId) {
     renderBetHistory();
     const betButton = document.getElementById(`place-bet-button-${panelId}`);
     const cashoutSection = document.getElementById(`cashout-section-${panelId}`);
-    if (betButton) betButton.style.display = "none";
-    if (cashoutSection) cashoutSection.style.display = "flex";
+    if (betButton) betButton.style.display = 'none';
+    if (cashoutSection) cashoutSection.style.display = 'flex';
   } catch (error) {}
 }
 
@@ -500,7 +676,7 @@ function cashOut(panelId) {
     }
     const winnings = betAmount * multiplier;
     setBalance(getBalance() + winnings);
-    addBetToTable("You", betAmount, multiplier.toFixed(2), winnings);
+    addBetToTable('You', betAmount, multiplier.toFixed(2), winnings);
     const betIndex = betHistoryData.findIndex(
       item => item.panelId === panelId && item.betId === betId
     );
@@ -520,52 +696,54 @@ function cashOut(panelId) {
       userBetId2 = null;
     }
     renderBetHistory();
-    showCrashMessage("FLEW AWAY!", "white", 1500);
-    const banner = document.getElementById("cashout-banner");
-    const winAmountElement = document.getElementById("cashout-win-amount");
+    showCrashMessage('FLEW AWAY!', 'white', 1500);
+    const banner = document.getElementById('cashout-banner');
+    const winAmountElement = document.getElementById('cashout-win-amount');
     if (banner && winAmountElement) {
       winAmountElement.textContent = winnings.toFixed(2);
-      banner.style.display = "flex";
-      banner.style.animation = "none";
+      banner.style.display = 'flex';
+      banner.style.animation = 'none';
       banner.offsetHeight;
-      banner.style.animation = "fadeOut 2s forwards";
+      banner.style.animation = 'fadeOut 2s forwards';
       setTimeout(() => {
-        banner.style.display = "none";
+        banner.style.display = 'none';
       }, 2000);
     }
     const cashoutSection = document.getElementById(`cashout-section-${panelId}`);
     const betButton = document.getElementById(`place-bet-button-${panelId}`);
-    if (cashoutSection) cashoutSection.style.display = "none";
-    if (betButton) betButton.style.display = "flex";
+    if (cashoutSection) cashoutSection.style.display = 'none';
+    if (betButton) betButton.style.display = 'flex';
   } catch (error) {}
 }
 
-const refreshButton = document.getElementById("refresh-balance");
+const refreshButton = document.getElementById('refresh-balance');
 if (refreshButton) {
-  refreshButton.addEventListener("click", () => {
+  refreshButton.addEventListener('click', () => {
     try {
       const newBalance = (Math.random() * 10000).toFixed(2);
-      const userBalance = document.getElementById("user-balance");
+      const userBalance = document.getElementById('user-balance');
       if (userBalance) {
         userBalance.textContent = `MZN ${newBalance}`;
       }
     } catch (error) {}
   });
 }
+
 function getBalance() {
   try {
-    const userBalance = document.getElementById("user-balance");
+    const userBalance = document.getElementById('user-balance');
     if (userBalance) {
-      return parseFloat(userBalance.textContent.replace(/[^\d.-]/g, ""));
+      return parseFloat(userBalance.textContent.replace(/[^\d.-]/g, ''));
     }
     return 0;
   } catch (error) {
     return 0;
   }
 }
+
 function setBalance(amount) {
   try {
-    const userBalance = document.getElementById("user-balance");
+    const userBalance = document.getElementById('user-balance');
     if (userBalance) {
       userBalance.textContent = `MZN ${amount.toFixed(2)}`;
     }
@@ -573,40 +751,168 @@ function setBalance(amount) {
 }
 
 // =========================
+// MULTIPLIER HISTORY
+// =========================
+function addMultiplierToHistory(multiplier) {
+  try {
+    const history = document.getElementById('multiplier-history');
+    if (!history) return;
+    const item = document.createElement('div');
+    item.className = 'multiplier-item';
+    if (multiplier >= 10) {
+      item.style.color = 'rgb(192, 23, 180)';
+    } else if (multiplier >= 2) {
+      item.style.color = 'rgb(145, 62, 248)';
+    } else {
+      item.style.color = 'rgb(52, 180, 255)';
+    }
+    item.textContent = `${multiplier.toFixed(2)}x`;
+    history.prepend(item);
+    if (history.children.length > 100) {
+      history.removeChild(history.lastChild);
+    }
+  } catch (error) {}
+}
+
+// =========================
+// BET HISTORY
+// =========================
+let betHistoryData = [
+  { date: '21-05-25 19:26', bet: 1.00, multiplier: '1.09x', cashout: 1.09 },
+  { date: '21-05-25 19:24', bet: 50.00, multiplier: '1.07x', cashout: 53.50 },
+  { date: '10-05-25 16:16', bet: 1.00, multiplier: '1.00x', cashout: null },
+  { date: '09-05-25 18:26', bet: 50.00, multiplier: '1.07x', cashout: 53.50 },
+  { date: '09-05-25 18:26', bet: 20.00, multiplier: '1.31x', cashout: 26.20 },
+  { date: '09-05-25 18:26', bet: 20.00, multiplier: '1.22x', cashout: 24.40 },
+  { date: '09-05-25 17:55', bet: 20.00, multiplier: '1.23x', cashout: 24.60 },
+  { date: '09-05-25 17:52', bet: 20.00, multiplier: '1.57x', cashout: 31.40 },
+  { date: '09-05-25 17:51', bet: 20.00, multiplier: '1.08x', cashout: null },
+  { date: '09-05-25 17:50', bet: 20.00, multiplier: '1.17x', cashout: null }
+];
+
+function renderBetHistory() {
+  try {
+    const container = document.querySelector('.bet-history-table');
+    if (!container) return;
+    container.innerHTML = `
+      <div class="bet-history-row header">
+        <span>Date</span><span>Bet MZN</span><span>X</span><span>Cash out MZN</span>
+      </div>
+    `;
+    betHistoryData.forEach(item => {
+      const row = document.createElement('div');
+      row.className = 'bet-history-row';
+      row.innerHTML = `
+        <span>${item.date}</span>
+        <span>${item.bet.toFixed(2)}</span>
+        <span>${item.multiplier || '—'}</span>
+        <span>${item.cashout !== null ? item.cashout.toFixed(2) : '—'}</span>
+      `;
+      container.appendChild(row);
+    });
+  } catch (error) {}
+}
+
+function addBetToTable(username, betAmount, multiplier = null, winAmount = null) {
+  try {
+    const table = document.querySelector('.bets-table');
+    if (!table) return;
+    const row = document.createElement('div');
+    row.classList.add('bets-row');
+    if (multiplier && winAmount) row.classList.add('highlight');
+    row.innerHTML = `
+      <span>${username}</span>
+      <span>${betAmount.toLocaleString()}</span>
+      <span>${multiplier ? multiplier + 'x' : '—'}</span>
+      <span>${winAmount ? winAmount.toLocaleString() : '—'}</span>
+    `;
+    table.insertBefore(row, table.children[1]);
+    while (table.children.length > 21) {
+      table.removeChild(table.lastChild);
+    }
+    updateTotalBets();
+  } catch (error) {}
+}
+
+// =========================
+// TOP BAR LOGIC
+// =========================
+let isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+function updateTopBar() {
+  try {
+    const topBar = document.getElementById('top-bar-button');
+    if (!topBar) return;
+    topBar.innerHTML = '';
+    const link = document.createElement('a');
+    link.style.color = 'white';
+    link.style.textDecoration = 'none';
+    link.style.cursor = 'pointer';
+    link.style.pointerEvents = 'auto';
+    link.tabIndex = 0;
+    if (isLoggedIn) {
+      link.href = '#';
+      link.textContent = 'Click to deposit';
+      link.onclick = () => {
+        openModal('deposit');
+        return false;
+      };
+    } else {
+      link.href = '#';
+      link.textContent = 'Login to play';
+      link.onclick = () => {
+        openModal('login-modal');
+        return false;
+      };
+    }
+    topBar.appendChild(link);
+  } catch (error) {}
+}
+
+// =========================
 // DOM READY
 // =========================
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener('DOMContentLoaded', () => {
   try {
-    const betButton1 = document.getElementById("place-bet-button-1");
-    const cashoutButton1 = document.getElementById("cashout-button-1");
-    const betInput1 = document.getElementById("bet-amount-1");
-    const betButton2 = document.getElementById("place-bet-button-2");
-    const cashoutButton2 = document.getElementById("cashout-button-2");
-    const betInput2 = document.getElementById("bet-amount-2");
+    // Render bet panels
+    const betPanelsContainer = document.getElementById('bet-panels-container');
+    [1, 2].forEach(panelId => {
+      betPanelsContainer.innerHTML += betPanelTemplate(panelId);
+    });
+
+    // Setup bet toggles
+    setupBetToggles();
+
+    // Setup bet and cashout buttons
+    const betButton1 = document.getElementById('place-bet-button-1');
+    const cashoutButton1 = document.getElementById('cashout-button-1');
+    const betInput1 = document.getElementById('bet-amount-1');
+    const betButton2 = document.getElementById('place-bet-button-2');
+    const cashoutButton2 = document.getElementById('cashout-button-2');
+    const betInput2 = document.getElementById('bet-amount-2');
     if (betButton1) {
       betButton1.replaceWith(betButton1.cloneNode(true));
-      document.getElementById("place-bet-button-1").addEventListener('click', (e) => {
+      document.getElementById('place-bet-button-1').addEventListener('click', (e) => {
         e.stopPropagation();
         startGame(1);
       });
     }
     if (cashoutButton1) {
       cashoutButton1.replaceWith(cashoutButton1.cloneNode(true));
-      document.getElementById("cashout-button-1").addEventListener('click', (e) => {
+      document.getElementById('cashout-button-1').addEventListener('click', (e) => {
         e.stopPropagation();
         cashOut(1);
       });
     }
     if (betButton2) {
       betButton2.replaceWith(betButton2.cloneNode(true));
-      document.getElementById("place-bet-button-2").addEventListener('click', (e) => {
+      document.getElementById('place-bet-button-2').addEventListener('click', (e) => {
         e.stopPropagation();
         startGame(2);
       });
     }
     if (cashoutButton2) {
       cashoutButton2.replaceWith(cashoutButton2.cloneNode(true));
-      document.getElementById("cashout-button-2").addEventListener('click', (e) => {
+      document.getElementById('cashout-button-2').addEventListener('click', (e) => {
         e.stopPropagation();
         cashOut(2);
       });
@@ -657,278 +963,36 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       });
     });
+
+    // Render initial bets table
+    const betsData = [
+      { player: 's***e', bet: '10,638.04', x: '—', win: '—' },
+      { player: 's***e', bet: '10,638.04', x: '—', win: '—' },
+      { player: '2***3', bet: '4,941.52', x: '—', win: '—' },
+      { player: '2***3', bet: '4,941.52', x: '—', win: '—' },
+      { player: '2***0', bet: '4,150.87', x: '—', win: '—' },
+      { player: 'b***u', bet: '1,085.08', x: '1.21x', win: '1,312.94', highlight: true }
+    ];
+    const betsTable = document.querySelector('.bets-table');
+    betsTable.innerHTML = `
+      <div class="bets-header">
+        <span>Player</span><span>Bet MZN</span><span>X</span><span>Win MZN</span>
+      </div>
+      ${betsData.map(bet => `
+        <div class="bets-row${bet.highlight ? ' highlight' : ''}">
+          <span>${bet.player}</span><span>${bet.bet}</span><span>${bet.x}</span><span>${bet.win}</span>
+        </div>
+      `).join('')}
+    `;
+    updateTotalBets();
+
     resizeCanvas();
     animateBackground();
     resetRound();
     updateTopBar();
-  } catch (error) {}
+  } catch (error) {
+    console.error('DOMContentLoaded error:', error);
+  }
 });
 
-window.addEventListener("resize", resizeCanvas);
-
-// =========================
-// MULTIPLIER HISTORY
-// =========================
-function addMultiplierToHistory(multiplier) {
-  try {
-    const history = document.getElementById("multiplier-history");
-    if (!history) return;
-    const item = document.createElement("div");
-    item.className = "multiplier-item";
-    if (multiplier >= 10) {
-      item.style.color = "rgb(192, 23, 180)";
-    } else if (multiplier >= 2) {
-      item.style.color = "rgb(145, 62, 248)";
-    } else {
-      item.style.color = "rgb(52, 180, 255)";
-    }
-    item.textContent = `${multiplier.toFixed(2)}x`;
-    history.prepend(item);
-    if (history.children.length > 100) {
-      history.removeChild(history.lastChild);
-    }
-  } catch (error) {}
-}
-
-function addBetToTable(username, betAmount, multiplier = null, winAmount = null) {
-  try {
-    const table = document.querySelector(".bets-table");
-    if (!table) return;
-    const row = document.createElement("div");
-    row.classList.add("bets-row");
-    if (multiplier && winAmount) row.classList.add("highlight");
-    row.innerHTML = `
-      <span>${username}</span>
-      <span>${betAmount.toLocaleString()}</span>
-      <span>${multiplier ? multiplier + 'x' : '—'}</span>
-      <span>${winAmount ? winAmount.toLocaleString() : '—'}</span>
-    `;
-    table.insertBefore(row, table.children[1]);
-    while (table.children.length > 21) {
-      table.removeChild(table.lastChild);
-    }
-  } catch (error) {}
-}
-
-// =========================
-// BET HISTORY
-// =========================
-let betHistoryData = [
-  { date: '21-05-25 19:26', bet: 1.00, multiplier: '1.09x', cashout: 1.09 },
-  { date: '21-05-25 19:24', bet: 50.00, multiplier: '1.07x', cashout: 53.50 },
-  { date: '10-05-25 16:16', bet: 1.00, multiplier: '1.00x', cashout: null },
-  { date: '09-05-25 18:26', bet: 50.00, multiplier: '1.07x', cashout: 53.50 },
-  { date: '09-05-25 18:26', bet: 20.00, multiplier: '1.31x', cashout: 26.20 },
-  { date: '09-05-25 18:26', bet: 20.00, multiplier: '1.22x', cashout: 24.40 },
-  { date: '09-05-25 17:55', bet: 20.00, multiplier: '1.23x', cashout: 24.60 },
-  { date: '09-05-25 17:52', bet: 20.00, multiplier: '1.57x', cashout: 31.40 },
-  { date: '09-05-25 17:51', bet: 20.00, multiplier: '1.08x', cashout: null },
-  { date: '09-05-25 17:50', bet: 20.00, multiplier: '1.17x', cashout: null }
-];
-function renderBetHistory() {
-  try {
-    const container = document.querySelector('.bet-history-table');
-    if (!container) return;
-    container.innerHTML = `
-      <div class="bet-history-row header">
-        <span>Date</span><span>Bet MZN</span><span>X</span><span>Cash out MZN</span>
-      </div>
-    `;
-    betHistoryData.forEach(item => {
-      const row = document.createElement('div');
-      row.className = 'bet-history-row';
-      row.innerHTML = `
-        <span>${item.date}</span>
-        <span>${item.bet.toFixed(2)}</span>
-        <span>${item.multiplier || '—'}</span>
-        <span>${item.cashout !== null ? item.cashout.toFixed(2) : '—'}</span>
-      `;
-      container.appendChild(row);
-    });
-  } catch (error) {}
-}
-
-// =========================
-// BET TOGGLE
-// =========================
-document.querySelectorAll(".bet-toggle").forEach(toggle => {
-  try {
-    const betBtn = toggle.querySelector(".toggle-bet");
-    const autoBtn = toggle.querySelector(".toggle-auto");
-    const autoOptions = toggle.closest('.bet-panel')?.querySelector('.auto-bet-cashout-options');
-    if (betBtn && betBtn.classList.contains("active") && autoOptions) {
-      autoOptions.style.display = "none";
-    }
-    if (betBtn) {
-      betBtn.addEventListener("click", () => {
-        betBtn.classList.add("active");
-        if (autoBtn) autoBtn.classList.remove("active");
-        if (autoOptions) autoOptions.style.display = "none";
-      });
-    }
-    if (autoBtn) {
-      autoBtn.addEventListener("click", () => {
-        autoBtn.classList.add("active");
-        if (betBtn) betBtn.classList.remove("active");
-        if (autoOptions) autoOptions.style.display = "block";
-      });
-    }
-  } catch (error) {}
-});
-
-// =========================
-// TOP BAR LOGIC (Login/Deposit)
-// =========================
-let isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-let authMode = 'login';
-
-function updateTopBar() {
-  try {
-    const topBar = document.getElementById('top-bar-button');
-    if (!topBar) return;
-    topBar.innerHTML = '';
-    const link = document.createElement('a');
-    link.style.color = 'white';
-    link.style.textDecoration = 'none';
-    link.style.cursor = 'pointer';
-    link.style.pointerEvents = 'auto';
-    link.tabIndex = 0;
-    if (isLoggedIn) {
-      link.href = '#';
-      link.textContent = 'Click to deposit';
-      link.onclick = function() {
-        openModal('deposit');
-        return false;
-      };
-    } else {
-      link.href = '#';
-      link.textContent = 'Login to play';
-      link.onclick = function() {
-        openModal('login');
-        return false;
-      };
-    }
-    topBar.appendChild(link);
-  } catch (error) {}
-}
-document.addEventListener('DOMContentLoaded', updateTopBar);
-
-// Modal open/close logic
-function openSignupModal() { document.getElementById('signupModal').style.display = 'flex'; }
-function closeSignupModal() { document.getElementById('signupModal').style.display = 'none'; }
-function openProfileModal() { document.getElementById('profileModal').style.display = 'flex'; }
-function closeProfileModal() { document.getElementById('profileModal').style.display = 'none'; }
-function openModal(modalId) { document.getElementById(modalId).style.display = 'block'; }
-function closeModal(modalId) { document.getElementById(modalId).style.display = 'none'; }
-function openLoginModal() { openModal('login-modal'); }
-function closeTicketsModal() { closeModal('ticketsModal'); }
-function openTicketsModal() { openModal('ticketsModal'); }
-function openBetHistoryModal() { openModal('betHistoryModal'); }
-function closeBetHistoryModal() { closeModal('betHistoryModal'); }
-
-// Toggle for bet/auto
-document.querySelectorAll('.bet-toggle').forEach(toggle => {
-  const betButton = toggle.querySelector('.toggle-bet');
-  const autoButton = toggle.querySelector('.toggle-auto');
-  betButton.addEventListener('click', () => {
-    betButton.classList.add('active');
-    autoButton.classList.remove('active');
-  });
-  autoButton.addEventListener('click', () => {
-    autoButton.classList.add('active');
-    betButton.classList.remove('active');
-  });
-});
-
-// Free bets menu
-document.addEventListener('DOMContentLoaded', function () {
-  var menu = document.querySelector('.menu-items li:first-child');
-  if (menu) menu.addEventListener('click', function () { openModal('freeBetsModal'); });
-
-  // ========== SIGNUP + PROFILE JS ==========
-  let registeredUserId = null;
-
-  document.getElementById('signupForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    const phone = document.getElementById('signup-phone').value;
-    const password = document.getElementById('signup-password').value;
-    const confirmPassword = document.getElementById('signup-confirm-password').value;
-    const referralCode = document.getElementById('signup-referral').value;
-    const errorP = document.getElementById('signup-error');
-    errorP.textContent = '';
-
-    if (password !== confirmPassword) {
-      errorP.textContent = "Passwords don't match.";
-      return;
-    }
-    try {
-      const response = await fetch('https://my-backend.onrender.com/register', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ phone, password, referralCode })
-      });
-
-      let result;
-      try {
-        result = await response.json();
-      } catch (jsonErr) {
-        errorP.textContent = "Server returned invalid JSON.";
-        return;
-      }
-
-      if (!response.ok) {
-        errorP.textContent = result.error || "Registration failed.";
-        return;
-      }
-
-      if (result.user && result.user._id) {
-        registeredUserId = result.user._id;
-        closeSignupModal();
-        openProfileModal();
-      } else {
-        errorP.textContent = result.error || "Registration failed.";
-      }
-    } catch (err) {
-      errorP.textContent = "Registration error: " + err.message;
-    }
-  });
-
-  document.getElementById('profileForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    const fullName = document.getElementById('profile-fullname').value;
-    const email = document.getElementById('profile-email').value;
-    const dob = document.getElementById('profile-dob').value;
-    const username = document.getElementById('profile-username').value;
-    const errorP = document.getElementById('profile-error');
-    errorP.textContent = '';
-
-    if (!registeredUserId) {
-      errorP.textContent = "No user registered.";
-      return;
-    }
-    try {
-      const response = await fetch('http://localhost:3000/complete-profile', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ userId: registeredUserId, fullName, email, dob, username })
-      });
-      const result = await response.json();
-      if (result.user) {
-        closeProfileModal();
-        alert('Profile completed! You can now play or log in.');
-      } else {
-        errorP.textContent = result.error || "Profile update failed.";
-      }
-    } catch (err) {
-      errorP.textContent = "Profile update error.";
-    }
-  });
-
-  // Modal close on outside click
-  window.addEventListener('click', function (event) {
-    ['signupModal', 'freeBetsModal', 'profileModal'].forEach(function (id) {
-      var modal = document.getElementById(id);
-      if (modal && event.target === modal) { closeModal(id); }
-    });
-  });
-});
+window.addEventListener('resize', resizeCanvas);
