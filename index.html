@@ -200,29 +200,31 @@
       </div>
 
       <!-- SIGNUP MODAL -->
-      <div id="signupModal" class="modal" style="display: none;">
-        <div class="modal-content" style="background-color: #1c1c1c; padding: 20px; border-radius: 10px; width: 300px; color: white; position: relative;">
-          <span class="close" onclick="closeSignupModal()" style="position: absolute; right: 10px; top: 10px; font-size: 20px; cursor: pointer;">&times;</span>
-          <h2 style="text-align: center;">Join Airpawa</h2>
-          <p style="text-align: center; font-size: 0.9em; margin-bottom: 20px;">Home to fast wins and easy bets</p>
-          <form id="signupForm">
-            <label>Phone number</label>
-            <input type="tel" id="signup-phone" placeholder="+256 7xxxxxxxx" required style="width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: none;" />
-            <label>Password</label>
-            <input type="password" id="signup-password" required style="width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: none;" />
-            <label>Confirm password</label>
-            <input type="password" id="signup-confirm-password" required style="width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: none;" />
-            <label>Referral code (optional)</label>
-            <input type="text" id="signup-referral" placeholder="e.g. ABCDXY" style="width: 100%; padding: 10px; margin: 5px 0 15px; border-radius: 5px; border: none;" />
-            <button type="submit" style="width: 100%; padding: 10px; background: red; color: white; border: none; border-radius: 5px;">Sign Up</button>
-            <p id="signup-error" style="color: #f88; text-align:center;"></p>
-            <p style="text-align: center; margin-top: 10px;">
-              or <a href="#" onclick="openLoginModal()" style="color: #00f;">Login</a>
-            </p>
-          </form>
-        </div>
-      </div>
-
+      <!-- SIGNUP MODAL -->
+<div id="signupModal" class="modal" style="display: none;">
+  <div class="modal-content" style="background-color: #1c1c1c; padding: 20px; border-radius: 10px; width: 300px; color: white; position: relative;">
+    <span class="close" onclick="closeSignupModal()" style="position: absolute; right: 10px; top: 10px; font-size: 20px; cursor: pointer;">&times;</span>
+    <h2 style="text-align: center;">Join Airpawa</h2>
+    <p style="text-align: center; font-size: 0.9em; margin-bottom: 20px;">Home to fast wins and easy bets</p>
+    <form id="signupForm">
+      <label>Username</label>
+      <input type="text" id="signup-username" required style="width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: none;" />
+      <label>Email address</label>
+      <input type="email" id="signup-email" required style="width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: none;" />
+      <label>Password</label>
+      <input type="password" id="signup-password" required style="width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: none;" />
+      <label>Confirm password</label>
+      <input type="password" id="signup-confirm-password" required style="width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: none;" />
+      <label>Referral code (optional)</label>
+      <input type="text" id="signup-referral" placeholder="e.g. ABCDXY" style="width: 100%; padding: 10px; margin: 5px 0 15px; border-radius: 5px; border: none;" />
+      <button type="submit" style="width: 100%; padding: 10px; background: red; color: white; border: none; border-radius: 5px;">Sign Up</button>
+      <p id="signup-error" style="color: #f88; text-align:center;"></p>
+      <p style="text-align: center; margin-top: 10px;">
+        or <a href="#" onclick="openLoginModal()" style="color: #00f;">Login</a>
+      </p>
+    </form>
+  </div>
+</div>
       <!-- PROFILE STEP MODAL -->
       <div id="profileModal" class="modal" style="display: none;">
         <div class="modal-content" style="background-color: #1c1c1c; padding: 20px; border-radius: 10px; width: 300px; color: white; position: relative;">
