@@ -33,7 +33,7 @@
           </div>
 
           <div class="dropdown-container">
-            <div class="hamburger" id="menu-toggle">&#9776;</div>
+            <div class="hamburger" id="menu-toggle">☰</div>
             <div class="dropdown-menu" id="dropdown-menu">
               <div class="user-section">
                 <img src="plane pink.png" class="avatar" alt="Avatar" />
@@ -199,36 +199,36 @@
         </div>
       </div>
 
-     <!-- SIGNUP MODAL -->
-<div id="signupModal" class="modal" style="display: none;">
-  <div class="modal-content" style="background-color: #1c1c1c; padding: 20px; border-radius: 10px; width: 300px; color: white; position: relative;">
-    <span class="close" onclick="closeSignupModal()" style="position: absolute; right: 10px; top: 10px; font-size: 20px; cursor: pointer;">&times;</span>
-    <h2 style="text-align: center;">Join Airpawa</h2>
-    <p style="text-align: center; font-size: 0.9em; margin-bottom: 20px;">Home to fast wins and easy bets</p>
-    <form id="signupForm">
-      <label>Username</label>
-      <input type="text" id="signup-username" required style="width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: none;" />
-      <label>Email address</label>
-      <input type="email" id="signup-email" required style="width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: none;" />
-      <label>Password</label>
-      <input type="password" id="signup-password" required style="width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: none;" />
-      <label>Confirm password</label>
-      <input type="password" id="signup-confirm-password" required style="width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: none;" />
-      <label>Referral code (optional)</label>
-      <input type="text" id="signup-referral" placeholder="e.g. ABCDXY" style="width: 100%; padding: 10px; margin: 5px 0 15px; border-radius: 5px; border: none;" />
-      <button type="submit" style="width: 100%; padding: 10px; background: red; color: white; border: none; border-radius: 5px;">Sign Up</button>
-      <p id="signup-error" style="color: #f88; text-align:center;"></p>
-      <p style="text-align: center; margin-top: 10px;">
-        or <a href="#" onclick="openLoginModal()" style="color: #00f;">Login</a>
-      </p>
-    </form>
-  </div>
-</div>
-      
+      <!-- SIGNUP MODAL -->
+      <div id="signupModal" class="modal" style="display: none;">
+        <div class="modal-content" style="background-color: #1c1c1c; padding: 20px; border-radius: 10px; width: 300px; color: white; position: relative;">
+          <span class="close" onclick="closeSignupModal()" style="position: absolute; right: 10px; top: 10px; font-size: 20px; cursor: pointer;">×</span>
+          <h2 style="text-align: center;">Join Airpawa</h2>
+          <p style="text-align: center; font-size: 0.9em; margin-bottom: 20px;">Home to fast wins and easy bets</p>
+          <form id="signupForm">
+            <label>Username</label>
+            <input type="text" id="signup-username" required style="width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: none;" />
+            <label>Email address</label>
+            <input type="email" id="signup-email" required style="width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: none;" />
+            <label>Password</label>
+            <input type="password" id="signup-password" required style="width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: none;" />
+            <label>Confirm password</label>
+            <input type="password" id="signup-confirm-password" required style="width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: none;" />
+            <label>Referral code (optional)</label>
+            <input type="text" id="signup-referral" placeholder="e.g. ABCDXY" style="width: 100%; padding: 10px; margin: 5px 0 15px; border-radius: 5px; border: none;" />
+            <button type="submit" style="width: 100%; padding: 10px; background: red; color: white; border: none; border-radius: 5px;">Sign Up</button>
+            <p id="signup-error" style="color: #f88; text-align:center;"></p>
+            <p style="text-align: center; margin-top: 10px;">
+              or <a href="#" onclick="openLoginModal()" style="color: #00f;">Login</a>
+            </p>
+          </form>
+        </div>
+      </div>
+
       <!-- PROFILE STEP MODAL -->
       <div id="profileModal" class="modal" style="display: none;">
         <div class="modal-content" style="background-color: #1c1c1c; padding: 20px; border-radius: 10px; width: 300px; color: white; position: relative;">
-          <span class="close" onclick="closeProfileModal()" style="position: absolute; right: 10px; top: 10px; font-size: 20px; cursor: pointer;">&times;</span>
+          <span class="close" onclick="closeProfileModal()" style="position: absolute; right: 10px; top: 10px; font-size: 20px; cursor: pointer;">×</span>
           <h2 style="text-align: center;">Complete Your Profile</h2>
           <form id="profileForm">
             <label>Full name</label>
@@ -248,7 +248,7 @@
       <!-- LOGIN MODAL -->
       <div id="login-modal" class="modal" style="display: none;">
         <div class="modal-content dark-modal">
-          <span class="close" onclick="closeModal('login-modal')">&times;</span>
+          <span class="close" onclick="closeModal('login-modal')">×</span>
           <form id="login-form">
             <h2>Login</h2>
             <label for="login-phone">Phone number</label>
@@ -270,7 +270,7 @@
       <!-- Free Bets Lightbox Modal -->
       <div id="freeBetsModal" class="modal" style="display: none;">
         <div class="modal-content">
-          <span class="close" onclick="closeModal('freeBetsModal')">&times;</span>
+          <span class="close" onclick="closeModal('freeBetsModal')">×</span>
           <h2>Free Bets Management</h2>
           <label>
             <input type="radio" name="bet-option" checked> Play with cash
@@ -285,7 +285,7 @@
       <!-- Bet History Modal -->
       <div id="betHistoryModal" class="modal" style="display: none;">
         <div class="modal-content bet-history-box">
-          <span class="close" onclick="closeBetHistoryModal()">&times;</span>
+          <span class="close" onclick="closeBetHistoryModal()">×</span>
           <h2>MY BET HISTORY</h2>
           <div class="bet-history-table">
             <div class="bet-history-row header">
@@ -352,73 +352,6 @@
         var modal = document.getElementById(id);
         if (modal && event.target === modal) { closeModal(id); }
       });
-    });
-
-    // ========== SIGNUP + PROFILE JS ==========
-
-    let registeredUserId = null;
-
-    document.getElementById('signupForm').addEventListener('submit', async function(e) {
-      e.preventDefault();
-      const phone = document.getElementById('signup-phone').value;
-      const password = document.getElementById('signup-password').value;
-      const confirmPassword = document.getElementById('signup-confirm-password').value;
-      const referralCode = document.getElementById('signup-referral').value;
-      const errorP = document.getElementById('signup-error');
-      errorP.textContent = '';
-
-      if (password !== confirmPassword) {
-        errorP.textContent = "Passwords don't match.";
-        return;
-      }
-      try {
-        const response = await fetch('https://backend-4lrl.onrender.com/complete-profile', {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({ phone, password, referralCode })
-        });
-        const result = await response.json();
-        if (result.user && result.user._id) {
-          registeredUserId = result.user._id;
-          closeSignupModal();
-          openProfileModal();
-        } else {
-          errorP.textContent = result.error || "Registration failed.";
-        }
-      } catch (err) {
-        errorP.textContent = "Registration error.";
-      }
-    });
-
-    document.getElementById('profileForm').addEventListener('submit', async function(e) {
-      e.preventDefault();
-      const fullName = document.getElementById('profile-fullname').value;
-      const email = document.getElementById('profile-email').value;
-      const dob = document.getElementById('profile-dob').value;
-      const username = document.getElementById('profile-username').value;
-      const errorP = document.getElementById('profile-error');
-      errorP.textContent = '';
-
-      if (!registeredUserId) {
-        errorP.textContent = "No user registered.";
-        return;
-      }
-      try {
-        const response = await fetch('https://backend-4lrl.onrender.com/complete-profile', {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({ userId: registeredUserId, fullName, email, dob, username })
-        });
-        const result = await response.json();
-        if (result.user) {
-          closeProfileModal();
-          alert('Profile completed! You can now play or log in.');
-        } else {
-          errorP.textContent = result.error || "Profile update failed.";
-        }
-      } catch (err) {
-        errorP.textContent = "Profile update error.";
-      }
     });
   </script>
   <script src="script.js"></script>
