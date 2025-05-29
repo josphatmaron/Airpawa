@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,7 +7,6 @@
   <link rel="stylesheet" href="style.css" />
   <link rel="icon" href="plane.png" type="image/png" />
 </head>
-
 <body>
   <div id="cashout-banner" class="cashout-banner" style="display: none;">
     <div class="cashout-bubble">You have cashed out!</div>
@@ -38,7 +36,7 @@
             <div class="hamburger" id="menu-toggle">&#9776;</div>
             <div class="dropdown-menu" id="dropdown-menu">
               <div class="user-section">
-                <img src="plane-avatar.png" class="avatar" alt="Avatar" />
+                <img src="plane pink.png" class="avatar" alt="Avatar" />
                 <div class="auth-buttons">
                   <button onclick="openModal('login-modal')">Login</button>
                   <button onclick="openSignupModal()">Signup</button>
@@ -209,17 +207,38 @@
           <p style="text-align: center; font-size: 0.9em; margin-bottom: 20px;">Home to fast wins and easy bets</p>
           <form id="signupForm">
             <label>Phone number</label>
-            <input type="tel" placeholder="+256 7xxxxxxxx" required style="width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: none;" />
+            <input type="tel" id="signup-phone" placeholder="+256 7xxxxxxxx" required style="width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: none;" />
             <label>Password</label>
-            <input type="password" required style="width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: none;" />
+            <input type="password" id="signup-password" required style="width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: none;" />
             <label>Confirm password</label>
-            <input type="password" required style="width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: none;" />
+            <input type="password" id="signup-confirm-password" required style="width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: none;" />
             <label>Referral code (optional)</label>
-            <input type="text" placeholder="e.g. ABCDXY" style="width: 100%; padding: 10px; margin: 5px 0 15px; border-radius: 5px; border: none;" />
+            <input type="text" id="signup-referral" placeholder="e.g. ABCDXY" style="width: 100%; padding: 10px; margin: 5px 0 15px; border-radius: 5px; border: none;" />
             <button type="submit" style="width: 100%; padding: 10px; background: red; color: white; border: none; border-radius: 5px;">Sign Up</button>
+            <p id="signup-error" style="color: #f88; text-align:center;"></p>
             <p style="text-align: center; margin-top: 10px;">
               or <a href="#" onclick="openLoginModal()" style="color: #00f;">Login</a>
             </p>
+          </form>
+        </div>
+      </div>
+
+      <!-- PROFILE STEP MODAL -->
+      <div id="profileModal" class="modal" style="display: none;">
+        <div class="modal-content" style="background-color: #1c1c1c; padding: 20px; border-radius: 10px; width: 300px; color: white; position: relative;">
+          <span class="close" onclick="closeProfileModal()" style="position: absolute; right: 10px; top: 10px; font-size: 20px; cursor: pointer;">&times;</span>
+          <h2 style="text-align: center;">Complete Your Profile</h2>
+          <form id="profileForm">
+            <label>Full name</label>
+            <input type="text" id="profile-fullname" required style="width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: none;" />
+            <label>Email address</label>
+            <input type="email" id="profile-email" required style="width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: none;" />
+            <label>Date of birth</label>
+            <input type="date" id="profile-dob" required style="width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: none;" />
+            <label>Username</label>
+            <input type="text" id="profile-username" required style="width: 100%; padding: 10px; margin: 5px 0 15px; border-radius: 5px; border: none;" />
+            <button type="submit" style="width: 100%; padding: 10px; background: red; color: white; border: none; border-radius: 5px;">Save Profile</button>
+            <p id="profile-error" style="color: #f88; text-align:center;"></p>
           </form>
         </div>
       </div>
@@ -292,6 +311,19 @@
   </div>
 
   <script>
+    // Modal open/close logic
+    function openSignupModal() { document.getElementById('signupModal').style.display = 'flex'; }
+    function closeSignupModal() { document.getElementById('signupModal').style.display = 'none'; }
+    function openProfileModal() { document.getElementById('profileModal').style.display = 'flex'; }
+    function closeProfileModal() { document.getElementById('profileModal').style.display = 'none'; }
+    function openModal(modalId) { document.getElementById(modalId).style.display = 'block'; }
+    function closeModal(modalId) { document.getElementById(modalId).style.display = 'none'; }
+    function openLoginModal() { openModal('login-modal'); }
+    function closeTicketsModal() { closeModal('ticketsModal'); }
+    function openTicketsModal() { openModal('ticketsModal'); }
+    function openBetHistoryModal() { openModal('betHistoryModal'); }
+    function closeBetHistoryModal() { closeModal('betHistoryModal'); }
+
     // Toggle for bet/auto
     document.querySelectorAll('.bet-toggle').forEach(toggle => {
       const betButton = toggle.querySelector('.toggle-bet');
@@ -306,17 +338,6 @@
       });
     });
 
-    // Modal open/close logic
-    function openSignupModal() { document.getElementById('signupModal').style.display = 'flex'; }
-    function closeSignupModal() { document.getElementById('signupModal').style.display = 'none'; }
-    function openModal(modalId) { document.getElementById(modalId).style.display = 'block'; }
-    function closeModal(modalId) { document.getElementById(modalId).style.display = 'none'; }
-    function openLoginModal() { openModal('login-modal'); }
-    function closeTicketsModal() { closeModal('ticketsModal'); }
-    function openTicketsModal() { openModal('ticketsModal'); }
-    function openBetHistoryModal() { openModal('betHistoryModal'); }
-    function closeBetHistoryModal() { closeModal('betHistoryModal'); }
-
     // Free bets menu
     document.addEventListener('DOMContentLoaded', function () {
       var menu = document.querySelector('.menu-items li:first-child');
@@ -325,12 +346,80 @@
 
     // Modal close on outside click
     window.addEventListener('click', function (event) {
-      ['signupModal', 'freeBetsModal'].forEach(function (id) {
+      ['signupModal', 'freeBetsModal', 'profileModal'].forEach(function (id) {
         var modal = document.getElementById(id);
         if (modal && event.target === modal) { closeModal(id); }
       });
     });
+
+    // ========== SIGNUP + PROFILE JS ==========
+
+    let registeredUserId = null;
+
+    document.getElementById('signupForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const phone = document.getElementById('signup-phone').value;
+      const password = document.getElementById('signup-password').value;
+      const confirmPassword = document.getElementById('signup-confirm-password').value;
+      const referralCode = document.getElementById('signup-referral').value;
+      const errorP = document.getElementById('signup-error');
+      errorP.textContent = '';
+
+      if (password !== confirmPassword) {
+        errorP.textContent = "Passwords don't match.";
+        return;
+      }
+      try {
+        const response = await fetch('https://backend-4lrl.onrender.com/complete-profile', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ phone, password, referralCode })
+        });
+        const result = await response.json();
+        if (result.user && result.user._id) {
+          registeredUserId = result.user._id;
+          closeSignupModal();
+          openProfileModal();
+        } else {
+          errorP.textContent = result.error || "Registration failed.";
+        }
+      } catch (err) {
+        errorP.textContent = "Registration error.";
+      }
+    });
+
+    document.getElementById('profileForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const fullName = document.getElementById('profile-fullname').value;
+      const email = document.getElementById('profile-email').value;
+      const dob = document.getElementById('profile-dob').value;
+      const username = document.getElementById('profile-username').value;
+      const errorP = document.getElementById('profile-error');
+      errorP.textContent = '';
+
+      if (!registeredUserId) {
+        errorP.textContent = "No user registered.";
+        return;
+      }
+      try {
+        const response = await fetch('https://backend-4lrl.onrender.com/complete-profile', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ userId: registeredUserId, fullName, email, dob, username })
+        });
+        const result = await response.json();
+        if (result.user) {
+          closeProfileModal();
+          alert('Profile completed! You can now play or log in.');
+        } else {
+          errorP.textContent = result.error || "Profile update failed.";
+        }
+      } catch (err) {
+        errorP.textContent = "Profile update error.";
+      }
+    });
   </script>
   <script src="script.js"></script>
+  <script src="registration-profile.js"></script>
 </body>
 </html>
