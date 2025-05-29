@@ -924,6 +924,18 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 
+  function logoutUser() {
+  // Clear login state
+  localStorage.setItem('isLoggedIn', 'false');
+  // Optionally clear any session/token information here
+  // For example: localStorage.removeItem('userToken');
+
+  // Optionally, reset UI elements, balance, etc., as needed.
+  alert('You have been logged out!');
+  // Refresh the page or update UI accordingly
+  location.reload(); // This reloads the page and resets to logged-out state
+}
+
   // Modal close on outside click
   window.addEventListener('click', function (event) {
     ['signupModal', 'freeBetsModal', 'profileModal'].forEach(function (id) {
