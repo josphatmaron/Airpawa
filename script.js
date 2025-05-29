@@ -907,7 +907,7 @@ document.addEventListener('DOMContentLoaded', function () {
       return;
     }
     try {
-      const response = await fetch('http://localhost:3000/complete-profile', {
+      const response = await fetch('https://backend-4lrl.onrender.com/complete-profile', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({ userId: registeredUserId, fullName, email, dob, username })
