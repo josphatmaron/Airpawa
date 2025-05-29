@@ -19,7 +19,7 @@ window.addEventListener('click', function (event) {
   });
 });
 
-// ========== SIGNUP + PROFILE JS ==========
+// ========== SIGNUP JS ==========
 
 let registeredUserId = null;
 
@@ -47,8 +47,11 @@ document.getElementById('signupForm').addEventListener('submit', async function(
     const result = await response.json();
     if (response.ok && result.user && result.user._id) {
       registeredUserId = result.user._id;
+      // Registration successful! You can now log in or show a success message/modal.
+      alert('Registration successful! You can now log in.');
       closeSignupModal();
-      openProfileModal();
+      // Optionally, you can open the login modal here
+      // openLoginModal();
     } else {
       errorP.textContent = result.error || "Registration failed.";
     }
@@ -57,8 +60,10 @@ document.getElementById('signupForm').addEventListener('submit', async function(
   }
 });
 
-// PROFILE: Step 2 (POST to /complete-profile)
-document.getElementById('profileForm').addEventListener('submit', async function(e) {
+// If you want to keep profile completion as a separate step, ensure your backend supports /complete-profile.
+// If NOT, remove the profile step below and only use /register for all user data.
+
+document.getElementById('profileForm')?.addEventListener('submit', async function(e) {
   e.preventDefault();
   const fullName = document.getElementById('profile-fullname').value;
   const email = document.getElementById('profile-email').value;
