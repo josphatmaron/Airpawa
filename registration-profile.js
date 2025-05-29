@@ -23,10 +23,11 @@ window.addEventListener('click', function (event) {
 
 let registeredUserId = null;
 
-// SIGNUP: Step 1 (POST to /register)
+// SIGNUP: Step 1 (POST to /register with username/email/password)
 document.getElementById('signupForm').addEventListener('submit', async function(e) {
   e.preventDefault();
-  const phone = document.getElementById('signup-phone').value;
+  const username = document.getElementById('signup-username').value;
+  const email = document.getElementById('signup-email').value;
   const password = document.getElementById('signup-password').value;
   const confirmPassword = document.getElementById('signup-confirm-password').value;
   const referralCode = document.getElementById('signup-referral').value;
@@ -38,11 +39,10 @@ document.getElementById('signupForm').addEventListener('submit', async function(
     return;
   }
   try {
-    // POST to /register, not /complete-profile
     const response = await fetch('https://backend-4lrl.onrender.com/register', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ phone, password, referralCode })
+      body: JSON.stringify({ username, email, password, referralCode })
     });
     const result = await response.json();
     if (response.ok && result.user && result.user._id) {
