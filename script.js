@@ -1,3 +1,18 @@
+// =========================
+// LOGOUT FUNCTION (GLOBAL SCOPE)
+// =========================
+function logoutUser() {
+  // Clear login state
+  localStorage.setItem('isLoggedIn', 'false');
+  // Optionally clear any session/token information here
+  // For example: localStorage.removeItem('userToken');
+  alert('You have been logged out!');
+  location.reload(); // This reloads the page and resets to logged-out state
+}
+
+// =========================
+// CRASH MESSAGE
+// =========================
 function showCrashMessage(msg, color = "white", duration = 1500) {
   const crashMessage = document.getElementById("crash-message");
   if (crashMessage) {
@@ -923,18 +938,6 @@ document.addEventListener('DOMContentLoaded', function () {
       errorP.textContent = "Profile update error.";
     }
   });
-
-  function logoutUser() {
-  // Clear login state
-  localStorage.setItem('isLoggedIn', 'false');
-  // Optionally clear any session/token information here
-  // For example: localStorage.removeItem('userToken');
-
-  // Optionally, reset UI elements, balance, etc., as needed.
-  alert('You have been logged out!');
-  // Refresh the page or update UI accordingly
-  location.reload(); // This reloads the page and resets to logged-out state
-}
 
   // Modal close on outside click
   window.addEventListener('click', function (event) {
