@@ -17,7 +17,6 @@ function updateAuthButtons() {
   if (loginBtn) loginBtn.style.display = isLoggedIn ? 'none' : '';
   if (signupBtn) signupBtn.style.display = isLoggedIn ? 'none' : '';
 }
-
 document.addEventListener('DOMContentLoaded', function() {
   updateAuthButtons();
 });
