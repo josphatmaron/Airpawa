@@ -2,13 +2,25 @@
 // LOGOUT FUNCTION (GLOBAL SCOPE)
 // =========================
 function logoutUser() {
-  // Clear login state
   localStorage.setItem('isLoggedIn', 'false');
-  // Optionally clear any session/token information here
-  // For example: localStorage.removeItem('userToken');
   alert('You have been logged out!');
-  location.reload(); // This reloads the page and resets to logged-out state
+  location.reload();
 }
+
+// =========================
+// AUTH BUTTONS SHOW/HIDE LOGIC
+// =========================
+function updateAuthButtons() {
+  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+  const loginBtn = document.getElementById('login-btn');
+  const signupBtn = document.getElementById('signup-btn');
+  if (loginBtn) loginBtn.style.display = isLoggedIn ? 'none' : '';
+  if (signupBtn) signupBtn.style.display = isLoggedIn ? 'none' : '';
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  updateAuthButtons();
+});
 
 // =========================
 // CRASH MESSAGE
@@ -67,13 +79,12 @@ if (ctx) {
 let rotationAngle = 0;
 function resizeCanvas() {
   if (canvas && ctx) {
-    // Always use the rendered size for scaling, for mobile correctness
     const displayWidth = canvas.clientWidth;
     const displayHeight = canvas.clientHeight;
     const dpr = window.devicePixelRatio || 1;
     canvas.width = displayWidth * dpr;
     canvas.height = displayHeight * dpr;
-    ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transform!
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.scale(dpr, dpr);
   }
 }
