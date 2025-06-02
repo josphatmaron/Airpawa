@@ -22,7 +22,7 @@ document.addEventListener('click', (e) => {
     document.getElementById('place-bet-button-2')
   ].filter(zone => zone);
 
-  const clickedInsideSafeZone = safeZones.some(zone => zone.contains(e.target));
+  const clickedInsideSafeZone = safeZones.some(zone => zone && zone.contains(e.target));
 
   if (!clickedInsideSafeZone && dropdownMenu) {
     dropdownMenu.style.display = 'none';
@@ -101,25 +101,27 @@ window.addEventListener('click', function (event) {
 });
 
 // -------------------- LOGIN FORM HANDLER --------------------
-const loginForm = document.getElementById('login-form');
-if (loginForm) {
-  loginForm.addEventListener('submit', function(event) {
-    event.preventDefault();
-    const phone = document.getElementById('login-phone').value;
-    const password = document.getElementById('login-password').value;
-    if (phone && password) {
-      // Here you would call your server for authentication!
-      // For demo, just simulate login:
-      isLoggedIn = true;
-      localStorage.setItem('isLoggedIn', 'true');
-      updateTopBar();
-      closeLoginModal();
-      alert('Login successful!');
-    } else {
-      alert('Please fill in all fields.');
-    }
-  });
-}
+document.addEventListener('DOMContentLoaded', function() {
+  const loginForm = document.getElementById('login-form');
+  if (loginForm) {
+    loginForm.addEventListener('submit', function(event) {
+      event.preventDefault();
+      const phone = document.getElementById('login-phone').value;
+      const password = document.getElementById('login-password').value;
+      if (phone && password) {
+        // Here you would call your server for authentication!
+        // For demo, just simulate login:
+        isLoggedIn = true;
+        localStorage.setItem('isLoggedIn', 'true');
+        updateTopBar();
+        closeLoginModal();
+        alert('Login successful!');
+      } else {
+        alert('Please fill in all fields.');
+      }
+    });
+  }
+});
 
 // -------------------- LOGOUT HANDLER --------------------
 function logoutUser() {
