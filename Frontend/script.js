@@ -64,16 +64,18 @@ document.addEventListener('DOMContentLoaded', updateTopBar);
 // -------------------- MODAL LOGIC --------------------
 function openModal(modalId) {
   const modal = document.getElementById(modalId);
-  if (modal) {
-    modal.style.display = (modalId === 'signupModal' || modalId === 'login-modal') ? 'block' : 'flex';
-    modal.style.position = 'fixed';
-    modal.style.top = '0';
-    modal.style.left = '0';
-    modal.style.width = '100%';
-    modal.style.height = '100%';
-    modal.style.zIndex = '1000';
-    modal.style.opacity = '1';
+  if (!modal) {
+    console.error(`Modal with id '${modalId}' not found.`);
+    return;
   }
+  modal.style.display = (modalId === 'signupModal' || modalId === 'login-modal') ? 'block' : 'flex';
+  modal.style.position = 'fixed';
+  modal.style.top = '0';
+  modal.style.left = '0';
+  modal.style.width = '100%';
+  modal.style.height = '100%';
+  modal.style.zIndex = '1000';
+  modal.style.opacity = '1';
 }
 
 function closeModal(modalId) {
