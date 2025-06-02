@@ -46,7 +46,12 @@ function updateTopBar() {
   if (isLoggedIn) {
     link.textContent = 'Click to deposit';
     link.onclick = function() {
-      openModal('depositModal'); // If you have a deposit modal, adjust id accordingly
+      // Only open modal if it exists, else show alert (prevents null error)
+      if (document.getElementById('depositModal')) {
+        openModal('depositModal');
+      } else {
+        alert('Deposit modal not implemented!');
+      }
       return false;
     };
   } else {
