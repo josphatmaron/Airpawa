@@ -279,7 +279,7 @@
       </div>
 
       <!-- Challenge Tickets Modal-->
-      <div id="ticketsModal" class="modal">
+      <div id="ticketsModal" class="modal" style="display: none;">
         <div class="modal-content">
           <span class="close" onclick="closeTicketsModal()">×</span>
           <div class="modal-body">
@@ -291,46 +291,8 @@
     </div>
   </div>
 
-  <script>
-    // Toggle for bet/auto
-    document.querySelectorAll('.bet-toggle').forEach(toggle => {
-      const betButton = toggle.querySelector('.toggle-bet');
-      const autoButton = toggle.querySelector('.toggle-auto');
-      betButton.addEventListener('click', () => {
-        betButton.classList.add('active');
-        autoButton.classList.remove('active');
-      });
-      autoButton.addEventListener('click', () => {
-        autoButton.classList.add('active');
-        betButton.classList.remove('active');
-      });
-    });
-
-    // Modal open/close logic
-    function openSignupModal() { document.getElementById('signupModal').style.display = 'flex'; }
-    function closeSignupModal() { document.getElementById('signupModal').style.display = 'none'; }
-    function openModal(modalId) { document.getElementById(modalId).style.display = 'block'; }
-    function closeModal(modalId) { document.getElementById(modalId).style.display = 'none'; }
-    function openLoginModal() { openModal('login-modal'); }
-    function closeTicketsModal() { closeModal('ticketsModal'); }
-    function openTicketsModal() { openModal('ticketsModal'); }
-    function openBetHistoryModal() { openModal('betHistoryModal'); }
-    function closeBetHistoryModal() { closeModal('betHistoryModal'); }
-
-    // Free bets menu
-    document.addEventListener('DOMContentLoaded', function () {
-      var menu = document.querySelector('.menu-items li:first-child');
-      if (menu) menu.addEventListener('click', function () { openModal('freeBetsModal'); });
-    });
-
-    // Modal close on outside click
-    window.addEventListener('click', function (event) {
-      ['signupModal', 'freeBetsModal'].forEach(function (id) {
-        var modal = document.getElementById(id);
-        if (modal && event.target === modal) { closeModal(id); }
-      });
-    });
-  </script>
+  <!-- REMOVE ALL INLINE MODAL SCRIPT LOGIC! -->
+  <!-- Only include your main JS file below -->
   <script src="script.js"></script>
 </body>
 </html>
