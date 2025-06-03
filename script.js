@@ -802,23 +802,20 @@ document.querySelectorAll(".bet-toggle").forEach(toggle => {
 });
 
 // =========================
-// TOP BAR LOGIC (Login/Deposit)
+// TOP BAR LOGIC (Deposit link)
 // =========================
-let isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-let authMode = 'login';
-
 function updateTopBar() {
   try {
     const topBar = document.getElementById('top-bar-button');
     if (!topBar) return;
     topBar.innerHTML = '';
-    const button = document.createElement('button');
-    button.className = 'deposit-btn';
-    button.textContent = 'Deposit';
-    button.onclick = function() {
-      openModal('deposit');
-    };
-    topBar.appendChild(button);
+    const link = document.createElement('a');
+    link.className = 'deposit-btn';
+    link.textContent = 'Deposit';
+    link.href = 'https://paystack.shop/pay/y3x316ps5i';
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    topBar.appendChild(link);
   } catch (error) {}
 }
 document.addEventListener('DOMContentLoaded', updateTopBar);
