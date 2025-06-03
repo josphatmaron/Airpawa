@@ -108,8 +108,8 @@ function drawRadiatingLines() {
   const dpr = window.devicePixelRatio || 1;
   const logicalHeight = canvas.height / dpr;
   // Add your offset values here
-  const offsetX = -500; // move left (negative value)
-  const offsetY = 500;  // move down (positive value)
+  const offsetX = -250; // move left (negative value)
+  const offsetY = 250;  // move down (positive value)
   const centerX = 0 + offsetX;
   const centerY = logicalHeight + offsetY;
   const radius = calculateMaxRadius(centerX, centerY);
