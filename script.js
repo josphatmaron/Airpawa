@@ -812,28 +812,13 @@ function updateTopBar() {
     const topBar = document.getElementById('top-bar-button');
     if (!topBar) return;
     topBar.innerHTML = '';
-    const link = document.createElement('a');
-    link.style.color = 'white';
-    link.style.textDecoration = 'none';
-    link.style.cursor = 'pointer';
-    link.style.pointerEvents = 'auto';
-    link.tabIndex = 0;
-    if (isLoggedIn) {
-      link.href = '#';
-      link.textContent = 'Click to deposit';
-      link.onclick = function() {
-        openModal('deposit');
-        return false;
-      };
-    } else {
-      link.href = '#';
-      link.textContent = 'Login to play';
-      link.onclick = function() {
-        openModal('login');
-        return false;
-      };
-    }
-    topBar.appendChild(link);
+    const button = document.createElement('button');
+    button.className = 'deposit-btn';
+    button.textContent = 'Deposit';
+    button.onclick = function() {
+      openModal('deposit');
+    };
+    topBar.appendChild(button);
   } catch (error) {}
 }
 document.addEventListener('DOMContentLoaded', updateTopBar);
