@@ -4,6 +4,7 @@
 function logoutUser() {
   localStorage.setItem('isLoggedIn', 'false');
   alert('You have been logged out!');
+  updateTopBar(); // Make sure top bar updates immediately
   location.reload();
 }
 
@@ -834,6 +835,21 @@ function updateTopBar() {
   } catch (error) {}
 }
 document.addEventListener('DOMContentLoaded', updateTopBar);
+
+// =========================
+// Prevent deposit when logged out
+// =========================
+document.addEventListener('click', function(e) {
+  const depositBtn = e.target.closest('.deposit-btn');
+  if (depositBtn) {
+    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    if (!isLoggedIn) {
+      e.preventDefault();
+      alert('Please log in to deposit.');
+      openLoginModal(); // Or redirect to login page
+    }
+  }
+});
 
 // Modal open/close logic
 function openSignupModal() { document.getElementById('signupModal').style.display = 'flex'; }
