@@ -825,3 +825,12 @@ body {
     padding: 5px 4px !important;
   }
 }
+
+/* ...your existing CSS above... */
+
+/* Move the multiplier higher in mobile view */
+@media (max-width: 600px) {
+  .multiplier-container {
+    top: 12%; /* Move higher up on mobile, decrease % for even higher */
+  }
+}
