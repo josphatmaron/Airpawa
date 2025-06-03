@@ -1,4 +1,3 @@
-// -------------------- MENU & DROPDOWN LOGIC --------------------
 const menuToggle = document.getElementById('menu-toggle');
 const dropdownMenu = document.getElementById('dropdown-menu');
 
@@ -46,7 +45,6 @@ function updateTopBar() {
   if (isLoggedIn) {
     link.textContent = 'Click to deposit';
     link.onclick = function() {
-      // Only open modal if it exists, else show alert (prevents null error)
       if (document.getElementById('depositModal')) {
         openModal('depositModal');
       } else {
@@ -57,7 +55,11 @@ function updateTopBar() {
   } else {
     link.textContent = 'Login to play';
     link.onclick = function() {
-      openModal('login-modal');
+      if (document.getElementById('login-modal')) {
+        openModal('login-modal');
+      } else {
+        alert('Login modal not implemented!');
+      }
       return false;
     };
   }
@@ -69,6 +71,7 @@ document.addEventListener('DOMContentLoaded', updateTopBar);
 // -------------------- MODAL LOGIC --------------------
 function openModal(modalId) {
   const modal = document.getElementById(modalId);
+  console.log(`Attempting to open modal with ID: ${modalId}, Found:`, modal);
   if (!modal) {
     console.error(`Modal with id '${modalId}' not found.`);
     return;
@@ -379,7 +382,7 @@ function crashGame() {
   addMultiplierToHistory(multiplier);
   const multiplierElement = document.getElementById("multiplier");
   const crashMessage = document.getElementById("crash-message");
-  if (multiplierElement) multiplierElement.style.color = "red";
+  if (multiplierElement) multiplierElement.style.color = "red" ;
   if (crashMessage) crashMessage.style.display = "block";
 
   setTimeout(() => {
