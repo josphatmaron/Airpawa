@@ -28,9 +28,7 @@ document.addEventListener('click', (e) => {
   }
 });
 
-// -------------------- TOP BAR LOGIN BUTTON LOGIC --------------------
-let isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-
+// -------------------- TOP BAR LOGIC --------------------
 function updateTopBar() {
   const topBar = document.getElementById('top-bar-button');
   if (!topBar) return;
@@ -41,32 +39,17 @@ function updateTopBar() {
   link.style.textDecoration = 'none';
   link.style.cursor = 'pointer';
   link.tabIndex = 0;
-
-  if (isLoggedIn) {
-    link.textContent = 'Click to deposit';
-    link.onclick = function() {
-      const modal = document.getElementById('depositModal');
-      if (modal) {
-        openModal('depositModal');
-      } else {
-        console.error('Deposit modal not found at click time');
-        alert('Deposit modal not implemented!');
-      }
-      return false;
-    };
-  } else {
-    link.textContent = 'Login to play';
-    link.onclick = function() {
-      const modal = document.getElementById('login-modal');
-      if (modal) {
-        openModal('login-modal');
-      } else {
-        console.error('Login modal not found at click time');
-        alert('Login modal not implemented!');
-      }
-      return false;
-    };
-  }
+  link.textContent = 'Click to deposit';
+  link.onclick = function() {
+    const modal = document.getElementById('depositModal');
+    if (modal) {
+      openModal('depositModal');
+    } else {
+      console.error('Deposit modal not found at click time');
+      alert('Deposit modal not implemented!');
+    }
+    return false;
+  };
 
   topBar.appendChild(link);
 }
@@ -123,9 +106,7 @@ document.addEventListener('DOMContentLoaded', function() {
       if (phone && password) {
         // Here you would call your server for authentication!
         // For demo, just simulate login:
-        isLoggedIn = true;
         localStorage.setItem('isLoggedIn', 'true');
-        updateTopBar();
         closeLoginModal();
         alert('Login successful!');
       } else {
@@ -137,9 +118,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // -------------------- LOGOUT HANDLER --------------------
 function logoutUser() {
-  isLoggedIn = false;
   localStorage.removeItem('isLoggedIn');
-  updateTopBar();
   alert("You have been logged out.");
 }
 
@@ -812,7 +791,6 @@ document.addEventListener("DOMContentLoaded", () => {
   resizeCanvas();
   animateBackground();
   resetRound();
-  updateTopBar();
   updateTotalBets();
 });
 
