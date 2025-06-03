@@ -45,9 +45,11 @@ function updateTopBar() {
   if (isLoggedIn) {
     link.textContent = 'Click to deposit';
     link.onclick = function() {
-      if (document.getElementById('depositModal')) {
+      const modal = document.getElementById('depositModal');
+      if (modal) {
         openModal('depositModal');
       } else {
+        console.error('Deposit modal not found at click time');
         alert('Deposit modal not implemented!');
       }
       return false;
@@ -55,9 +57,11 @@ function updateTopBar() {
   } else {
     link.textContent = 'Login to play';
     link.onclick = function() {
-      if (document.getElementById('login-modal')) {
+      const modal = document.getElementById('login-modal');
+      if (modal) {
         openModal('login-modal');
       } else {
+        console.error('Login modal not found at click time');
         alert('Login modal not implemented!');
       }
       return false;
