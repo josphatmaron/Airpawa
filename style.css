@@ -826,11 +826,17 @@ body {
   }
 }
 
-/* ...your existing CSS above... */
+/* ...existing styles... */
 
-/* Move the multiplier higher in mobile view */
+/* Move the multiplier higher in the game bg on mobile view */
 @media (max-width: 600px) {
+  .game-area {
+    position: relative !important;
+  }
   .multiplier-container {
-    top: 12%; /* Move higher up on mobile, decrease % for even higher */
+    top: 8% !important;      /* Move much higher */
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    z-index: 10;
   }
 }
