@@ -810,13 +810,27 @@ function updateTopBar() {
     const topBar = document.getElementById('top-bar-button');
     if (!topBar) return;
     topBar.innerHTML = '';
-    const link = document.createElement('a');
-    link.className = 'deposit-btn';
-    link.textContent = 'Deposit';
-    link.href = 'https://paystack.shop/pay/y3x316ps5i';
-    link.target = '_blank';
-    link.rel = 'noopener noreferrer';
-    topBar.appendChild(link);
+
+    // Check if user is logged in
+    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+
+    if (isLoggedIn) {
+      // Only show deposit if logged in
+      const link = document.createElement('a');
+      link.className = 'deposit-btn';
+      link.textContent = 'Deposit';
+      link.href = 'https://paystack.shop/pay/y3x316ps5i';
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      topBar.appendChild(link);
+    } else {
+      // Show a login button or message
+      const loginBtn = document.createElement('button');
+      loginBtn.className = 'login-btn';
+      loginBtn.textContent = 'Login to Deposit';
+      loginBtn.onclick = openLoginModal; // Or your login function
+      topBar.appendChild(loginBtn);
+    }
   } catch (error) {}
 }
 document.addEventListener('DOMContentLoaded', updateTopBar);
