@@ -89,7 +89,16 @@ document.getElementById('login-form').addEventListener('submit', async function(
 
   const phoneInput    = document.getElementById('login-phone');
   const passwordInput = document.getElementById('login-password');
-  const errorP        = document.getElementById('login-error');
+  // Make sure you have this element in your HTML:
+  let errorP = document.getElementById('login-error');
+  // If not present, create and append it to the form
+  if (!errorP) {
+    errorP = document.createElement('p');
+    errorP.id = 'login-error';
+    errorP.style.color = '#f88';
+    const form = document.getElementById('login-form');
+    form.appendChild(errorP);
+  }
   errorP.textContent  = '';
 
   if (!phoneInput || !passwordInput || !errorP) {
