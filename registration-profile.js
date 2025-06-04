@@ -1,4 +1,15 @@
+// =========================
+// PASSWORD VALIDATION FUNCTION
+// =========================
+function isPasswordValid(password) {
+  // At least 8 characters, at least one letter and one number
+  const regex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+  return regex.test(password);
+}
+
+// =========================
 // Modal open/close logic
+// =========================
 function openSignupModal() { document.getElementById('signupModal').style.display = 'flex'; }
 function closeSignupModal() { document.getElementById('signupModal').style.display = 'none'; }
 function openLoginModal() { document.getElementById('login-modal').style.display = 'block'; }
@@ -18,7 +29,7 @@ window.addEventListener('click', function (event) {
 
 // ========== SIGNUP JS ==========
 
-// SIGNUP: Only Step (POST to /register with username/email/password/referralCode)
+// SIGNUP: POST to /register with username/email/password/referralCode
 document.getElementById('signupForm').addEventListener('submit', async function(e) {
   e.preventDefault();
   const username = document.getElementById('signup-username').value;
@@ -29,6 +40,11 @@ document.getElementById('signupForm').addEventListener('submit', async function(
   const errorP = document.getElementById('signup-error');
   errorP.textContent = '';
 
+  // Password validation
+  if (!isPasswordValid(password)) {
+    errorP.textContent = "Password must be at least 8 characters, include at least one letter and one number.";
+    return;
+  }
   if (password !== confirmPassword) {
     errorP.textContent = "Passwords don't match.";
     return;
