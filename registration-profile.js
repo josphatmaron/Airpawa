@@ -35,18 +35,20 @@ document.getElementById('signupForm').addEventListener('submit', async function(
   e.preventDefault();
 
   const usernameInput         = document.getElementById('signup-username');
+  const phoneInput            = document.getElementById('signup-phone');
   const emailInput            = document.getElementById('signup-email');
   const passwordInput         = document.getElementById('signup-password');
   const confirmPasswordInput  = document.getElementById('signup-confirm-password');
   const referralInput         = document.getElementById('signup-referral');
   const errorP                = document.getElementById('signup-error');
 
-  if (!usernameInput || !emailInput || !passwordInput || !confirmPasswordInput || !referralInput || !errorP) {
+  if (!usernameInput || !phoneInput || !emailInput || !passwordInput || !confirmPasswordInput || !referralInput || !errorP) {
     alert('Signup form is not set up correctly. Please check your HTML input IDs.');
     return;
   }
 
   const username       = usernameInput.value.trim();
+  const phone          = phoneInput.value.trim();
   const email          = emailInput.value.trim();
   const password       = passwordInput.value;
   const confirmPassword= confirmPasswordInput.value;
@@ -66,7 +68,7 @@ document.getElementById('signupForm').addEventListener('submit', async function(
     const response = await fetch('https://backend-4lrl.onrender.com/register', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ username, email, password, referralCode })
+      body: JSON.stringify({ username, phone, email, password, referralCode })
     });
     const result = await response.json();
     if (response.ok && result.user && result.user._id) {
@@ -121,7 +123,7 @@ document.getElementById('login-form').addEventListener('submit', async function(
       body: JSON.stringify({ phone, password })
     });
     const result = await response.json();
-    if (response.ok && result.success) {
+    if (response.ok && (result.success || result.user)) {
       // Only log the user in if backend says so!
       localStorage.setItem('isLoggedIn', 'true');
       closeLoginModal();
