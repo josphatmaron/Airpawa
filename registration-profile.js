@@ -32,15 +32,27 @@ window.addEventListener('click', function (event) {
 // SIGNUP: POST to /register with username/email/password/referralCode
 document.getElementById('signupForm').addEventListener('submit', async function(e) {
   e.preventDefault();
-  const username = document.getElementById('signup-username').value;
-  const email = document.getElementById('signup-email').value;
-  const password = document.getElementById('signup-password').value;
-  const confirmPassword = document.getElementById('signup-confirm-password').value;
-  const referralCode = document.getElementById('signup-referral').value;
+
+  // SAFETY: Check all elements exist
+  const usernameInput = document.getElementById('signup-username');
+  const emailInput = document.getElementById('signup-email');
+  const passwordInput = document.getElementById('signup-password');
+  const confirmPasswordInput = document.getElementById('signup-confirm-password');
+  const referralInput = document.getElementById('signup-referral');
   const errorP = document.getElementById('signup-error');
+
+  if (!usernameInput || !emailInput || !passwordInput || !confirmPasswordInput || !referralInput || !errorP) {
+    alert('Signup form is not set up correctly. Please check your HTML input IDs.');
+    return;
+  }
+
+  const username = usernameInput.value;
+  const email = emailInput.value;
+  const password = passwordInput.value;
+  const confirmPassword = confirmPasswordInput.value;
+  const referralCode = referralInput.value;
   errorP.textContent = '';
 
-  // Password validation
   if (!isPasswordValid(password)) {
     errorP.textContent = "Password must be at least 8 characters, include at least one letter and one number.";
     return;
