@@ -50,58 +50,14 @@ document.getElementById('signupForm').addEventListener('submit', async function(
       body: JSON.stringify({ username, phone, email, password, referralCode })
     });
     const result = await response.json();
-    if (response.ok && result.message) {
-      alert(result.message + "\nEnter the code you received next.");
-      // Show verification modal/step
-      showVerificationStep(phone); // You implement this function to display a code input field/modal
+    if (response.ok && result.user && result.user._id) {
+      alert("Registration successful! You can now log in.");
+      closeSignupModal();
+      openLoginModal();
     } else {
       errorP.textContent = result.error || "Registration failed.";
     }
   } catch (err) {
     errorP.textContent = "Registration error.";
   }
-});
-
-// =========================
-// CODE VERIFICATION LOGIC
-// =========================
-async function verifyCode(phone, code) {
-  const verifyError = document.getElementById('verify-error');
-  verifyError.textContent = '';
-  try {
-    const response = await fetch('https://backend-4lrl.onrender.com/verify', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ phone, code })
-    });
-    const result = await response.json();
-    if (response.ok && result.user && result.user._id) {
-      alert('Account verified! You can now log in.');
-      // Hide verification modal/step
-      closeVerificationStep();
-      openLoginModal();
-    } else {
-      verifyError.textContent = result.error || "Verification failed.";
-    }
-  } catch (err) {
-    verifyError.textContent = "Verification error.";
-  }
-}
-
-// Example implementation of show/hide verification step
-function showVerificationStep(phone) {
-  // Display a modal or section for code entry
-  document.getElementById('verifyModal').style.display = 'block';
-  document.getElementById('verify-phone').value = phone; // hidden or readonly
-}
-function closeVerificationStep() {
-  document.getElementById('verifyModal').style.display = 'none';
-}
-
-// Add this event listener if you have a verification form
-document.getElementById('verifyForm').addEventListener('submit', function(e) {
-  e.preventDefault();
-  const phone = document.getElementById('verify-phone').value;
-  const code  = document.getElementById('verify-code').value;
-  verifyCode(phone, code);
 });
