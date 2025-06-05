@@ -8,27 +8,6 @@ function isPasswordValid(password) {
 }
 
 // =========================
-// Modal open/close logic
-// =========================
-function openSignupModal() { document.getElementById('signupModal').style.display = 'flex'; }
-function closeSignupModal() { document.getElementById('signupModal').style.display = 'none'; }
-function openLoginModal()   { document.getElementById('login-modal').style.display = 'block'; }
-function closeLoginModal()  { document.getElementById('login-modal').style.display = 'none'; }
-function closeModal(modalId) { document.getElementById(modalId).style.display = 'none'; }
-function openTicketsModal() { document.getElementById('ticketsModal').style.display = 'block'; }
-function closeTicketsModal() { document.getElementById('ticketsModal').style.display = 'none'; }
-function openBetHistoryModal() { document.getElementById('betHistoryModal').style.display = 'block'; }
-function closeBetHistoryModal() { document.getElementById('betHistoryModal').style.display = 'none'; }
-
-// Modal close on outside click (signup/freebets/login)
-window.addEventListener('click', function (event) {
-  ['signupModal', 'freeBetsModal', 'login-modal'].forEach(function (id) {
-    var modal = document.getElementById(id);
-    if (modal && event.target === modal) { closeModal(id); }
-  });
-});
-
-// =========================
 // Registration (Signup)
 // =========================
 document.getElementById('signupForm').addEventListener('submit', async function(e) {
@@ -71,10 +50,10 @@ document.getElementById('signupForm').addEventListener('submit', async function(
       body: JSON.stringify({ username, phone, email, password, referralCode })
     });
     const result = await response.json();
-    if (response.ok && result.user && result.user._id) {
-      alert('Registration successful! You can now log in.');
-      closeSignupModal();
-      openLoginModal();
+    if (response.ok && result.message) {
+      alert(result.message + "\nEnter the code you received next.");
+      // Show verification modal/step
+      showVerificationStep(phone); // You implement this function to display a code input field/modal
     } else {
       errorP.textContent = result.error || "Registration failed.";
     }
@@ -84,56 +63,45 @@ document.getElementById('signupForm').addEventListener('submit', async function(
 });
 
 // =========================
-// Login
+// CODE VERIFICATION LOGIC
 // =========================
-document.getElementById('login-form').addEventListener('submit', async function(e) {
-  e.preventDefault();
-
-  const phoneInput    = document.getElementById('login-phone');
-  const passwordInput = document.getElementById('login-password');
-  // Make sure you have this element in your HTML:
-  let errorP = document.getElementById('login-error');
-  // If not present, create and append it to the form
-  if (!errorP) {
-    errorP = document.createElement('p');
-    errorP.id = 'login-error';
-    errorP.style.color = '#f88';
-    const form = document.getElementById('login-form');
-    form.appendChild(errorP);
-  }
-  errorP.textContent  = '';
-
-  if (!phoneInput || !passwordInput || !errorP) {
-    alert('Login form is not set up correctly. Please check your HTML input IDs.');
-    return;
-  }
-
-  const phone    = phoneInput.value.trim();
-  const password = passwordInput.value;
-
-  if (!isPasswordValid(password)) {
-    errorP.textContent = "Password must be at least 8 characters, include at least one letter and one number.";
-    return;
-  }
-
+async function verifyCode(phone, code) {
+  const verifyError = document.getElementById('verify-error');
+  verifyError.textContent = '';
   try {
-    const response = await fetch('https://backend-4lrl.onrender.com/login', {
+    const response = await fetch('https://backend-4lrl.onrender.com/verify', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ phone, password })
+      body: JSON.stringify({ phone, code })
     });
     const result = await response.json();
-    if (response.ok && (result.success || result.user)) {
-      // Only log the user in if backend says so!
-      localStorage.setItem('isLoggedIn', 'true');
-      closeLoginModal();
-      // Optionally update UI, reload, or redirect
-      alert('Login successful!');
-      location.reload();
+    if (response.ok && result.user && result.user._id) {
+      alert('Account verified! You can now log in.');
+      // Hide verification modal/step
+      closeVerificationStep();
+      openLoginModal();
     } else {
-      errorP.textContent = result.error || "Invalid phone or password.";
+      verifyError.textContent = result.error || "Verification failed.";
     }
   } catch (err) {
-    errorP.textContent = "Login error.";
+    verifyError.textContent = "Verification error.";
   }
+}
+
+// Example implementation of show/hide verification step
+function showVerificationStep(phone) {
+  // Display a modal or section for code entry
+  document.getElementById('verifyModal').style.display = 'block';
+  document.getElementById('verify-phone').value = phone; // hidden or readonly
+}
+function closeVerificationStep() {
+  document.getElementById('verifyModal').style.display = 'none';
+}
+
+// Add this event listener if you have a verification form
+document.getElementById('verifyForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const phone = document.getElementById('verify-phone').value;
+  const code  = document.getElementById('verify-code').value;
+  verifyCode(phone, code);
 });
