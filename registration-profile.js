@@ -53,6 +53,8 @@ document.addEventListener('DOMContentLoaded', function() {
           body: JSON.stringify({ username, phone, email, password, referralCode })
         });
         const result = await response.json();
+        console.log("Login response:", result);
+        console.log("Response OK?", response.ok);
         if (response.ok && result.user && result.user._id) {
           alert("Registration successful! You can now log in.");
           if (typeof closeSignupModal === "function") closeSignupModal();
