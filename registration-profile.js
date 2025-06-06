@@ -61,3 +61,43 @@ document.getElementById('signupForm').addEventListener('submit', async function(
     errorP.textContent = "Registration error.";
   }
 });
+
+// =========================
+// Login (Signin)
+// =========================
+document.getElementById('loginForm').addEventListener('submit', async function(e) {
+  console.log("Login clicked!"); // This will show up in the browser console when you click login
+  e.preventDefault();
+
+  const phoneInput = document.getElementById('login-phone');
+  const passwordInput = document.getElementById('login-password');
+  const errorP = document.getElementById('login-error');
+
+  if (!phoneInput || !passwordInput || !errorP) {
+    alert('Login form is not set up correctly. Please check your HTML input IDs.');
+    return;
+  }
+
+  const phone = phoneInput.value.trim();
+  const password = passwordInput.value;
+  errorP.textContent = '';
+
+  try {
+    const response = await fetch('https://backend-4lrl.onrender.com/login', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ phone, password })
+    });
+    const result = await response.json();
+    if (response.ok && result.user && result.user._id) {
+      errorP.textContent = "Login successful!";
+      // You can close the login modal or redirect here
+      // closeLoginModal(); // Uncomment if you have this function
+      // window.location.href = '/dashboard'; // Example redirect
+    } else {
+      errorP.textContent = result.error || "Login failed.";
+    }
+  } catch (err) {
+    errorP.textContent = "Login error.";
+  }
+});
