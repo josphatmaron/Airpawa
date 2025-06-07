@@ -849,7 +849,7 @@ body {
 
 @media (max-width: 600px) {
   #game-bg {
-    height: 150px; /* smaller height for mobile */
+    height: 200px; /* smaller height for mobile */
   }
 }
 
