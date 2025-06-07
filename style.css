@@ -832,7 +832,7 @@ body {
     position: relative !important;
   }
   .multiplier-container {
-    top: 50% !important;      /* Move much higher */
+    top: 10% !important;      /* Move much higher */
     left: 50% !important;
     transform: translate(-50%, -50%) !important;
     z-index: 10;
