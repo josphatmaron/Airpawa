@@ -841,6 +841,7 @@ body {
     font-size: 20px;
   }
   #game-bg {
+    weight: 382px;
     height: 200px; /* smaller height for mobile */
   }
 }
