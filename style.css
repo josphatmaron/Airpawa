@@ -839,7 +839,7 @@ body {
     font-size: 5rem;
   }
   #game-bg {
-    weight: 382px;
+    width: 382px;
     height: 200px; /* smaller height for mobile */
   }
 }
