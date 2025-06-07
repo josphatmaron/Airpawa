@@ -840,3 +840,9 @@ body {
     z-index: 10;
   }
 }
+
+@media (max-width: 600px) {
+  #game-bg {
+    height: 150px; /* smaller height for mobile */
+  }
+}
