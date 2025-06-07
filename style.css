@@ -834,16 +834,9 @@ body {
     position: relative !important;
   }
   .multiplier-container {
-    top: 8% !important;      /* Move much higher */
+    top: 20% !important;      /* Move much higher */
     left: 50% !important;
     transform: translate(-50%, -50%) !important;
     z-index: 10;
   }
 }
-
-@media (max-width: 768px) {
-  .multiplier-container {
-    top: 50%; /* Adjust this value as needed */
-  }
-}
-
