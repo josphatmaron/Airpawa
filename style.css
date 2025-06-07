@@ -832,11 +832,11 @@ body {
     position: relative !important;
   }
   .multiplier-container {
-    top: 10% !important;      /* Move much higher */
+    top: 15% !important;      /* Move much higher */
     left: 50% !important;
     transform: translate(-50%, -50%) !important;
     z-index: 10;
-    font-size: 3rem;
+    font-size: 5rem;
   }
   #game-bg {
     weight: 382px;
