@@ -843,7 +843,7 @@ body {
 
 @media (max-width: 768px) {
   .multiplier-container {
-    top: 40%; /* Adjust this value as needed */
+    top: 60%; /* Adjust this value as needed */
   }
 }
 
