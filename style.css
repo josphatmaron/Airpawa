@@ -843,11 +843,9 @@ body {
     height: 200px; /* smaller height for mobile */
   }
   .crash-message {
-    font-size: 2rem; /* Adjust size for mobile */
+    font-size: 1.5rem; /* Adjust size for mobile */
     font-family: 'Arial', sans-serif; /* Or your desired mobile font */
     font-weight: 600; /* Optional: tweak weight */
-    top: 10%;
+    top: 8%;
   }
 }
-
-
