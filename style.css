@@ -827,7 +827,8 @@ body {
 }
 
 /* Move the multiplier higher in the game bg on mobile view */
-@media (max-width: 600px) {
+@media (max-width: 768px) {
+
   .game-area {
     position: relative !important;
   }
