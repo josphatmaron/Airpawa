@@ -228,7 +228,7 @@ body {
 .left-panel {
   width: 340px;
   min-width: 220px;
-  max-width: 400px;
+  max-width: 366px;
   background: #222;
   border-radius: 20px;
   margin: 14px 14px 14px 0;
@@ -629,7 +629,7 @@ body {
   border: 1px solid #444;
   border-radius: 12px;
   width: 90%;
-  max-width: 400px;
+  max-width: 366px;
   color: #fff;
   position: relative;
   box-shadow: 0 2px 20px rgba(0,0,0,0.6);
@@ -806,7 +806,7 @@ body {
 }
 
 /* Extra Small Screens */
-@media (max-width: 400px) {
+@media (max-width: 366x) {
   .bet-panel {
     min-height: 300px !important;
   }
