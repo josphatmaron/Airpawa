@@ -81,45 +81,84 @@
           </div>
           <div class="crash-message" id="crash-message" style="display: none;">FLEW AWAY!</div>
           <div class="bet-panels-row">
-            <!-- Bet Panel 1 -->
-            <div class="bet-panel">
-              <div class="bet-toggle">
-                <button class="toggle-bet active">Bet</button>
-                <button class="toggle-auto">Auto</button>
-              </div>
-              <div class="bet-content">
-                <div class="bet-controls">
-                  <div class="bet-amount-control">
-                    <button class="adjust" data-action="decrease">−</button>
-                    <input class="amount" id="bet-amount-1" type="number" value="8.00" step="100" min="300" />
-                    <button class="adjust" data-action="increase">+</button>
-                  </div>
-                  <div class="quick-bets">
-                    <button class="quick-bet" data-bet="1000.00">32.00</button>
-                    <button class="quick-bet" data-bet="2000.00">80.00</button>
-                    <button class="quick-bet" data-bet="5000.00">160.00</button>
-                    <button class="quick-bet" data-bet="10000.00">800.00</button>
-                  </div>
-                </div>
-                <div class="bet-button-wrapper" id="bet-action-container-1">
-                  <button class="bet-button" id="place-bet-button-1">
-                    Bet<br><span class="bet-amount" id="bet-amount-text-1">8.00 USD</span>
-                  </button>
-                  <div class="cashout-section" id="cashout-section-1" style="display: none;">
-                    <button class="cashout-button" id="cashout-button-1">
-                      Cash Out<br><span class="cashout-amount" id="cashout-amount-text-1">USD 0.00</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-              <div class="auto-options">
-                <label><span>Auto bet</span><input type="checkbox" class="toggle-switch" /></label>
-                <label><span>Auto Cash Out</span><input type="checkbox" class="toggle-switch" /></label>
-                <div class="cashout-input">
-                  <input type="number" min="1" step="10" value="1.10" />
-                </div>
-              </div>
-            </div>
+           <!-- Bet Panel 1 -->
+<div class="bet-panel">
+  <!-- Toggle Buttons -->
+  <div class="bet-toggle">
+    <button class="toggle-bet active">Bet</button>
+    <button class="toggle-auto">Auto</button>
+  </div>
+
+  <!-- Main Bet Content -->
+  <div class="bet-content">
+    <div class="bet-controls">
+      <div class="bet-amount-control">
+        <button class="adjust" data-action="decrease">−</button>
+        <input class="amount" id="bet-amount-1" type="number" value="8.00" step="100" min="300" />
+        <button class="adjust" data-action="increase">+</button>
+      </div>
+      <div class="quick-bets">
+        <button class="quick-bet" data-bet="1000.00">32.00</button>
+        <button class="quick-bet" data-bet="2000.00">80.00</button>
+        <button class="quick-bet" data-bet="5000.00">160.00</button>
+        <button class="quick-bet" data-bet="10000.00">800.00</button>
+      </div>
+    </div>
+
+    <div class="bet-button-wrapper" id="bet-action-container-1">
+      <button class="bet-button" id="place-bet-button-1">
+        Bet<br><span class="bet-amount" id="bet-amount-text-1">8.00 USD</span>
+      </button>
+      <div class="cashout-section" id="cashout-section-1" style="display: none;">
+        <button class="cashout-button" id="cashout-button-1">
+          Cash Out<br><span class="cashout-amount" id="cashout-amount-text-1">USD 0.00</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Auto Options (Initially hidden) -->
+  <div class="auto-options" style="display: none;">
+    <label>
+      <span>Auto bet</span>
+      <input type="checkbox" class="toggle-switch" />
+    </label>
+    <label>
+      <span>Auto Cash Out</span>
+      <input type="checkbox" class="toggle-switch" />
+    </label>
+    <div class="cashout-input">
+      <input type="number" min="1" step="10" value="1.10" />
+    </div>
+  </div>
+</div>
+
+<!-- Include this script at the bottom of your HTML or in a script tag -->
+<script>
+  document.querySelectorAll(".bet-panel").forEach(panel => {
+    const betBtn = panel.querySelector(".toggle-bet");
+    const autoBtn = panel.querySelector(".toggle-auto");
+    const autoOptions = panel.querySelector(".auto-options");
+
+    if (!betBtn || !autoBtn || !autoOptions) return;
+
+    // Set initial visibility
+    autoOptions.style.display = autoBtn.classList.contains("active") ? "block" : "none";
+
+    betBtn.addEventListener("click", () => {
+      betBtn.classList.add("active");
+      autoBtn.classList.remove("active");
+      autoOptions.style.display = "none";
+    });
+
+    autoBtn.addEventListener("click", () => {
+      autoBtn.classList.add("active");
+      betBtn.classList.remove("active");
+      autoOptions.style.display = "block";
+    });
+  });
+</script>
+
             <!-- Bet Panel 2 -->
             <div class="bet-panel">
               <div class="bet-toggle">
