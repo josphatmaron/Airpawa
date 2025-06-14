@@ -777,31 +777,35 @@ function renderBetHistory() {
 
 // =========================
 // BET TOGGLE
-// =========================
 document.querySelectorAll(".bet-toggle").forEach(toggle => {
-  try {
-    const betBtn = toggle.querySelector(".toggle-bet");
-    const autoBtn = toggle.querySelector(".toggle-auto");
-    const autoOptions = toggle.closest('.bet-panel')?.querySelector('.auto-bet-cashout-options');
-    if (betBtn && betBtn.classList.contains("active") && autoOptions) {
-      autoOptions.style.display = "none";
-    }
-    if (betBtn) {
-      betBtn.addEventListener("click", () => {
-        betBtn.classList.add("active");
-        if (autoBtn) autoBtn.classList.remove("active");
-        if (autoOptions) autoOptions.style.display = "none";
-      });
-    }
-    if (autoBtn) {
-      autoBtn.addEventListener("click", () => {
-        autoBtn.classList.add("active");
-        if (betBtn) betBtn.classList.remove("active");
-        if (autoOptions) autoOptions.style.display = "block";
-      });
-    }
-  } catch (error) {}
+  const betBtn = toggle.querySelector(".toggle-bet");
+  const autoBtn = toggle.querySelector(".toggle-auto");
+  const autoOptions = toggle.closest('.bet-panel')?.querySelector('.auto-bet-cashout-options');
+
+  if (!betBtn || !autoBtn || !autoOptions) return;
+
+  // Initialize state on load
+  if (betBtn.classList.contains("active")) {
+    autoOptions.style.display = "none";
+  } else if (autoBtn.classList.contains("active")) {
+    autoOptions.style.display = "block";
+  }
+
+  // Event listener for "Bet" button
+  betBtn.addEventListener("click", () => {
+    betBtn.classList.add("active");
+    autoBtn.classList.remove("active");
+    autoOptions.style.display = "none";
+  });
+
+  // Event listener for "Auto" button
+  autoBtn.addEventListener("click", () => {
+    autoBtn.classList.add("active");
+    betBtn.classList.remove("active");
+    autoOptions.style.display = "block";
+  });
 });
+
 
 // =========================
 // TOP BAR LOGIC (Deposit link)
