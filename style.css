@@ -841,7 +841,7 @@ body {
   }
   #game-bg {
     width: 382px;
-    height: 144px; /* smaller height for mobile */
+    height: 200px; /* smaller height for mobile */
   }
   .crash-message {
     font-size: 1.5rem; /* Adjust size for mobile */
