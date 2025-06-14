@@ -841,8 +841,8 @@ body {
 
   .bet-amount-control .amount {
     font-size: 14px;
-    width: 14px;
-    height: 32px;
+    width: 84px;
+    height: 20px;
   }
 
   .quick-bets button {
