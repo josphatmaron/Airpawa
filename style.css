@@ -803,11 +803,10 @@ body {
   }
 
   .bet-panel {
-    max-width: 90%;
-    min-width: 0;
+    width: 382px;
+    height: 144px !important;
     margin: 0 auto 16px auto;
     padding: 10px;
-    min-height: 300px !important;
   }
 
   .bet-content {
