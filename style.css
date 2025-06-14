@@ -426,7 +426,7 @@ body {
   width: 100%;
   padding: 10px;
   border-radius: 8px;
-  font-size: 1.5rem;
+  font-size:1.5rem;
   background-color: #111111;
 }
 
@@ -761,30 +761,21 @@ body {
   margin: 0 auto 16px auto;
 }
 
-/* Responsive: Left panel at end for mobile */
-@media (max-width: 900px) {
-  .bet-panels-row {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0;
-  }
-  .bet-panel {
-    max-width: 100%;
-    margin: 0 0 16px 0;
-  }
-}
-
+/* Mobile View */
 @media (max-width: 768px) {
   .content-body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
   }
+
   .game-area {
     width: 100%;
     margin: 0;
     border-radius: 0;
+    position: relative !important;
   }
+
   .left-panel {
     width: 100%;
     max-width: 100%;
@@ -795,58 +786,83 @@ body {
     overflow-y: visible;
     z-index: auto;
     display: block;
-  }
-  .bet-panel,
-  .bet-panels-row {
-    min-width: 0;
-    width: 100%;
-    max-width: 100%;
-    margin: 0 0 16px 0;
-  }
-}
-
-/* Extra Small Screens */
-@media (max-width: 366x) {
-  .bet-panel {
-    min-height: 300px !important;
-  }
-  .bet-content {
-    gap: 10px !important;
-  }
-  .bet-button,
-  .cashout-button {
-    font-size: 20px !important;
-    padding: 15px 20px !important;
-  }
-  .left-panel {
     min-height: 50px !important;
     max-height: unset !important;
     height: 60px !important;
     padding: 5px 4px !important;
   }
-}
 
-/* Move the multiplier higher in the game bg on mobile view */
-@media (max-width: 768px) {
-
-  .game-area {
-    position: relative !important;
+  .bet-panels-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
+    margin: 0 0 16px 0;
   }
+
+  .bet-panel {
+    max-width: 90%;
+    min-width: 0;
+    margin: 0 auto 16px auto;
+    padding: 10px;
+    min-height: 300px !important;
+  }
+
+  .bet-content {
+    gap: 8px;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .bet-button,
+  .cashout-button {
+    font-size: 18px;
+    padding: 12px 20px;
+  }
+
+  .bet-amount-control {
+    padding: 8px;
+  }
+
+  .bet-amount-control .amount {
+    font-size: 14px;
+    width: 80px;
+  }
+
+  .quick-bets button {
+    font-size: 12px;
+    padding: 5px;
+  }
+
+  .auto-options {
+    padding: 8px;
+    font-size: 12px;
+  }
+
+  .cashout-input input {
+    width: 40px;
+    padding: 3px;
+  }
+
   .multiplier-container {
-    top: 15% !important;      /* Move much higher */
+    top: 15% !important;
     left: 50% !important;
     transform: translate(-50%, -50%) !important;
     z-index: 10;
     font-size: 5rem;
   }
+
   #game-bg {
-    width: 382px;
-    height: 200px; /* smaller height for mobile */
+    width: 100%;
+    height: 200px;
   }
+
   .crash-message {
-    font-size: 1.5rem; /* Adjust size for mobile */
-    font-family: 'Arial', sans-serif; /* Or your desired mobile font */
-    font-weight: 600; /* Optional: tweak weight */
+    font-size: 1.5rem;
+    font-family: 'Arial', sans-serif;
+    font-weight: 600;
     top: 8%;
   }
 }
