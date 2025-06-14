@@ -813,7 +813,7 @@ body {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    gap: 10px;
+    gap: 0px;
     align-items: flex-start;
   }
 
