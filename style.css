@@ -793,7 +793,7 @@ body {
   }
 
   .bet-panels-row {
-    flex-direction: column;
+    flex-direction: row;
     align-items: stretch;
     gap: 0;
     width: 382px;
