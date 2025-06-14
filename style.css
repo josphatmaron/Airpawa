@@ -829,6 +829,8 @@ body {
 
   .bet-button,
   .cashout-button {
+    width: 210px;
+    height: 80px;
     font-size: 18px;
     padding: 12px 20px;
   }
