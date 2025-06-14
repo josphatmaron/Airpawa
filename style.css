@@ -810,9 +810,21 @@ body {
   }
 
   .bet-content {
-    gap: 8px;
-    flex-direction: column;
-    align-items: stretch;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .bet-controls {
+    flex: 1;
+    order: 1;
+  }
+
+  .bet-button-wrapper {
+    order: 2;
+    flex-shrink: 0;
   }
 
   .bet-button,
