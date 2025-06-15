@@ -893,7 +893,7 @@ body {
 @media (max-width: 430px) {
   .multiplier-container {
     font-size: 4rem;
-    top: 25% !important;
+    top: 20% !important;
     left: 50% !important;
     transform: translate(-50%, -50%) !important;
     max-width: 90%;
