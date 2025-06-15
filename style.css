@@ -878,6 +878,10 @@ body {
     height: 200px;
   }
 
+  .multiplier-container.crashed {
+  color: red !important;
+}
+
   .crash-message {
     font-size: 1rem;
     font-family: 'Arial', sans-serif;
