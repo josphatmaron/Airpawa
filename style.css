@@ -921,8 +921,3 @@ body {
     margin: 0 4px;
   }
 }
-
-.multiplier-container {
-  font-size: clamp(2rem, 8vw, 5rem);
-}
-
