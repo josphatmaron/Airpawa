@@ -890,24 +890,39 @@ body {
   }
 }
 
-@media (max-width: 319px) {
+@media (max-width: 430px) {
   .multiplier-container {
-    font-size: 2.5rem;
-    top: 50% !important;
+    font-size: 3rem;
+    top: 45% !important;
     left: 50% !important;
     transform: translate(-50%, -50%) !important;
     max-width: 90%;
     text-align: center;
-    word-wrap: break-word;
   }
 
   #game-bg {
-    height: 180px; /* Optional: reduce height to fit better */
+    height: 220px; /* Optional: shrink slightly if things feel tight */
   }
 
   .crash-message {
-    font-size: 1.2rem;
-    top: 30% !important;
+    font-size: 1.4rem;
+    top: 30%;
   }
+
+  .bet-button,
+  .cashout-button {
+    font-size: 16px;
+    padding: 12px;
+    height: auto;
+  }
+
+  .bet-panel {
+    padding: 8px;
+    margin: 0 4px;
+  }
+}
+
+.multiplier-container {
+  font-size: clamp(2rem, 8vw, 5rem);
 }
 
