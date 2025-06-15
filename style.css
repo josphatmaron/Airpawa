@@ -889,3 +889,25 @@ body {
     top: 15%;
   }
 }
+
+@media (max-width: 319px) {
+  .multiplier-container {
+    font-size: 2.5rem;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    max-width: 90%;
+    text-align: center;
+    word-wrap: break-word;
+  }
+
+  #game-bg {
+    height: 180px; /* Optional: reduce height to fit better */
+  }
+
+  .crash-message {
+    font-size: 1.2rem;
+    top: 30% !important;
+  }
+}
+
