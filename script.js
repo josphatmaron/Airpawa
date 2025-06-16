@@ -1,3 +1,4 @@
+```javascript
 // =========================
 // LOGOUT FUNCTION (GLOBAL SCOPE)
 // =========================
@@ -213,7 +214,7 @@ function resetRound() {
   const multiplierElement = document.getElementById("multiplier");
   if (multiplierElement) {
     multiplierElement.textContent = "1.00x";
-    multiplierElement.style.color = "#ffffff";
+    multiplierElement.classList.remove("crashed"); // Remove crashed class
   }
   gameRunning = true;
   if (ctx) resizeCanvas();
@@ -299,7 +300,11 @@ function crashGame() {
     const multiplierElement = document.getElementById("multiplier");
     if (multiplierElement) {
       multiplierElement.textContent = multiplier.toFixed(2) + "x";
-      multiplierElement.style.color = "white";
+      multiplierElement.classList.add("crashed"); // Add crashed class
+      // Remove crashed class after 3 seconds (sync with crash message)
+      setTimeout(() => {
+        multiplierElement.classList.remove("crashed");
+      }, 3000);
     }
     showCrashMessage("FLEW AWAY!", "white", 3000);
     document.dispatchEvent(new Event('gameCrash'));
@@ -806,7 +811,6 @@ document.querySelectorAll(".bet-toggle").forEach(toggle => {
   });
 });
 
-
 // =========================
 // TOP BAR LOGIC (Deposit link)
 // =========================
@@ -974,3 +978,4 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 });
+```
