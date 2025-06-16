@@ -903,6 +903,7 @@ body {
 
   #game-bg {
     height: 220px; /* Optional: shrink slightly if things feel tight */
+    width: 400px;
   }
 
   .crash-message {
