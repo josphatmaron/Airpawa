@@ -334,6 +334,11 @@ body {
   text-shadow: 0 0 10px rgba(0, 0,0.7);
 }
 
+.multiplier-container.crashed {
+  color: #ff0000 !important; /* Explicit red hex code */
+  transition: color 0.3s ease; /* Smooth color change */
+}
+
 .crash-message {
   position: absolute;
   top: 20%;
@@ -916,8 +921,4 @@ body {
     padding: 8px;
     margin: 0 4px;
   }
-}
-
- .multiplier-container.crashed {
-  color: red !important;
 }
