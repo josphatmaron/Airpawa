@@ -211,10 +211,13 @@ function resetRound() {
 
   showCrashMessage("", "white", 0);
 
+  const multiplierContainer = document.querySelector(".multiplier-container");
   const multiplierElement = document.getElementById("multiplier");
   if (multiplierElement) {
     multiplierElement.textContent = "1.00x";
-    multiplierElement.classList.remove("crashed"); // Remove crashed class
+  }
+  if (multiplierContainer) {
+    multiplierContainer.classList.remove("crashed"); // Remove crashed class
   }
   gameRunning = true;
   if (ctx) resizeCanvas();
@@ -297,13 +300,16 @@ function crashGame() {
     }
     renderBetHistory();
     addMultiplierToHistory(multiplier);
+    const multiplierContainer = document.querySelector(".multiplier-container");
     const multiplierElement = document.getElementById("multiplier");
     if (multiplierElement) {
       multiplierElement.textContent = multiplier.toFixed(2) + "x";
-      multiplierElement.classList.add("crashed"); // Add crashed class
+    }
+    if (multiplierContainer) {
+      multiplierContainer.classList.add("crashed"); // Add crashed class
       // Remove crashed class after 3 seconds (sync with crash message)
       setTimeout(() => {
-        multiplierElement.classList.remove("crashed");
+        multiplierContainer.classList.remove("crashed");
       }, 3000);
     }
     showCrashMessage("FLEW AWAY!", "white", 3000);
