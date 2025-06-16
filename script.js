@@ -1,4 +1,3 @@
-```javascript
 // =========================
 // LOGOUT FUNCTION (GLOBAL SCOPE)
 // =========================
