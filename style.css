@@ -367,7 +367,7 @@ body {
   flex-direction: column;
   position: relative;
   width: 100%;
-  max-width: 382px;
+  max-width: 430px;
   justify-content: center;
   align-items: center;
   border-radius: 20px;
@@ -801,13 +801,13 @@ body {
     flex-direction: row;
     align-items: stretch;
     gap: 0;
-    width: 382px;
+    width: 430px;
     height:292px;
     margin: 0 0 16px 0;
   }
 
   .bet-panel {
-    width: 382px !important;
+    width: 430px !important;
     height: 144px !important;
     margin: 0;
     padding: 10px;
@@ -879,7 +879,7 @@ body {
   }
 
   #game-bg {
-    width: 382px;
+    width: 430px;
     height: 200px;
   }
 
