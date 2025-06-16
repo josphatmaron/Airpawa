@@ -878,10 +878,6 @@ body {
     height: 200px;
   }
 
-  .multiplier-container.crashed {
-  color: red !important;
-}
-
   .crash-message {
     font-size: 1rem;
     font-family: 'Arial', sans-serif;
@@ -920,4 +916,8 @@ body {
     padding: 8px;
     margin: 0 4px;
   }
+}
+
+ .multiplier-container.crashed {
+  color: red !important;
 }
