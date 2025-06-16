@@ -5,7 +5,7 @@
 function logoutUser() {
   localStorage.setItem('isLoggedIn', 'false');
   alert('You have been logged out!');
-  updateTopBar(); // Make sure top bar updates immediately
+  updateTopBar();
   location.reload();
 }
 
@@ -87,6 +87,7 @@ function resizeCanvas() {
     canvas.height = displayHeight * dpr;
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.scale(dpr, dpr);
+    console.log(`Canvas resized: ${canvas.width}x${canvas.height}`);
   }
 }
 function calculateMaxRadius(centerX, centerY) {
@@ -109,9 +110,8 @@ function drawRadiatingLines() {
   if (!ctx) return;
   const dpr = window.devicePixelRatio || 1;
   const logicalHeight = canvas.height / dpr;
-  // Move more to the left and downwards
-  const centerX = -100;                // Negative value moves it further left
-  const centerY = logicalHeight + 50; // Positive value moves it further down
+  const centerX = -100;
+  const centerY = logicalHeight + 50;
   const radius = calculateMaxRadius(centerX, centerY);
   const lineCount = 36;
   const angleStep = (2 * Math.PI) / lineCount;
@@ -200,40 +200,56 @@ function getNextCrashPoint() {
 }
 
 function resetRound() {
-  multiplier = 1.0;
-  crashPoint = getNextCrashPoint();
-  startTime = null;
-  trail.length = 0;
-  bounceStartTime = null;
-  isBouncing = false;
-  isExiting = false;
-  exitStartTime = null;
+  try {
+    multiplier = 1.0;
+    crashPoint = getNextCrashPoint();
+    startTime = null;
+    trail.length = 0;
+    bounceStartTime = null;
+    isBouncing = false;
+    isExiting = false;
+    exitStartTime = null;
 
-  showCrashMessage("", "white", 0);
+    showCrashMessage("", "white", 0);
 
-  const multiplierContainer = document.querySelector(".multiplier-container");
-  const multiplierElement = document.getElementById("multiplier");
-  if (multiplierElement) {
+    const multiplierContainer = document.querySelector(".multiplier-container");
+    const multiplierElement = document.getElementById("multiplier");
+    if (!multiplierElement) {
+      console.error("Multiplier element not found");
+      return;
+    }
     multiplierElement.textContent = "1.00x";
+    if (multiplierContainer) {
+      multiplierContainer.classList.remove("crashed");
+    }
+    gameRunning = true;
+    if (ctx) {
+      resizeCanvas();
+    } else {
+      console.error("Canvas context not available in resetRound");
+    }
+    if (animationFrame) cancelAnimationFrame(animationFrame);
+    animationFrame = requestAnimationFrame(animate);
+    console.log("Game round reset");
+  } catch (error) {
+    console.error("Error in resetRound:", error);
   }
-  if (multiplierContainer) {
-    multiplierContainer.classList.remove("crashed"); // Remove crashed class
-  }
-  gameRunning = true;
-  if (ctx) resizeCanvas();
-  if (animationFrame) cancelAnimationFrame(animationFrame);
-  animationFrame = requestAnimationFrame(animate);
 }
 
 function animate(timestamp) {
   try {
-    if (!ctx || !canvas || !gameRunning) return;
+    if (!ctx || !canvas || !gameRunning) {
+      console.warn("Animation stopped: ctx, canvas, or gameRunning missing");
+      return;
+    }
     if (!startTime) startTime = timestamp;
     const elapsed = (timestamp - startTime) / 1000;
     multiplier = 1 + (elapsed / 3.5);
     const multiplierElement = document.getElementById("multiplier");
     if (multiplierElement) {
       multiplierElement.textContent = multiplier.toFixed(2) + "x";
+    } else {
+      console.warn("Multiplier element not found in animate");
     }
     updateActivePlayers();
     if (crashPoint && multiplier >= crashPoint && !isExiting) {
@@ -262,7 +278,9 @@ function animate(timestamp) {
       const cashoutSection = document.getElementById("cashout-section-2");
       if (cashoutSection) cashoutSection.style.display = "flex";
     }
+    console.log(`Animation frame: multiplier=${multiplier.toFixed(2)}`);
   } catch (error) {
+    console.error("Error in animate:", error);
     if (animationFrame) cancelAnimationFrame(animationFrame);
   }
 }
@@ -306,8 +324,7 @@ function crashGame() {
       multiplierElement.textContent = multiplier.toFixed(2) + "x";
     }
     if (multiplierContainer) {
-      multiplierContainer.classList.add("crashed"); // Add crashed class
-      // Remove crashed class after 3 seconds (sync with crash message)
+      multiplierContainer.classList.add("crashed");
       setTimeout(() => {
         multiplierContainer.classList.remove("crashed");
       }, 3000);
@@ -317,7 +334,10 @@ function crashGame() {
     setTimeout(() => {
       resetRound();
     }, 3000);
-  } catch (error) {}
+    console.log("Game crashed");
+  } catch (error) {
+    console.error("Error in crashGame:", error);
+  }
 }
 
 function resetGameUI() {
@@ -334,18 +354,18 @@ function resetGameUI() {
   const betInput1 = document.getElementById("bet-amount-1");
   const betButton1 = document.getElementById("place-bet-button-1");
   if (betInput1 && betButton1) {
-    betButton1.innerHTML = 'Bet<br><span class="bet-amount" id="bet-amount-text-1">8.00 MZN</span>';
+    betButton1.innerHTML = 'Bet<br><span class="bet-amount" id="bet-amount-text-1">8.00 USD</span>';
     betButton1.style.display = "flex";
     const betAmountText1 = document.getElementById("bet-amount-text-1");
-    if (betAmountText1) betAmountText1.textContent = `${parseFloat(betInput1.value).toFixed(2)} MZN`;
+    if (betAmountText1) betAmountText1.textContent = `${parseFloat(betInput1.value).toFixed(2)} USD`;
   }
   const betInput2 = document.getElementById("bet-amount-2");
   const betButton2 = document.getElementById("place-bet-button-2");
   if (betInput2 && betButton2) {
-    betButton2.innerHTML = 'Bet<br><span class="bet-amount" id="bet-amount-text-2">8.00 MZN</span>';
+    betButton2.innerHTML = 'Bet<br><span class="bet-amount" id="bet-amount-text-2">8.00 USD</span>';
     betButton2.style.display = "flex";
     const betAmountText2 = document.getElementById("bet-amount-text-2");
-    if (betAmountText2) betAmountText2.textContent = `${parseFloat(betInput2.value).toFixed(2)} MZN`;
+    if (betAmountText2) betAmountText2.textContent = `${parseFloat(betInput2.value).toFixed(2)} USD`;
   }
 }
 
@@ -353,12 +373,12 @@ function updateActivePlayers() {
   if (userHasBet1) {
     const winnings = userBetAmount1 * multiplier;
     const cashoutText = document.getElementById("cashout-amount-text-1");
-    if (cashoutText) cashoutText.textContent = `MZN ${winnings.toFixed(2)}`;
+    if (cashoutText) cashoutText.textContent = `USD ${winnings.toFixed(2)}`;
   }
   if (userHasBet2) {
     const winnings = userBetAmount2 * multiplier;
     const cashoutText = document.getElementById("cashout-amount-text-2");
-    if (cashoutText) cashoutText.textContent = `MZN ${winnings.toFixed(2)}`;
+    if (cashoutText) cashoutText.textContent = `USD ${winnings.toFixed(2)}`;
   }
 }
 
@@ -446,8 +466,12 @@ function drawTrail(multiplier) {
 // =========================
 const planeImage = new Image();
 planeImage.src = 'plane pink.png';
-planeImage.onload = () => {};
-planeImage.onerror = () => {};
+planeImage.onload = () => {
+  console.log("Plane image loaded successfully");
+};
+planeImage.onerror = () => {
+  console.error("Failed to load plane image");
+};
 function drawPlane(multiplier, timestamp) {
   if (!ctx || !canvas) return;
   const planeSize = 70;
@@ -459,6 +483,7 @@ function drawPlane(multiplier, timestamp) {
   } else {
     ctx.fillStyle = "blue";
     ctx.fillRect(0, -planeSize, planeSize, planeSize);
+    console.warn("Drawing fallback blue rectangle for plane");
   }
   ctx.restore();
 }
@@ -473,7 +498,9 @@ function updateTotalBets() {
     if (totalBetsCount) {
       totalBetsCount.textContent = `Total: ${bets.length}`;
     }
-  } catch (error) {}
+  } catch (error) {
+    console.error("Error in updateTotalBets:", error);
+  }
 }
 updateTotalBets();
 
@@ -525,7 +552,9 @@ function startGame(panelId) {
     const cashoutSection = document.getElementById(`cashout-section-${panelId}`);
     if (betButton) betButton.style.display = "none";
     if (cashoutSection) cashoutSection.style.display = "flex";
-  } catch (error) {}
+  } catch (error) {
+    console.error("Error in startGame:", error);
+  }
 }
 
 function cashOut(panelId) {
@@ -575,7 +604,9 @@ function cashOut(panelId) {
     const betButton = document.getElementById(`place-bet-button-${panelId}`);
     if (cashoutSection) cashoutSection.style.display = "none";
     if (betButton) betButton.style.display = "flex";
-  } catch (error) {}
+  } catch (error) {
+    console.error("Error in cashOut:", error);
+  }
 }
 
 const refreshButton = document.getElementById("refresh-balance");
@@ -585,9 +616,11 @@ if (refreshButton) {
       const newBalance = (Math.random() * 10000).toFixed(2);
       const userBalance = document.getElementById("user-balance");
       if (userBalance) {
-        userBalance.textContent = `MZN ${newBalance}`;
+        userBalance.textContent = `USD ${newBalance}`;
       }
-    } catch (error) {}
+    } catch (error) {
+      console.error("Error in refreshBalance:", error);
+    }
   });
 }
 function getBalance() {
@@ -598,6 +631,7 @@ function getBalance() {
     }
     return 0;
   } catch (error) {
+    console.error("Error in getBalance:", error);
     return 0;
   }
 }
@@ -605,9 +639,11 @@ function setBalance(amount) {
   try {
     const userBalance = document.getElementById("user-balance");
     if (userBalance) {
-      userBalance.textContent = `MZN ${amount.toFixed(2)}`;
+      userBalance.textContent = `USD ${amount.toFixed(2)}`;
     }
-  } catch (error) {}
+  } catch (error) {
+    console.error("Error in setBalance:", error);
+  }
 }
 
 // =========================
@@ -655,7 +691,7 @@ document.addEventListener("DOMContentLoaded", () => {
         betInput.addEventListener('input', () => {
           const betAmountText = document.getElementById(`bet-amount-text-${panelId}`);
           if (betAmountText) {
-            betAmountText.textContent = `${parseFloat(betInput.value).toFixed(2)} MZN`;
+            betAmountText.textContent = `${parseFloat(betInput.value).toFixed(2)} USD`;
           }
         });
       }
@@ -674,7 +710,7 @@ document.addEventListener("DOMContentLoaded", () => {
             betInput.value = value.toFixed(2);
             const betAmountText = document.getElementById(`bet-amount-text-${panelId}`);
             if (betAmountText) {
-              betAmountText.textContent = `${value.toFixed(2)} MZN`;
+              betAmountText.textContent = `${value.toFixed(2)} USD`;
             }
           }
         });
@@ -688,7 +724,7 @@ document.addEventListener("DOMContentLoaded", () => {
               betInput.value = value.toFixed(2);
               const betAmountText = document.getElementById(`bet-amount-text-${panelId}`);
               if (betAmountText) {
-                betAmountText.textContent = `${value.toFixed(2)} MZN`;
+                betAmountText.textContent = `${value.toFixed(2)} USD`;
               }
             }
           }
@@ -699,7 +735,10 @@ document.addEventListener("DOMContentLoaded", () => {
     animateBackground();
     resetRound();
     updateTopBar();
-  } catch (error) {}
+    console.log("DOM loaded, game initialized");
+  } catch (error) {
+    console.error("Error in DOMContentLoaded:", error);
+  }
 });
 
 window.addEventListener("resize", resizeCanvas);
@@ -725,7 +764,9 @@ function addMultiplierToHistory(multiplier) {
     if (history.children.length > 100) {
       history.removeChild(history.lastChild);
     }
-  } catch (error) {}
+  } catch (error) {
+    console.error("Error in addMultiplierToHistory:", error);
+  }
 }
 
 function addBetToTable(username, betAmount, multiplier = null, winAmount = null) {
@@ -745,7 +786,9 @@ function addBetToTable(username, betAmount, multiplier = null, winAmount = null)
     while (table.children.length > 21) {
       table.removeChild(table.lastChild);
     }
-  } catch (error) {}
+  } catch (error) {
+    console.error("Error in addBetToTable:", error);
+  }
 }
 
 // =========================
@@ -769,7 +812,7 @@ function renderBetHistory() {
     if (!container) return;
     container.innerHTML = `
       <div class="bet-history-row header">
-        <span>Date</span><span>Bet MZN</span><span>X</span><span>Cash out MZN</span>
+        <span>Date</span><span>Bet USD</span><span>X</span><span>Cash out USD</span>
       </div>
     `;
     betHistoryData.forEach(item => {
@@ -783,33 +826,33 @@ function renderBetHistory() {
       `;
       container.appendChild(row);
     });
-  } catch (error) {}
+  } catch (error) {
+    console.error("Error in renderBetHistory:", error);
+  }
 }
 
 // =========================
 // BET TOGGLE
+// =========================
 document.querySelectorAll(".bet-toggle").forEach(toggle => {
   const betBtn = toggle.querySelector(".toggle-bet");
   const autoBtn = toggle.querySelector(".toggle-auto");
-  const autoOptions = toggle.closest('.bet-panel')?.querySelector('.auto-bet-cashout-options');
+  const autoOptions = toggle.closest('.bet-panel')?.querySelector('.auto-options');
 
   if (!betBtn || !autoBtn || !autoOptions) return;
 
-  // Initialize state on load
   if (betBtn.classList.contains("active")) {
     autoOptions.style.display = "none";
   } else if (autoBtn.classList.contains("active")) {
     autoOptions.style.display = "block";
   }
 
-  // Event listener for "Bet" button
   betBtn.addEventListener("click", () => {
     betBtn.classList.add("active");
     autoBtn.classList.remove("active");
     autoOptions.style.display = "none";
   });
 
-  // Event listener for "Auto" button
   autoBtn.addEventListener("click", () => {
     autoBtn.classList.add("active");
     betBtn.classList.remove("active");
@@ -826,11 +869,9 @@ function updateTopBar() {
     if (!topBar) return;
     topBar.innerHTML = '';
 
-    // Check if user is logged in
     const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
 
     if (isLoggedIn) {
-      // Only show deposit if logged in
       const link = document.createElement('a');
       link.className = 'deposit-btn';
       link.textContent = 'Deposit';
@@ -839,14 +880,15 @@ function updateTopBar() {
       link.rel = 'noopener noreferrer';
       topBar.appendChild(link);
     } else {
-      // Show a login button or message
       const loginBtn = document.createElement('button');
       loginBtn.className = 'login-btn';
       loginBtn.textContent = 'Login to Deposit';
-      loginBtn.onclick = openLoginModal; // Or your login function
+      loginBtn.onclick = openLoginModal;
       topBar.appendChild(loginBtn);
     }
-  } catch (error) {}
+  } catch (error) {
+    console.error("Error in updateTopBar:", error);
+  }
 }
 document.addEventListener('DOMContentLoaded', updateTopBar);
 
@@ -860,7 +902,7 @@ document.addEventListener('click', function(e) {
     if (!isLoggedIn) {
       e.preventDefault();
       alert('Please log in to deposit.');
-      openLoginModal(); // Or redirect to login page
+      openLoginModal();
     }
   }
 });
@@ -877,20 +919,6 @@ function closeTicketsModal() { closeModal('ticketsModal'); }
 function openTicketsModal() { openModal('ticketsModal'); }
 function openBetHistoryModal() { openModal('betHistoryModal'); }
 function closeBetHistoryModal() { closeModal('betHistoryModal'); }
-
-// Toggle for bet/auto
-document.querySelectorAll('.bet-toggle').forEach(toggle => {
-  const betButton = toggle.querySelector('.toggle-bet');
-  const autoButton = toggle.querySelector('.toggle-auto');
-  betButton.addEventListener('click', () => {
-    betButton.classList.add('active');
-    autoButton.classList.remove('active');
-  });
-  autoButton.addEventListener('click', () => {
-    autoButton.classList.add('active');
-    betButton.classList.remove('active');
-  });
-});
 
 // Free bets menu
 document.addEventListener('DOMContentLoaded', function () {
@@ -984,4 +1012,3 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 });
-```
