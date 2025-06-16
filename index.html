@@ -134,31 +134,7 @@
 </div>
 
 <!-- Include this script at the bottom of your HTML or in a script tag -->
-<script>
-  document.querySelectorAll(".bet-panel").forEach(panel => {
-    const betBtn = panel.querySelector(".toggle-bet");
-    const autoBtn = panel.querySelector(".toggle-auto");
-    const autoOptions = panel.querySelector(".auto-options");
-
-    if (!betBtn || !autoBtn || !autoOptions) return;
-
-    // Set initial visibility
-    autoOptions.style.display = autoBtn.classList.contains("active") ? "block" : "none";
-
-    betBtn.addEventListener("click", () => {
-      betBtn.classList.add("active");
-      autoBtn.classList.remove("active");
-      autoOptions.style.display = "none";
-    });
-
-    autoBtn.addEventListener("click", () => {
-      autoBtn.classList.add("active");
-      betBtn.classList.remove("active");
-      autoOptions.style.display = "block";
-    });
-  });
-</script>
-
+            
            <!-- Bet Panel 2 -->
 <div class="bet-panel">
   <!-- Toggle Buttons -->
