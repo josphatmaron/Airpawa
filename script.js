@@ -1,16 +1,13 @@
-// =========================
-// LOGOUT FUNCTION (GLOBAL SCOPE)
-// =========================
 function logoutUser() {
   localStorage.setItem('isLoggedIn', 'false');
+  const dropdownMenu = document.getElementById('dropdown-menu');
+  if (dropdownMenu) dropdownMenu.style.display = 'none';
   alert('You have been logged out!');
   updateTopBar();
+  updateAuthButtons();
   location.reload();
 }
 
-// =========================
-// AUTH BUTTONS SHOW/HIDE LOGIC
-// =========================
 function updateAuthButtons() {
   const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
   const loginBtn = document.getElementById('login-btn');
@@ -18,131 +15,14 @@ function updateAuthButtons() {
   const dropdownMenu = document.getElementById('dropdown-menu');
   const menuToggle = document.getElementById('menu-toggle');
 
-  // Show/hide login and signup buttons
   if (loginBtn) loginBtn.style.display = isLoggedIn ? 'none' : '';
   if (signupBtn) signupBtn.style.display = isLoggedIn ? 'none' : '';
 
-  // Hide dropdown menu when logged out, show when logged in
   if (dropdownMenu) {
-    dropdownMenu.style.display = isLoggedIn ? '' : 'none';
+    dropdownMenu.style.display = isLoggedIn ? 'none' : 'none'; // Start hidden
   }
-
-  // Optional: Hide hamburger menu when logged out (uncomment if desired)
-  // if (menuToggle) menuToggle.style.display = isLoggedIn ? '' : 'none';
 }
 
-document.addEventListener('DOMContentLoaded', function () {
-  updateAuthButtons();
-
-  const countries = [
-    "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Argentina", "Armenia", "Australia",
-    "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium",
-    "Belize", "Benin", "Bhutan", "Bolivia", "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei",
-    "Bulgaria", "Burkina Faso", "Burundi", "Cambodia", "Cameroon", "Canada", "Cape Verde", "Chad",
-    "Chile", "China", "Colombia", "Comoros", "Congo", "Costa Rica", "Croatia", "Cuba", "Cyprus",
-    "Czech Republic", "Denmark", "Djibouti", "Dominica", "Dominican Republic", "Ecuador", "Egypt",
-    "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia", "Eswatini", "Ethiopia", "Fiji",
-    "Finland", "France", "Gabon", "Gambia", "Georgia", "Germany", "Ghana", "Greece", "Grenada",
-    "Guatemala", "Guinea", "Guinea-Bissau", "Guyana", "Haiti", "Honduras", "Hungary", "Iceland",
-    "India", "Indonesia", "Iran", "Iraq", "Ireland", "Israel", "Italy", "Ivory Coast", "Jamaica",
-    "Japan", "Jordan", "Kazakhstan", "Kenya", "Kiribati", "Kuwait", "Kyrgyzstan", "Laos", "Latvia",
-    "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg", "Madagascar",
-    "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Mauritania", "Mauritius", "Mexico",
-    "Micronesia", "Moldova", "Monaco", "Mongolia", "Montenegro", "Morocco", "Mozambique", "Myanmar",
-    "Namibia", "Nauru", "Nepal", "Netherlands", "New Zealand", "Nicaragua", "Niger", "Nigeria",
-    "North Korea", "North Macedonia", "Norway", "Oman", "Pakistan", "Palau", "Panama", "Papua New Guinea",
-    "Paraguay", "Peru", "Philippines", "Poland", "Portugal", "Qatar", "Romania", "Russia", "Rwanda",
-    "Saint Kitts and Nevis", "Saint Lucia", "Saint Vincent and the Grenadines", "Samoa", "San Marino",
-    "Sao Tome and Principe", "Saudi Arabia", "Senegal", "Serbia", "Seychelles", "Sierra Leone",
-    "Singapore", "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Korea",
-    "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname", "Sweden", "Switzerland", "Syria",
-    "Taiwan", "Tajikistan", "Tanzania", "Thailand", "Timor-Leste", "Togo", "Tonga", "Trinidad and Tobago",
-    "Tunisia", "Turkey", "Turkmenistan", "Tuvalu", "Uganda", "Ukraine", "United Arab Emirates",
-    "United Kingdom", "United States", "Uruguay", "Uzbekistan", "Vanuatu", "Vatican City", "Venezuela",
-    "Vietnam", "Yemen", "Zambia", "Zimbabwe"
-  ];
-
-  const countrySelect = document.getElementById('signup-country');
-  if (countrySelect) {
-    countries.forEach(country => {
-      const option = document.createElement('option');
-      option.value = country;
-      option.textContent = country;
-      countrySelect.appendChild(option);
-    });
-  }
-
-  function isPasswordValid(password) {
-    // Minimum 8 chars, at least one letter and one number
-    const regex = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
-    return regex.test(password);
-  }
-
-  function isAtLeast18(dob) {
-    const birthDate = new Date(dob);
-    const today = new Date();
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const monthDiff = today.getMonth() - birthDate.getMonth();
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-      age--;
-    }
-    return age >= 18;
-  }
-
-  const signupForm = document.getElementById('signupForm');
-  if (signupForm) {
-    signupForm.addEventListener('submit', async function (e) {
-      e.preventDefault();
-
-      const country = countrySelect.value.trim();
-      const phone = document.getElementById('signup-phone').value.trim();
-      const email = document.getElementById('signup-email').value.trim();
-      const dob = document.getElementById('signup-dob').value;
-      const password = document.getElementById('signup-password').value;
-      const confirmPassword = document.getElementById('signup-confirm-password').value;
-      const errorP = document.getElementById('signup-error');
-      errorP.textContent = '';
-
-      if (!isAtLeast18(dob)) {
-        errorP.textContent = "You must be at least 18 years old to register.";
-        return;
-      }
-
-      if (!isPasswordValid(password)) {
-        errorP.textContent = "Password must be at least 8 characters, include at least one letter and one number.";
-        return;
-      }
-
-      if (password !== confirmPassword) {
-        errorP.textContent = "Passwords do not match.";
-        return;
-      }
-
-      try {
-        const response = await fetch('https://backend-4lrl.onrender.com/register', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ country, phone, email, dob, password }),
-        });
-        const result = await response.json();
-
-        if (response.ok && result.user && result.user._id) {
-          alert("Registration successful! You can now log in.");
-          signupForm.reset();
-          // optionally close modal here
-        } else {
-          errorP.textContent = result.error || "Registration failed.";
-        }
-      } catch (err) {
-        errorP.textContent = "Registration error.";
-      }
-    });
-  }
-});
-
-// =========================
-// CRASH MESSAGE
-// =========================
 function showCrashMessage(msg, color = "white", duration = 1500) {
   const crashMessage = document.getElementById("crash-message");
   if (crashMessage) {
@@ -157,9 +37,6 @@ function showCrashMessage(msg, color = "white", duration = 1500) {
   }
 }
 
-// =========================
-// MENU TOGGLE
-// =========================
 const menuToggle = document.getElementById('menu-toggle');
 const dropdownMenu = document.getElementById('dropdown-menu');
 if (menuToggle && dropdownMenu) {
@@ -167,7 +44,6 @@ if (menuToggle && dropdownMenu) {
     e.stopPropagation();
     const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
     if (!isLoggedIn) {
-      // Optionally open login modal instead
       openLoginModal();
       return;
     }
@@ -190,9 +66,6 @@ document.addEventListener('click', (e) => {
   }
 });
 
-// =========================
-// CANVAS BACKGROUND
-// =========================
 const canvas = document.getElementById("game-bg");
 const ctx = canvas ? canvas.getContext("2d") : null;
 if (ctx) {
@@ -264,9 +137,6 @@ function animateBackground() {
   }
 }
 
-// =========================
-// CRASH POINTS
-// =========================
 const crashPointList = [
   1.41, 1.62, 1.28, 4.18, 1.59, 1.22, 1.14, 5.40, 1.23, 1.43,
   1.85, 3.66, 9.50, 1.29, 1.12, 3.95, 1.91, 6.52, 3.55, 1.09,
@@ -291,9 +161,6 @@ const crashPointList = [
 ];
 let crashIndex = 0;
 
-// =========================
-// GAME LOGIC & ANIMATION
-// =========================
 let multiplier = 1.0;
 let crashPoint = getNextCrashPoint();
 let animationFrame;
@@ -505,9 +372,6 @@ function updateActivePlayers() {
   }
 }
 
-// =========================
-// PLANE POSITION CALCULATION
-// =========================
 function getPlanePosition(multiplier, timestamp) {
   const dpr = window.devicePixelRatio || 1;
   const logicalHeight = canvas.height / dpr;
@@ -539,9 +403,6 @@ function getPlanePosition(multiplier, timestamp) {
   return { x, y };
 }
 
-// =========================
-// TRAIL DRAWING
-// =========================
 function drawTrail(multiplier) {
   if (!ctx) return;
   const dpr = window.devicePixelRatio || 1;
@@ -584,9 +445,6 @@ function drawTrail(multiplier) {
   ctx.restore();
 }
 
-// =========================
-// PLANE IMAGE & DRAWING
-// =========================
 const planeImage = new Image();
 planeImage.src = 'plane pink.png';
 planeImage.onload = () => {
@@ -611,9 +469,6 @@ function drawPlane(multiplier, timestamp) {
   ctx.restore();
 }
 
-// =========================
-// BETTING LOGIC
-// =========================
 function updateTotalBets() {
   try {
     const bets = document.querySelectorAll('.bets-table .bets-row');
@@ -628,6 +483,11 @@ function updateTotalBets() {
 updateTotalBets();
 
 function startGame(panelId) {
+  if (localStorage.getItem('isLoggedIn') !== 'true') {
+    alert('Please log in to place a bet.');
+    openLoginModal();
+    return;
+  }
   try {
     const betInput = document.getElementById(`bet-amount-${panelId}`);
     if (!betInput) return;
@@ -769,106 +629,284 @@ function setBalance(amount) {
   }
 }
 
-// =========================
-// DOM READY
-// =========================
 document.addEventListener("DOMContentLoaded", () => {
-  try {
-    const betButton1 = document.getElementById("place-bet-button-1");
-    const cashoutButton1 = document.getElementById("cashout-button-1");
-    const betInput1 = document.getElementById("bet-amount-1");
-    const betButton2 = document.getElementById("place-bet-button-2");
-    const cashoutButton2 = document.getElementById("cashout-button-2");
-    const betInput2 = document.getElementById("bet-amount-2");
-    if (betButton1) {
-      betButton1.replaceWith(betButton1.cloneNode(true));
-      document.getElementById("place-bet-button-1").addEventListener('click', (e) => {
-        e.stopPropagation();
-        startGame(1);
-      });
+  updateAuthButtons();
+  updateTopBar();
+
+  const countries = [
+    "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Argentina", "Armenia", "Australia",
+    "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium",
+    "Belize", "Benin", "Bhutan", "Bolivia", "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei",
+    "Bulgaria", "Burkina Faso", "Burundi", "Cambodia", "Cameroon", "Canada", "Cape Verde", "Chad",
+    "Chile", "China", "Colombia", "Comoros", "Congo", "Costa Rica", "Croatia", "Cuba", "Cyprus",
+    "Czech Republic", "Denmark", "Djibouti", "Dominica", "Dominican Republic", "Ecuador", "Egypt",
+    "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia", "Eswatini", "Ethiopia", "Fiji",
+    "Finland", "France", "Gabon", "Gambia", "Georgia", "Germany", "Ghana", "Greece", "Grenada",
+    "Guatemala", "Guinea", "Guinea-Bissau", "Guyana", "Haiti", "Honduras", "Hungary", "Iceland",
+    "India", "Indonesia", "Iran", "Iraq", "Ireland", "Israel", "Italy", "Ivory Coast", "Jamaica",
+    "Japan", "Jordan", "Kazakhstan", "Kenya", "Kiribati", "Kuwait", "Kyrgyzstan", "Laos", "Latvia",
+    "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg", "Madagascar",
+    "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Mauritania", "Mauritius", "Mexico",
+    "Micronesia", "Moldova", "Monaco", "Mongolia", "Montenegro", "Morocco", "Mozambique", "Myanmar",
+    "Namibia", "Nauru", "Nepal", "Netherlands", "New Zealand", "Nicaragua", "Niger", "Nigeria",
+    "North Korea", "North Macedonia", "Norway", "Oman", "Pakistan", "Palau", "Panama", "Papua New Guinea",
+    "Paraguay", "Peru", "Philippines", "Poland", "Portugal", "Qatar", "Romania", "Russia", "Rwanda",
+    "Saint Kitts and Nevis", "Saint Lucia", "Saint Vincent and the Grenadines", "Samoa", "San Marino",
+    "Sao Tome and Principe", "Saudi Arabia", "Senegal", "Serbia", "Seychelles", "Sierra Leone",
+    "Singapore", "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Korea",
+    "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname", "Sweden", "Switzerland", "Syria",
+    "Taiwan", "Tajikistan", "Tanzania", "Thailand", "Timor-Leste", "Togo", "Tonga", "Trinidad and Tobago",
+    "Tunisia", "Turkey", "Turkmenistan", "Tuvalu", "Uganda", "Ukraine", "United Arab Emirates",
+    "United Kingdom", "United States", "Uruguay", "Uzbekistan", "Vanuatu", "Vatican City", "Venezuela",
+    "Vietnam", "Yemen", "Zambia", "Zimbabwe"
+  ];
+
+  const countrySelect = document.getElementById('signup-country');
+  if (countrySelect) {
+    countries.forEach(country => {
+      const option = document.createElement('option');
+      option.value = country;
+      option.textContent = country;
+      countrySelect.appendChild(option);
+    });
+  }
+
+  function isPasswordValid(password) {
+    const regex = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
+    return regex.test(password);
+  }
+
+  function isAtLeast18(dob) {
+    const birthDate = new Date(dob);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
     }
-    if (cashoutButton1) {
-      cashoutButton1.replaceWith(cashoutButton1.cloneNode(true));
-      document.getElementById("cashout-button-1").addEventListener('click', (e) => {
-        e.stopPropagation();
-        cashOut(1);
-      });
-    }
-    if (betButton2) {
-      betButton2.replaceWith(betButton2.cloneNode(true));
-      document.getElementById("place-bet-button-2").addEventListener('click', (e) => {
-        e.stopPropagation();
-        startGame(2);
-      });
-    }
-    if (cashoutButton2) {
-      cashoutButton2.replaceWith(cashoutButton2.cloneNode(true));
-      document.getElementById("cashout-button-2").addEventListener('click', (e) => {
-        e.stopPropagation();
-        cashOut(2);
-      });
-    }
-    [betInput1, betInput2].forEach((betInput, index) => {
-      const panelId = index + 1;
-      if (betInput) {
-        betInput.addEventListener('input', () => {
-          const betAmountText = document.getElementById(`bet-amount-text-${panelId}`);
-          if (betAmountText) {
-            betAmountText.textContent = `${parseFloat(betInput.value).toFixed(2)} USD`;
-          }
+    return age >= 18;
+  }
+
+  const signupForm = document.getElementById('signupForm');
+  if (signupForm) {
+    signupForm.addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      const country = countrySelect.value.trim();
+      const phone = document.getElementById('signup-phone').value.trim();
+      const email = document.getElementById('signup-email').value.trim();
+      const dob = document.getElementById('signup-dob').value;
+      const password = document.getElementById('signup-password').value;
+      const confirmPassword = document.getElementById('signup-confirm-password').value;
+      const errorP = document.getElementById('signup-error');
+      errorP.textContent = '';
+
+      if (!isAtLeast18(dob)) {
+        errorP.textContent = "You must be at least 18 years old to register.";
+        return;
+      }
+
+      if (!isPasswordValid(password)) {
+        errorP.textContent = "Password must be at least 8 characters, include at least one letter and one number.";
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        errorP.textContent = "Passwords do not match.";
+        return;
+      }
+
+      try {
+        const response = await fetch('https://backend-4lrl.onrender.com/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ country, phone, email, dob, password }),
         });
+        const result = await response.json();
+
+        if (response.ok && result.user && result.user._id) {
+          alert("Registration successful! You can now log in.");
+          signupForm.reset();
+          closeModal('signupModal');
+        } else {
+          errorP.textContent = result.error || "Registration failed.";
+        }
+      } catch (err) {
+        errorP.textContent = "Registration error.";
       }
     });
-    document.querySelectorAll('.bet-panel').forEach((panel, index) => {
-      const panelId = index + 1;
-      panel.querySelectorAll('.adjust').forEach(button => {
-        button.addEventListener('click', () => {
-          const betInput = document.getElementById(`bet-amount-${panelId}`);
-          if (betInput) {
-            const step = parseFloat(betInput.step) || 1.00;
-            const min = parseFloat(betInput.min) || 1.00;
-            let value = parseFloat(betInput.value);
-            if (button.dataset.action === 'increase') value += step;
-            else if (button.dataset.action === 'decrease' && value > min) value -= step;
+  }
+
+  const loginForm = document.getElementById('login-form');
+  if (loginForm) {
+    loginForm.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const phone = document.getElementById('login-phone').value;
+      const password = document.getElementById('login-password').value;
+      const errorP = document.getElementById('login-error');
+      errorP.textContent = '';
+
+      try {
+        const response = await fetch('https://backend-4lrl.onrender.com/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone, password })
+        });
+        const result = await response.json();
+        if (response.ok && result.user) {
+          localStorage.setItem('isLoggedIn', 'true');
+          updateAuthButtons();
+          updateTopBar();
+          closeModal('login-modal');
+          alert('Login successful!');
+        } else {
+          errorP.textContent = result.error || 'Login failed.';
+        }
+      } catch (err) {
+        errorP.textContent = 'Login error.';
+      }
+    });
+  }
+
+  let registeredUserId = null;
+  const profileForm = document.getElementById('profileForm');
+  if (profileForm) {
+    profileForm.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const fullName = document.getElementById('profile-fullname').value;
+      const email = document.getElementById('profile-email').value;
+      const dob = document.getElementById('profile-dob').value;
+      const username = document.getElementById('profile-username').value;
+      const errorP = document.getElementById('profile-error');
+      errorP.textContent = '';
+
+      if (!registeredUserId) {
+        errorP.textContent = "No user registered.";
+        return;
+      }
+      try {
+        const response = await fetch('https://backend-4lrl.onrender.com/complete-profile', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ userId: registeredUserId, fullName, email, dob, username })
+        });
+        const result = await response.json();
+        if (result.user) {
+          closeModal('profileModal');
+          alert('Profile completed! You can now play or log in.');
+        } else {
+          errorP.textContent = result.error || "Profile update failed.";
+        }
+      } catch (err) {
+        errorP.textContent = "Profile update error.";
+      }
+    });
+  }
+
+  const freeBetsMenu = document.querySelector('.menu-items li:first-child');
+  if (freeBetsMenu) {
+    freeBetsMenu.addEventListener('click', function () {
+      openModal('freeBetsModal');
+    });
+  }
+
+  window.addEventListener('click', function (event) {
+    ['signupModal', 'freeBetsModal', 'profileModal', 'login-modal'].forEach(function (id) {
+      const modal = document.getElementById(id);
+      if (modal && event.target === modal) {
+        closeModal(id);
+      }
+    });
+  });
+
+  const betButton1 = document.getElementById("place-bet-button-1");
+  const cashoutButton1 = document.getElementById("cashout-button-1");
+  const betInput1 = document.getElementById("bet-amount-1");
+  const betButton2 = document.getElementById("place-bet-button-2");
+  const cashoutButton2 = document.getElementById("cashout-button-2");
+  const betInput2 = document.getElementById("bet-amount-2");
+  if (betButton1) {
+    betButton1.replaceWith(betButton1.cloneNode(true));
+    document.getElementById("place-bet-button-1").addEventListener('click', (e) => {
+      e.stopPropagation();
+      startGame(1);
+    });
+  }
+  if (cashoutButton1) {
+    cashoutButton1.replaceWith(cashoutButton1.cloneNode(true));
+    document.getElementById("cashout-button-1").addEventListener('click', (e) => {
+      e.stopPropagation();
+      cashOut(1);
+    });
+  }
+  if (betButton2) {
+    betButton2.replaceWith(betButton2.cloneNode(true));
+    document.getElementById("place-bet-button-2").addEventListener('click', (e) => {
+      e.stopPropagation();
+      startGame(2);
+    });
+  }
+  if (cashoutButton2) {
+    cashoutButton2.replaceWith(cashoutButton2.cloneNode(true));
+    document.getElementById("cashout-button-2").addEventListener('click', (e) => {
+      e.stopPropagation();
+      cashOut(2);
+    });
+  }
+  [betInput1, betInput2].forEach((betInput, index) => {
+    const panelId = index + 1;
+    if (betInput) {
+      betInput.addEventListener('input', () => {
+        const betAmountText = document.getElementById(`bet-amount-text-${panelId}`);
+        if (betAmountText) {
+          betAmountText.textContent = `${parseFloat(betInput.value).toFixed(2)} USD`;
+        }
+      });
+    }
+  });
+  document.querySelectorAll('.bet-panel').forEach((panel, index) => {
+    const panelId = index + 1;
+    panel.querySelectorAll('.adjust').forEach(button => {
+      button.addEventListener('click', () => {
+        const betInput = document.getElementById(`bet-amount-${panelId}`);
+        if (betInput) {
+          const step = parseFloat(betInput.step) || 1.00;
+          const min = parseFloat(betInput.min) || 1.00;
+          let value = parseFloat(betInput.value);
+          if (button.dataset.action === 'increase') value += step;
+          else if (button.dataset.action === 'decrease' && value > min) value -= step;
+          betInput.value = value.toFixed(2);
+          const betAmountText = document.getElementById(`bet-amount-text-${panelId}`);
+          if (betAmountText) {
+            betAmountText.textContent = `${value.toFixed(2)} USD`;
+          }
+        }
+      });
+    });
+    panel.querySelectorAll('.quick-bet').forEach(button => {
+      button.addEventListener('click', () => {
+        const betInput = document.getElementById(`bet-amount-${panelId}`);
+        if (betInput) {
+          const value = parseFloat(button.dataset.bet);
+          if (!isNaN(value)) {
             betInput.value = value.toFixed(2);
             const betAmountText = document.getElementById(`bet-amount-text-${panelId}`);
             if (betAmountText) {
               betAmountText.textContent = `${value.toFixed(2)} USD`;
             }
           }
-        });
-      });
-      panel.querySelectorAll('.quick-bet').forEach(button => {
-        button.addEventListener('click', () => {
-          const betInput = document.getElementById(`bet-amount-${panelId}`);
-          if (betInput) {
-            const value = parseFloat(button.dataset.bet);
-            if (!isNaN(value)) {
-              betInput.value = value.toFixed(2);
-              const betAmountText = document.getElementById(`bet-amount-text-${panelId}`);
-              if (betAmountText) {
-                betAmountText.textContent = `${value.toFixed(2)} USD`;
-              }
-            }
-          }
-        });
+        }
       });
     });
-    resizeCanvas();
-    animateBackground();
-    resetRound();
-    updateTopBar();
-    console.log("DOM loaded, game initialized");
-  } catch (error) {
-    console.error("Error in DOMContentLoaded:", error);
-  }
+  });
+  resizeCanvas();
+  animateBackground();
+  resetRound();
+  console.log("DOM loaded, game initialized");
 });
 
 window.addEventListener("resize", resizeCanvas);
 
-// =========================
-// MULTIPLIER HISTORY
-// =========================
 function addMultiplierToHistory(multiplier) {
   try {
     const history = document.getElementById("multiplier-history");
@@ -914,9 +952,6 @@ function addBetToTable(username, betAmount, multiplier = null, winAmount = null)
   }
 }
 
-// =========================
-// BET HISTORY
-// =========================
 let betHistoryData = [
   { date: '21-05-25 19:26', bet: 1.00, multiplier: '1.09x', cashout: 1.09 },
   { date: '21-05-25 19:24', bet: 50.00, multiplier: '1.07x', cashout: 53.50 },
@@ -954,9 +989,6 @@ function renderBetHistory() {
   }
 }
 
-// =========================
-// BET TOGGLE
-// =========================
 document.querySelectorAll(".bet-toggle").forEach(toggle => {
   const betBtn = toggle.querySelector(".toggle-bet");
   const autoBtn = toggle.querySelector(".toggle-auto");
@@ -983,9 +1015,6 @@ document.querySelectorAll(".bet-toggle").forEach(toggle => {
   });
 });
 
-// =========================
-// TOP BAR LOGIC (Deposit link)
-// =========================
 function updateTopBar() {
   try {
     const topBar = document.getElementById('top-bar-button');
@@ -1013,11 +1042,7 @@ function updateTopBar() {
     console.error("Error in updateTopBar:", error);
   }
 }
-document.addEventListener('DOMContentLoaded', updateTopBar);
 
-// =========================
-// Prevent deposit when logged out
-// =========================
 document.addEventListener('click', function(e) {
   const depositBtn = e.target.closest('.deposit-btn');
   if (depositBtn) {
@@ -1030,7 +1055,6 @@ document.addEventListener('click', function(e) {
   }
 });
 
-// Modal open/close logic
 function openSignupModal() { document.getElementById('signupModal').style.display = 'flex'; }
 function closeSignupModal() { document.getElementById('signupModal').style.display = 'none'; }
 function openProfileModal() { document.getElementById('profileModal').style.display = 'flex'; }
@@ -1042,107 +1066,3 @@ function closeTicketsModal() { closeModal('ticketsModal'); }
 function openTicketsModal() { openModal('ticketsModal'); }
 function openBetHistoryModal() { openModal('betHistoryModal'); }
 function closeBetHistoryModal() { closeModal('betHistoryModal'); }
-
-// Free bets menu
-document.addEventListener('DOMContentLoaded', function () {
-  var menu = document.querySelector('.menu-items li:first-child');
-  if (menu) menu.addEventListener('click', function () { openModal('freeBetsModal'); });
-
-  // ========== SIGNUP + PROFILE JS ==========
-  let registeredUserId = null;
-
-  document.getElementById('signupForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    const phone = document.getElementById('signup-phone').value;
-    const password = document.getElementById('signup-password').value;
-    const confirmPassword = document.getElementById('signup-confirm-password').value;
-    const referralCode = document.getElementById('signup-referral').value;
-    const errorP = document.getElementById('signup-error');
-    errorP.textContent = '';
-
-    if (password !== confirmPassword) {
-      errorP.textContent = "Passwords don't match.";
-      return;
-    }
-    try {
-      const response = await fetch('https://backend-4lrl.onrender.com/register', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ phone, password, referralCode })
-      });
-
-      let result;
-      try {
-        result = await response.json();
-      } catch (jsonErr) {
-        errorP.textContent = "Server returned invalid JSON.";
-        return;
-      }
-
-      if (!response.ok) {
-        errorP.textContent = result.error || "Registration failed.";
-        return;
-      }
-
-      if (result.user && result.user._id) {
-        registeredUserId = result.user._id;
-        closeSignupModal();
-        openProfileModal();
-      } else {
-        errorP.textContent = result.error || "Registration failed.";
-      }
-    } catch (err) {
-      errorP.textContent = "Registration error: " + err.message;
-    }
-  });
-
-  document.getElementById('profileForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    const fullName = document.getElementById('profile-fullname').value;
-    const email = document.getElementById('profile-email').value;
-    const dob = document.getElementById('profile-dob').value;
-    const username = document.getElementById('profile-username').value;
-    const errorP = document.getElementById('profile-error');
-    errorP.textContent = '';
-
-    if (!registeredUserId) {
-      errorP.textContent = "No user registered.";
-      return;
-    }
-    try {
-      const response = await fetch('https://backend-4lrl.onrender.com/complete-profile', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ userId: registeredUserId, fullName, email, dob, username })
-      });
-      const result = await response.json();
-      if (result.user) {
-        closeProfileModal();
-        alert('Profile completed! You can now play or log in.');
-      } else {
-        errorP.textContent = result.error || "Profile update failed.";
-      }
-    } catch (err) {
-      errorP.textContent = "Profile update error.";
-    }
-  });
-
-  // Modal close on outside click
-  window.addEventListener('click', function (event) {
-    ['signupModal', 'freeBetsModal', 'profileModal'].forEach(function (id) {
-      var modal = document.getElementById(id);
-      if (modal && event.target === modal) { closeModal(id); }
-    });
-  });
-});
-
-function openLoginModal() {
-  const modal = document.getElementById('login-modal');
-  if (modal) modal.style.display = 'block';
-}
-
-function closeModal(modalId) {
-  const modal = document.getElementById(modalId);
-  if (modal) modal.style.display = 'none';
-}
-
