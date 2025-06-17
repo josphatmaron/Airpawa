@@ -219,76 +219,58 @@
         </div>
       </div>
 
-      <!-- SIGNUP MODAL -->
-      <div id="signupModal" class="modal" style="display: none;">
-        <div class="modal-content" style="background-color: #1c1c1c; padding: 20px; border-radius: 10px; width: 300px; color: white; position: relative;">
-          <span class="close" onclick="closeSignupModal()" style="position: absolute; right: 10px; top: 10px; font-size: 20px; cursor: pointer;">×</span>
-          <h2 style="text-align: center;">Join Airpawa</h2>
-          <p style="text-align: center; font-size: 0.9em; margin-bottom: 20px;">Home to fast wins and easy bets</p>
-          <form id="signupForm">
-            <label>Username</label>
-            <input type="text" id="signup-username" required style="width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: none;" />
-            <label>Phone number</label>
-            <input type="text" id="signup-phone" required style="width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: none;" />
-            <label>Email address</label>
-            <input type="email" id="signup-email" required style="width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: none;" />
-            <label>Password</label>
-            <input type="password" id="signup-password" required style="width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: none;" />
-            <label>Confirm password</label>
-            <input type="password" id="signup-confirm-password" required style="width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: none;" />
-            <label>Referral code (optional)</label>
-            <input type="text" id="signup-referral" placeholder="e.g. ABCDXY" style="width: 100%; padding: 10px; margin: 5px 0 15px; border-radius: 5px; border: none;" />
-            <button type="submit" style="width: 100%; padding: 10px; background: red; color: white; border: none; border-radius: 5px;">Sign Up</button>
-            <p id="signup-error" style="color: #f88; text-align:center;"></p>
-            <p style="text-align: center; margin-top: 10px;">
-              or <a href="#" onclick="openLoginModal()" style="color: #00f;">Login</a>
-            </p>
-          </form>
-        </div>
-      </div>
-      <!-- PROFILE STEP MODAL -->
-      <div id="profileModal" class="modal" style="display: none;">
-        <div class="modal-content" style="background-color: #1c1c1c; padding: 20px; border-radius: 10px; width: 300px; color: white; position: relative;">
-          <span class="close" onclick="closeProfileModal()" style="position: absolute; right: 10px; top: 10px; font-size: 20px; cursor: pointer;">×</span>
-          <h2 style="text-align: center;">Complete Your Profile</h2>
-          <form id="profileForm">
-            <label>Full name</label>
-            <input type="text" id="profile-fullname" required style="width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: none;" />
-            <label>Email address</label>
-            <input type="email" id="profile-email" required style="width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: none;" />
-            <label>Date of birth</label>
-            <input type="date" id="profile-dob" required style="width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: none;" />
-            <label>Username</label>
-            <input type="text" id="profile-username" required style="width: 100%; padding: 10px; margin: 5px 0 15px; border-radius: 5px; border: none;" />
-            <button type="submit" style="width: 100%; padding: 10px; background: red; color: white; border: none; border-radius: 5px;">Save Profile</button>
-            <p id="profile-error" style="color: #f88; text-align:center;"></p>
-          </form>
-        </div>
-      </div>
+      <!-- SIGNUP MODAL (Simplified) -->
+<div id="signupModal" class="modal" style="display: none;">
+  <div class="modal-content" style="background-color: #1c1c1c; padding: 20px; border-radius: 10px; width: 300px; color: white; position: relative;">
+    <span class="close" onclick="closeSignupModal()" style="position: absolute; right: 10px; top: 10px; font-size: 20px; cursor: pointer;">×</span>
+    <h2 style="text-align: center;">Join Airpawa</h2>
+    <p style="text-align: center; font-size: 0.9em; margin-bottom: 20px;">Home to fast wins and easy bets</p>
 
-      <!-- LOGIN MODAL -->
-      <div id="login-modal" class="modal" style="display: none;">
-        <div class="modal-content dark-modal">
-          <span class="close" onclick="closeModal('login-modal')">×</span>
-          <form id="login-form">
-            <h2>Login</h2>
-            <label for="login-phone">Phone number</label>
-            <input type="text" id="login-phone" placeholder="0700000000" required />
-            <label for="login-password">Password</label>
-            <input type="password" id="login-password" placeholder="Enter password" required />
-            <!-- Error message display for login -->
-            <p id="login-error" style="color:#f88;text-align:center;"></p>
-            <div class="modal-links">
-              <a href="#">Forgot password?</a>
-              <a href="#">Activate account?</a>
-            </div>
-            <div class="modal-buttons">
-              <button type="button" class="cancel-btn" onclick="closeModal('login-modal')">Cancel</button>
-              <button type="submit" class="login-btn">Login to Airpawa</button>
-            </div>
-          </form>
-        </div>
-      </div>
+    <form id="signupForm">
+      <label>Country</label>
+      <input type="text" id="signup-country" required style="width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: none;" />
+
+      <label>Phone number</label>
+      <input type="text" id="signup-phone" required style="width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: none;" />
+
+      <label>Password</label>
+      <input type="password" id="signup-password" required style="width: 100%; padding: 10px; margin: 5px 0 15px; border-radius: 5px; border: none;" />
+
+      <button type="submit" style="width: 100%; padding: 10px; background: red; color: white; border: none; border-radius: 5px;">Sign Up</button>
+
+      <p id="signup-error" style="color: #f88; text-align:center;"></p>
+
+      <p style="text-align: center; margin-top: 10px;">
+        or <a href="#" onclick="openLoginModal()" style="color: #00f;">Login</a>
+      </p>
+    </form>
+  </div>
+</div>
+
+     <!-- LOGIN MODAL (Simplified) -->
+<div id="login-modal" class="modal" style="display: none;">
+  <div class="modal-content" style="background-color: #1c1c1c; padding: 20px; border-radius: 10px; width: 300px; color: white; position: relative;">
+    <span class="close" onclick="closeModal('login-modal')" style="position: absolute; right: 10px; top: 10px; font-size: 20px; cursor: pointer;">×</span>
+    <h2 style="text-align: center;">Login to Airpawa</h2>
+
+    <form id="login-form">
+      <label for="login-phone">Phone number</label>
+      <input type="text" id="login-phone" placeholder="0700000000" required style="width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: none;" />
+
+      <label for="login-password">Password</label>
+      <input type="password" id="login-password" placeholder="Enter password" required style="width: 100%; padding: 10px; margin: 5px 0 15px; border-radius: 5px; border: none;" />
+
+      <p id="login-error" style="color:#f88;text-align:center;"></p>
+
+      <button type="submit" style="width: 100%; padding: 10px; background: red; color: white; border: none; border-radius: 5px;">Login</button>
+
+      <p style="text-align: center; margin-top: 10px;">
+        or <a href="#" onclick="openSignupModal()" style="color: #00f;">Sign up</a>
+      </p>
+    </form>
+  </div>
+</div>
+
       <!-- Free Bets Lightbox Modal -->
       <div id="freeBetsModal" class="modal" style="display: none;">
         <div class="modal-content">
