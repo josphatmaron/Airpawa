@@ -813,7 +813,7 @@ body {
   .bet-panels-row {
     flex-direction: row;
     align-items: stretch;
-    gap: 0;
+    gap: 16px;
     width: 100%;
     max-width: 424px;
     margin: 0 auto 16px auto;
