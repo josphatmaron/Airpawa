@@ -165,6 +165,12 @@ const dropdownMenu = document.getElementById('dropdown-menu');
 if (menuToggle && dropdownMenu) {
   menuToggle.addEventListener('click', (e) => {
     e.stopPropagation();
+    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    if (!isLoggedIn) {
+      // Optionally open login modal instead
+      openLoginModal();
+      return;
+    }
     const isVisible = dropdownMenu.style.display === 'flex';
     dropdownMenu.style.display = isVisible ? 'none' : 'flex';
   });
