@@ -660,7 +660,7 @@ function addMultiplierToHistory(multiplier) {
     if (!history) return;
     const item = document.createElement("div");
     item.className = 'history-item';
-    item.style.backgroundColor = multiplier >= 10 ? "rgb(255, 215, 0)" : multiplier <= 2 ? "rgb(255, 69, 0)" : "rgb(0, 206, 209)";
+    item.style.color = multiplier >= 10 ? "pink" : multiplier <= 2 ? "blue" : "purple";
     item.textContent = `${multiplier.toFixed(2)}x`;
     history.prepend(item);
     if (history.children.length > 100) history.removeChild(history.lastChild);
