@@ -1117,3 +1117,14 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 });
+
+function openLoginModal() {
+  const modal = document.getElementById('login-modal');
+  if (modal) modal.style.display = 'block';
+}
+
+function closeModal(modalId) {
+  const modal = document.getElementById(modalId);
+  if (modal) modal.style.display = 'none';
+}
+
