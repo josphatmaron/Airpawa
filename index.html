@@ -271,6 +271,33 @@
   </div>
 </div>
 
+          <!-- PROFILE STEP MODAL (with Email and DOB) -->
+<div id="profileModal" class="modal" style="display: none;">
+  <div class="modal-content" style="background-color: #1c1c1c; padding: 20px; border-radius: 10px; width: 300px; color: white; position: relative;">
+    <span class="close" onclick="closeProfileModal()" style="position: absolute; right: 10px; top: 10px; font-size: 20px; cursor: pointer;">×</span>
+    <h2 style="text-align: center;">Complete Your Profile</h2>
+
+    <form id="profileForm">
+      <label>Full name</label>
+      <input type="text" id="profile-fullname" required style="width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: none;" />
+
+      <label>Username</label>
+      <input type="text" id="profile-username" required style="width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: none;" />
+
+      <label>Email address</label>
+      <input type="email" id="profile-email" required style="width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: none;" />
+
+      <label>Date of birth</label>
+      <input type="date" id="profile-dob" required style="width: 100%; padding: 10px; margin: 5px 0 15px; border-radius: 5px; border: none;" />
+
+      <button type="submit" style="width: 100%; padding: 10px; background: red; color: white; border: none; border-radius: 5px;">Save Profile</button>
+
+      <p id="profile-error" style="color: #f88; text-align:center;"></p>
+    </form>
+  </div>
+</div>
+
+
       <!-- Free Bets Lightbox Modal -->
       <div id="freeBetsModal" class="modal" style="display: none;">
         <div class="modal-content">
