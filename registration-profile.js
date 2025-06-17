@@ -1,62 +1,42 @@
-// =========================
-// PASSWORD VALIDATION FUNCTION
-// =========================
-function isPasswordValid(password) {
-  // At least 8 characters, at least one letter and one number
-  const regex = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
-  return regex.test(password);
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-  // =========================
-  // Registration (Signup)
-  // =========================
+document.addEventListener('DOMContentLoaded', function () {
   const signupForm = document.getElementById('signupForm');
+
   if (signupForm) {
-    signupForm.addEventListener('submit', async function(e) {
+    signupForm.addEventListener('submit', async function (e) {
       e.preventDefault();
 
-      const usernameInput         = document.getElementById('signup-username');
-      const phoneInput            = document.getElementById('signup-phone');
-      const emailInput            = document.getElementById('signup-email');
-      const passwordInput         = document.getElementById('signup-password');
-      const confirmPasswordInput  = document.getElementById('signup-confirm-password');
-      const referralInput         = document.getElementById('signup-referral');
-      const errorP                = document.getElementById('signup-error');
+      const countryInput = document.getElementById('signup-country');
+      const phoneInput = document.getElementById('signup-phone');
+      const passwordInput = document.getElementById('signup-password');
+      const errorP = document.getElementById('signup-error');
 
-      if (!usernameInput || !phoneInput || !emailInput || !passwordInput || !confirmPasswordInput || !referralInput || !errorP) {
-        alert('Signup form is not set up correctly. Please check your HTML input IDs.');
+      if (!countryInput || !phoneInput || !passwordInput || !errorP) {
+        alert('Signup form setup error. Check input IDs.');
         return;
       }
 
-      const username       = usernameInput.value.trim();
-      const phone          = phoneInput.value.trim();
-      const email          = emailInput.value.trim();
-      const password       = passwordInput.value;
-      const confirmPassword= confirmPasswordInput.value;
-      const referralCode   = referralInput.value.trim();
-      errorP.textContent   = '';
+      const country = countryInput.value.trim();
+      const phone = phoneInput.value.trim();
+      const password = passwordInput.value;
 
-      if (!isPasswordValid(password)) {
-        errorP.textContent = "Password must be at least 8 characters, include at least one letter and one number.";
-        return;
-      }
-      if (password !== confirmPassword) {
-        errorP.textContent = "Passwords don't match.";
+      errorP.textContent = '';
+
+      if (password.length < 6) {
+        errorP.textContent = "Password must be at least 6 characters.";
         return;
       }
 
       try {
-        const response = await fetch('https://backend-4lrl.onrender.com/register', {
+        const response = await fetch('https://your-backend-url/register', {
           method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({ username, phone, email, password, referralCode })
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ country, phone, password })
         });
+
         const result = await response.json();
-        console.log("Login response:", result);
-        console.log("Response OK?", response.ok);
+
         if (response.ok && result.user && result.user._id) {
-          alert("Registration successful! You can now log in.");
+          alert("Registration successful!");
           if (typeof closeSignupModal === "function") closeSignupModal();
           if (typeof openLoginModal === "function") openLoginModal();
         } else {
@@ -67,14 +47,13 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   }
+});
 
-  // =========================
-  // Login (Signin)
-  // =========================
+document.addEventListener('DOMContentLoaded', function () {
   const loginForm = document.getElementById('login-form');
+
   if (loginForm) {
-    loginForm.addEventListener('submit', async function(e) {
-      console.log("Login clicked!");
+    loginForm.addEventListener('submit', async function (e) {
       e.preventDefault();
 
       const phoneInput = document.getElementById('login-phone');
@@ -82,29 +61,28 @@ document.addEventListener('DOMContentLoaded', function() {
       const errorP = document.getElementById('login-error');
 
       if (!phoneInput || !passwordInput || !errorP) {
-        alert('Login form is not set up correctly. Please check your HTML input IDs.');
+        alert('Login form setup error. Check input IDs.');
         return;
       }
 
       const phone = phoneInput.value.trim();
       const password = passwordInput.value;
+
       errorP.textContent = '';
 
       try {
-        const response = await fetch('https://backend-4lrl.onrender.com/login', {
+        const response = await fetch('https://your-backend-url/login', {
           method: 'POST',
-          headers: {'Content-Type': 'application/json'},
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ phone, password })
         });
+
         const result = await response.json();
+
         if (response.ok && result.user && result.user._id) {
           errorP.textContent = "Login successful!";
           localStorage.setItem('isLoggedIn', 'true');
           if (typeof updateAuthButtons === "function") updateAuthButtons();
-          // Uncomment below to close modal on successful login
-          // if (typeof closeModal === "function") closeModal('login-modal');
-          // Or redirect to dashboard
-          // window.location.href = '/dashboard';
         } else {
           errorP.textContent = result.error || "Login failed.";
         }
