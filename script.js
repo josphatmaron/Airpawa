@@ -15,8 +15,20 @@ function updateAuthButtons() {
   const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
   const loginBtn = document.getElementById('login-btn');
   const signupBtn = document.getElementById('signup-btn');
+  const dropdownMenu = document.getElementById('dropdown-menu');
+  const menuToggle = document.getElementById('menu-toggle');
+
+  // Show/hide login and signup buttons
   if (loginBtn) loginBtn.style.display = isLoggedIn ? 'none' : '';
   if (signupBtn) signupBtn.style.display = isLoggedIn ? 'none' : '';
+
+  // Hide dropdown menu when logged out, show when logged in
+  if (dropdownMenu) {
+    dropdownMenu.style.display = isLoggedIn ? '' : 'none';
+  }
+
+  // Optional: Hide hamburger menu when logged out (uncomment if desired)
+  // if (menuToggle) menuToggle.style.display = isLoggedIn ? '' : 'none';
 }
 
 document.addEventListener('DOMContentLoaded', function () {
