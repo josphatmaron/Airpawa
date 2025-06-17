@@ -673,11 +673,12 @@ function updateTopBar() {
   try {
     const topBar = document.getElementById('top-bar-button');
     if (!topBar) {
-      console.error("Top bar element (#top-bar-button) not found in HTML.");
+      console.error("Top bar element (#top-bar-button) not found in HTML. Ensure <div id='top-bar-button'></div> exists.");
       return;
     }
     topBar.innerHTML = '';
     const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    console.log("isLoggedIn status:", isLoggedIn);
     if (isLoggedIn) {
       const link = document.createElement('a');
       link.className = 'deposit-btn';
@@ -686,17 +687,20 @@ function updateTopBar() {
       link.target = '_blank';
       link.rel = 'noopener noreferrer';
       topBar.appendChild(link);
+      console.log("Deposit link created");
     } else {
       const loginButton = document.createElement('button');
       loginButton.className = 'login-btn';
+      loginButton.id = 'login-to-deposit-btn';
       loginButton.textContent = 'Login to Deposit';
       loginButton.addEventListener('click', (e) => {
         e.preventDefault();
+        console.log("Login to Deposit button clicked");
         openLoginModal();
       });
       topBar.appendChild(loginButton);
+      console.log("Login to Deposit button created with ID 'login-to-deposit-btn'");
     }
-    console.log("Top bar updated:", isLoggedIn ? "Deposit link" : "Login to Deposit button");
   } catch (error) {
     console.error("Error updating topBar:", error);
   }
@@ -716,13 +720,24 @@ document.addEventListener('click', (e) => {
 
 function openModal(modalId) {
   const modal = document.getElementById(modalId);
-  if (modal) modal.style.display = 'block';
+  if (modal) {
+    modal.style.display = 'block';
+    console.log(`Modal '${modalId}' opened`);
+  } else {
+    console.error(`Modal element (#${modalId}) not found in HTML. Ensure <div id='${modalId}' class='modal'></div> exists.`);
+  }
 }
+
 function closeModal(modalId) {
   const modal = document.getElementById(modalId);
   if (modal) modal.style.display = 'none';
 }
-function openLoginModal() { openModal('login-modal'); }
+
+function openLoginModal() {
+  console.log("Attempting to open login modal");
+  openModal('login-modal');
+}
+
 function openSignupModal() { openModal('signupModal'); }
 function closeSignupModal() { closeModal('signupModal'); }
 function openProfileModal() { openModal('profileModal'); }
@@ -735,13 +750,13 @@ function openBetHistoryModal() { openModal('betHistoryModal'); }
 function closeBetHistoryModal() { closeModal('betHistoryModal'); }
 
 document.addEventListener("DOMContentLoaded", () => {
+  console.log("DOM loaded, initializing game");
   updateAuthButtons();
   updateTopBar();
   resizeCanvas();
   animateBackground();
   resetRound();
   updateTotalBets();
-  console.log("DOM loaded, game initialized");
 
   const countries = [
     "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua", "Argentina", "Armenia",
