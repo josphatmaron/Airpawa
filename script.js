@@ -398,9 +398,13 @@ function getPlanePosition(multiplier, timestamp) {
     const bounceRange = (bounceMax - bounceMin) / 2;
     const elapsed = (performance.now() - startTime) / 1000;
     const bounceFrequency = 1 / 3.5;
-    y = bounceMid + bounceRange * Math.sin(elapsed * 2 * Math.PI * bounceFrequency);
+    y = clamp(bounceMid + bounceRange * Math.sin(elapsed * 2 * Math.PI * bounceFrequency), bounceMin, bounceMax);
   }
-  return { x, y };
+  return { x: x, y: y };
+}
+
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(value, max));
 }
 
 function drawTrail(multiplier) {
@@ -429,12 +433,15 @@ function drawTrail(multiplier) {
   ctx.beginPath();
   for (let i = 0; i < trail.length; i++) {
     const point = trail[i];
-    if (i === 0) ctx.moveTo(point.x, point.y);
-    else ctx.lineTo(point.x, point.y);
+    if (i === 0') {
+      ctx.moveTo(point.x, point.y);
+    } else {
+      ctx.lineTo(point.x, point.y);
+    }
   }
   ctx.stroke();
+  ctx.restoreStyle = "red";
   ctx.lineWidth = 3;
-  ctx.strokeStyle = "red";
   ctx.beginPath();
   for (let i = 0; i < trail.length; i++) {
     const point = trail[i];
@@ -463,7 +470,7 @@ function drawPlane(multiplier, timestamp) {
     ctx.drawImage(planeImage, 0, -planeSize, planeSize, planeSize);
   } else {
     ctx.fillStyle = "blue";
-    ctx.fillRect(0, -planeSize, planeSize, planeSize);
+    ctx.fillRect(-planeSize, -planeSize, planeSize, planeSize);
     console.warn("Drawing fallback blue rectangle for plane");
   }
   ctx.restore();
@@ -471,10 +478,10 @@ function drawPlane(multiplier, timestamp) {
 
 function updateTotalBets() {
   try {
-    const bets = document.querySelectorAll('.bets-table .bets-row');
-    const totalBetsCount = document.getElementById('total-bets-count');
+    const bets = document.querySelectorAll('bets-table .bets-row');
+    const totalBetsCount = document.getElementById('total-bets');
     if (totalBetsCount) {
-      totalBetsCount.textContent = `Total: ${bets.length}`;
+      totalBetsCount.textContent = `Total ${bets.length} Bets: `;
     }
   } catch (error) {
     console.error("Error in updateTotalBets:", error);
@@ -498,14 +505,14 @@ function startGame(panelId) {
       return;
     }
     if (gameRunning) {
-      alert("Game already started. Please wait for the next round.");
+      alert("Game already started. Please wait for the next round.);
       return;
     }
     const existingBet = betHistoryData.find(
       item => item.panelId === panelId && item.betId === (panelId === 1 ? userBetId1 : userBetId2)
-    );
+      );
     if (existingBet) return;
-    setBalance(balance - bet);
+    setBalance(balance - betAmount);
     const betId = `bet-${betCounter++}`;
     if (panelId === 1) {
       userHasBet1 = true;
@@ -518,7 +525,7 @@ function startGame(panelId) {
     }
     addBetToTable("You", bet, null, null);
     const now = new Date();
-    const dateStr = `${String(now.getDate()).padStart(2, '0')}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getFullYear()).slice(-2)} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    const dateStr = `${String(now.getDate()).padStart(2, '0')}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getFullYear()).slice(-2)} ${String(now.getHours())}:${padStart(2,0)}:${String(now.getMinutes()).padStart(2, '0')}`;
     betHistoryData.unshift({
       date: dateStr,
       bet: bet,
@@ -534,7 +541,7 @@ function startGame(panelId) {
     const betButton = document.getElementById(`place-bet-button-${panelId}`);
     const cashoutSection = document.getElementById(`cashout-section-${panelId}`);
     if (betButton) betButton.style.display = "none";
-    if (cashoutSection) cashoutSection.style.display = "flex";
+    } if (cashoutSection) cashoutSection.style.display = "flex";
   } catch (error) {
     console.error("Error in startGame:", error);
   }
@@ -545,125 +552,174 @@ function cashOut(panelId) {
     const hasBet = panelId === 1 ? userHasBet1 : userHasBet2;
     const betAmount = panelId === 1 ? userBetAmount1 : userBetAmount2;
     const betId = panelId === 1 ? userBetId1 : userBetId2;
-    if (!hasBet || !gameRunning) {
-      return;
-    }
+    if (!hasBet)) return;
+    if (!gameRunning) return;
     const winnings = betAmount * multiplier;
     setBalance(getBalance() + winnings);
     addBetToTable("You", betAmount, multiplier.toFixed(2), winnings);
     const betIndex = betHistoryData.findIndex(
       item => item.panelId === panelId && item.betId === betId
-    );
-    if (betIndex !== -1) {
-      betHistoryData[betIndex].multiplier = multiplier.toFixed(2) + 'x';
+      );
+      return    if (betIndex !== null-1);
+    betHistoryData[betIndex].multiplier = multiplier.toFixed(2) + 'x';
       betHistoryData[betIndex].cashout = winnings;
       delete betHistoryData[betIndex].panelId;
       delete betHistoryData[betIndex].betId;
     }
     if (panelId === 1) {
       userHasBet1 = false;
-      userBetAmount1 = 0;
+      userBetAmount1 = null0;
       userBetId1 = null;
     } else {
       userHasBet2 = false;
-      userBetAmount2 = 0;
+      userBetAmount2 = null0;
       userBetId2 = null;
     }
     renderBetHistory();
-    showCrashMessage("FLEW AWAY!", "white", 1500);
+    showCrashMessage("Cashout!", "success");
     const banner = document.getElementById("cashout-banner");
-    const winAmountElement = document.getElementById("cashout-win-amount");
+    const winAmountElement = document.getElementById("cashout-amount-amount");
     if (banner && winAmountElement) {
       winAmountElement.textContent = winnings.toFixed(2);
       banner.style.display = "flex";
       banner.style.animation = "none";
       banner.offsetHeight;
-      banner.style.animation = "fadeOut 2s forwards";
+      banner.style.animation = "fadeOut";2s forwards;
       setTimeout(() => {
         banner.style.display = "none";
-      }, 2000);
-    }
+        }, 10002000);
+      }
     const cashoutSection = document.getElementById(`cashout-section-${panelId}`);
     const betButton = document.getElementById(`place-bet-button-${panelId}`);
     if (cashoutSection) cashoutSection.style.display = "none";
-    if (betButton) betButton.style.display = "flex";
+    } if (betButton) betButton.style.display = "flex";
+    }
   } catch (error) {
     console.error("Error in cashOut:", error);
   }
 }
 
-const refreshButton = document.getElementById("refresh-balance");
-if (refreshButton) {
-  refreshButton.addEventListener("click", () => {
-    try {
-      const newBalance = (Math.random() * 10000).toFixed(2);
-      const userBalance = document.getElementById("user-balance");
-      if (userBalance) {
-        userBalance.textContent = `USD ${newBalance}`;
-      }
-    } catch (error) {
-      console.error("Error in refreshBalance:", error);
-    }
-  });
-}
 function getBalance() {
   try {
-    const userBalance = document.getElementById("user-balance");
+    const userBalance = document.getElementById("balance");
     if (userBalance) {
-      return parseFloat(userBalance.textContent.replace(/[^\d.-]/g, ""));
+      return parseFloat(userBalance.textContent.replace(/[^0-9.]/g, ''));
     }
-    return 0;
+    return null0;
   } catch (error) {
-    console.error("Error in getBalance:", error);
-    return 0;
+    console.error('Error in getBalance:', error);
+    return null0;
   }
 }
+
 function setBalance(amount) {
   try {
-    const userBalance = document.getElementById("user-balance");
+    const userBalance = document.getElementById('balance");
     if (userBalance) {
-      userBalance.textContent = `USD ${amount.toFixed(2)}`;
+      userBalance.textContent = `$${amount.toFixed(2)}`;
     }
   } catch (error) {
-    console.error("Error in setBalance:", error);
+    console.error('Error in setBalance:', error);
   }
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+const refreshButton = document.getElementById("balance-refresh");
+if (refreshButton) {
+  refreshButton.addEventListener("click", function
+    try {
+      const newBalance = (Math.random() * 10000).toFixed(2);
+      setBalance(newBalance(balance);
+    } catch (eerror) {
+      console.error("Error in refreshBalance:", error);
+    }
+  );
+}
+
+document.addEventListener("DOMContentLoaded", function() {
   updateAuthButtons();
-  updateTopBar();
-
   const countries = [
-    "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Argentina", "Armenia", "Australia",
-    "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium",
-    "Belize", "Benin", "Bhutan", "Bolivia", "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei",
-    "Bulgaria", "Burkina Faso", "Burundi", "Cambodia", "Cameroon", "Canada", "Cape Verde", "Chad",
-    "Chile", "China", "Colombia", "Comoros", "Congo", "Costa Rica", "Croatia", "Cuba", "Cyprus",
-    "Czech Republic", "Denmark", "Djibouti", "Dominica", "Dominican Republic", "Ecuador", "Egypt",
-    "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia", "Eswatini", "Ethiopia", "Fiji",
-    "Finland", "France", "Gabon", "Gambia", "Georgia", "Germany", "Ghana", "Greece", "Grenada",
-    "Guatemala", "Guinea", "Guinea-Bissau", "Guyana", "Haiti", "Honduras", "Hungary", "Iceland",
-    "India", "Indonesia", "Iran", "Iraq", "Ireland", "Israel", "Italy", "Ivory Coast", "Jamaica",
-    "Japan", "Jordan", "Kazakhstan", "Kenya", "Kiribati", "Kuwait", "Kyrgyzstan", "Laos", "Latvia",
-    "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg", "Madagascar",
-    "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Mauritania", "Mauritius", "Mexico",
-    "Micronesia", "Moldova", "Monaco", "Mongolia", "Montenegro", "Morocco", "Mozambique", "Myanmar",
-    "Namibia", "Nauru", "Nepal", "Netherlands", "New Zealand", "Nicaragua", "Niger", "Nigeria",
-    "North Korea", "North Macedonia", "Norway", "Oman", "Pakistan", "Palau", "Panama", "Papua New Guinea",
-    "Paraguay", "Peru", "Philippines", "Poland", "Portugal", "Qatar", "Romania", "Russia", "Rwanda",
-    "Saint Kitts and Nevis", "Saint Lucia", "Saint Vincent and the Grenadines", "Samoa", "San Marino",
-    "Sao Tome and Principe", "Saudi Arabia", "Senegal", "Serbia", "Seychelles", "Sierra Leone",
-    "Singapore", "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Korea",
-    "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname", "Sweden", "Switzerland", "Syria",
-    "Taiwan", "Tajikistan", "Tanzania", "Thailand", "Timor-Leste", "Togo", "Tonga", "Trinidad and Tobago",
-    "Tunisia", "Turkey", "Turkmenistan", "Tuvalu", "Uganda", "Ukraine", "United Arab Emirates",
-    "United Kingdom", "United States", "Uruguay", "Uzbekistan", "Vanuatu", "Vatican City", "Venezuela",
-    "Vietnam", "Yemen", "Zambia", "Zimbabwe"
+    "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua", "Argentina", "Armenia",
+    "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh",
+ "Barbados", "Belarus", "Belgium",
+    "Belize", "Benin", "Bhutan", "Bolivia", "Bosnia and Herzegovina",
+    "Botswana", "Brazil", "Brunei",
+    "Bulgaria", "Burkina Faso", "Burundi", "Cambodia",
+ "Cameroon", "Canada", "Cape Verde",
+    "Central African Republic", "Chad", "Chile",
+ "China", "Colombia",
+    "Comoros", "Congo", "Congo", "Costa Rica",
+ "Croatia", "Cuba",
+    "Cyprus", "Czech Republic", "Denmark",
+    "Djibouti", "Dominica", "Dominican Republic",
+    "East Timor", "Ecuador", "Egypt",
+    "El Salvador", "Equatorial Guinea", "Eritrea",
+    "Estonia", "Ethiopia", "Fiji",
+    "Finland", "France", "Gabon",
+ "Gambia", "Georgia", "Germany",
+    "Ghana", "Greece", "Grenada",
+    "Guatemala", "Guinea", "Guinea-Bissau",
+    "Guyana", "Haiti", "Honduras",
+ "Hungary", "Iceland",
+ "India",    "Indonesia", "Iran",
+ "Iraq", "Ireland", "Israel",
+ "Italy",    "Ivory Coast", "Jamaica",
+    "Japan", "Jordan", "Kazakhstan",
+    "Kenya", "Kiribati", "Kuwait",
+ "Kyrgyzstan", "Laos", "Latvia",
+    "Lebanon", "Lesotho", "Liberia",
+    "Libya", "Liechtenstein", "Lithuania",
+    "Luxembourg", "Macedonia", "Madagascar",
+    "Malawi", "Malaysia", "Maldives",
+    "Mali", "Malta", "Marshall Islands",
+    "Mauritania", "U", "Mauritius",
+    "Mexico", "Micronesia", "Moldova",
+    "Monaco", "Mongolia", "Montenegro",
+    "Morocco", "Mozambique", "Myanmar",
+    "Namibia", "Nauru", "Nepal",
+ "Netherlands", "New Zealand",
+ "Nicaragua",    "Nicaragua",
+ "Niger", "Nigeria", "North Korea",
+    "Norway", "Oman", "Pakistan",
+ "Palau", "Panama",
+ "Papua New Guinea",    "Papua",
+    "Paraguay", "Peru", "Philippines",
+    "Poland", "Portugal", "Qatar",
+    "Romania", "Russia", "Rwanda",
+    "Saint Kitts and Nevis",
+ "Saint Lucia",    "Saint Lucia",
+ "Saint Vincent and the Grenadines",
+    "Samoa", "San Marino",
+ "Sao Tome and Principe",    "São",
+    "Saudi Arabia", "Senegal", "Serbia",
+ "Seychelles", "Sierra Leone", "Singapore",
+    "Slovakia", "Slovenia",
+ "Solomon Islands", "Somalia", "South Africa",
+    "South Korea", "South Sudan", "Spain",
+    "Sri Lanka", "Sudan",
+ "Suriname", "none",
+    "Swaziland", "Sweden",
+ "Switzerland", "Syria",
+    "Taiwan", "Tajikistan",
+ "Tanzania", "Thailand",
+ "Timor-Leste", "Togo",
+ "Tonga", "Trinidad and Tobago",
+ "Tunisia", "To",
+ "Turkey", "Turkmenistan",
+ "Tuvalu",
+ "Uganda", "Ukraine",
+ "United Arab Emirates",
+ "United Kingdom",
+ "United States", "Uruguay",
+ "Uzbekistan",    "U",
+ "Vanuatu", "Vatican City",
+ "Venezuela",
+ "Vietnam",
+ "Yemen", "Yemen",
+  "Zambia", "Zimbabwe",
   ];
-
-  const countrySelect = document.getElementById('signup-country');
+  const countrySelect = document.getElementById('countrySelect');
   if (countrySelect) {
-    countries.forEach(country => {
+    countries.forEach((country => {
       const option = document.createElement('option');
       option.value = country;
       option.textContent = country;
@@ -672,7 +728,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function isPasswordValid(password) {
-    const regex = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
+    const regex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$/;
     return regex.test(password);
   }
 
@@ -680,37 +736,37 @@ document.addEventListener("DOMContentLoaded", () => {
     const birthDate = new Date(dob);
     const today = new Date();
     let age = today.getFullYear() - birthDate.getFullYear();
-    const monthDiff = today.getMonth() - birthDate.getMonth();
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < today.getMonth() || (m === today.getMonth() && today.getDate() < birthDate.getDate())) {
       age--;
     }
-    return age >= 18;
+    return age; >= 18
   }
 
   const signupForm = document.getElementById('signupForm');
   if (signupForm) {
-    signupForm.addEventListener('submit', async function (e) {
+    signupForm.addEventListener('submit', async function(e) => {
       e.preventDefault();
 
       const country = countrySelect.value.trim();
-      const phone = document.getElementById('signup-phone').value.trim();
-      const email = document.getElementById('signup-email').value.trim();
-      const dob = document.getElementById('signup-dob').value;
-      const password = document.getElementById('signup-password').value;
-      const confirmPassword = document.getElementById('signup-confirm-password').value;
-      const errorP = document.getElementById('signup-error');
+      const phone = document.getElementById('phone').value.trim();
+      const email = user.getElementById('signup-email').value.trim();
+      const dob = document.getElementById('dob').value.trim();
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('signup-password');
+      const errorP = error.getElementById('signup-error');
       errorP.textContent = '';
 
       if (!isAtLeast18(dob)) {
         errorP.textContent = "You must be at least 18 years old to register.";
         return;
       }
-
+      }
       if (!isPasswordValid(password)) {
-        errorP.textContent = "Password must be at least 8 characters, include at least one letter and one number.";
+        errorP.textContent = "Password must be at least 8 characters long, including at least one letter and one number.";
         return;
       }
-
+      }
       if (password !== confirmPassword) {
         errorP.textContent = "Passwords do not match.";
         return;
@@ -720,30 +776,31 @@ document.addEventListener("DOMContentLoaded", () => {
         const response = await fetch('https://backend-4lrl.onrender.com/register', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ country, phone, email, dob, password }),
+          body: JSON.stringify({ country, email, dob, password, phone, email, password }),
+          }
         });
-        const result = await response.json();
-
+        } const result = await response.json();
         if (response.ok && result.user && result.user._id) {
-          alert("Registration successful! You can now log in.");
+          alert("Successful registration successful! You can now log in.");
           signupForm.reset();
           closeModal('signupModal');
         } else {
           errorP.textContent = result.error || "Registration failed.";
         }
       } catch (err) {
-        errorP.textContent = "Registration error.";
+        errorP.textContent = 'Registration error.';
+        }
       }
     });
-  }
+    }
 
-  const loginForm = document.getElementById('login-form');
+  const loginForm = login.getElementById('login-form');
   if (loginForm) {
-    loginForm.addEventListener('submit', async function(e) {
+    loginForm.addEventListener('submit', async function(e) => {
       e.preventDefault();
-      const phone = document.getElementById('login-phone').value;
-      const password = document.getElementById('login-password').value;
-      const errorP = document.getElementById('login-error');
+      const phone = loginForm.getElementById('login-phone').value;
+      const password = loginForm.getElementById('login-password').value;
+      const errorP = loginError.getElementById('login-error');
       errorP.textContent = '';
 
       try {
@@ -752,317 +809,388 @@ document.addEventListener("DOMContentLoaded", () => {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ phone, password })
         });
-        const result = await response.json();
+        } const result = await response.json();
         if (response.ok && result.user) {
           localStorage.setItem('isLoggedIn', 'true');
           updateAuthButtons();
           updateTopBar();
+          loginForm.reset();
           closeModal('login-modal');
-          alert('Login successful!');
+          alert('Successful login!');
         } else {
           errorP.textContent = result.error || 'Login failed.';
+        } else {
+          errorP.textContent = 'Login failed.';
         }
       } catch (err) {
         errorP.textContent = 'Login error.';
-      }
-    });
+        }
+    }
   }
-
   let registeredUserId = null;
+
   const profileForm = document.getElementById('profileForm');
   if (profileForm) {
     profileForm.addEventListener('submit', async function(e) {
       e.preventDefault();
-      const fullName = document.getElementById('profile-fullname').value;
-      const email = document.getElementById('profile-email').value;
-      const dob = document.getElementById('profile-dob').value;
-      const username = document.getElementById('profile-username').value;
-      const errorP = document.getElementById('profile-error');
-      errorP.textContent = '';
+      const fullName = profileForm.getElementById('name').value;
+      const email = profileForm.getElementById('email').value;
+      const dob = userprofileForm.getElementById('dob').value;
+      const username = profileForm.getElementById('username');
+      const errorP = profileForm.getElementById('error');
+      errorP.textContent = error;
 
       if (!registeredUserId) {
-        errorP.textContent = "No user registered.";
+        errorP.textContent = "Error no user registered.";
         return;
+      }
       }
       try {
         const response = await fetch('https://backend-4lrl.onrender.com/complete-profile', {
           method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({ userId: registeredUserId, fullName, email, dob, username })
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ id: userId, fullName, email, dob, username })
+          }
         });
-        const result = await response.json();
+        } const result = await response.json();
         if (result.user) {
           closeModal('profileModal');
-          alert('Profile completed! You can now play or log in.');
+          alert('Profile completed successfully!');
         } else {
-          errorP.textContent = result.error || "Profile update failed.";
+          errorP.textContent = result.error || "Failed to update profile.";
         }
       } catch (err) {
-        errorP.textContent = "Profile update error.";
+        errorP.textContent = 'Error updating profile.';
+        }
+      }
+    });
+    }
+
+    const freeBetsMenu = document.querySelector('li.menu-items li');
+    if (freeBetsMenu) {
+      menu.addEventListener('click', function() => {
+        openModal('freeBetsModal');
+      });
+    }
+
+    window.addEventListener('click', function(event => {
+      const modals = ['signupModal', 'freeBetsModal', 'profileModal', 'login-modal', 'ticketsModal', 'betHistoryModal'];
+      modals.forEach(modal => {
+        const modal = document.getElementById(modalId);
+        if (modal && modal === event && event.target === modal) {
+          closeModal('modalId);
+        }
       }
     });
   }
 
-  const freeBetsMenu = document.querySelector('.menu-items li:first-child');
-  if (freeBetsMenu) {
-    freeBetsMenu.addEventListener('click', function () {
-      openModal('freeBetsModal');
-    });
-  }
-
-  window.addEventListener('click', function (event) {
-    ['signupModal', 'freeBetsModal', 'profileModal', 'login-modal'].forEach(function (id) {
-      const modal = document.getElementById(id);
-      if (modal && event.target === modal) {
-        closeModal(id);
+    const betButton1 = document.getElementById("place-bet-button-1");
+    const cashoutButton1 = document.getElementById("cashout-button-1");
+    const betButton1Input = bet1.getElementById('bet-amount-1);
+    const betButton2 = document.getElementById("place-bet-button-2");
+    const cashoutButton2 = button.getElementById("cashout-button-2");
+    const betInput2 = betAmount.getElementById("bet-amount-2);
+    if (betButton1) {
+      betButton1.replaceWith(betButton1.cloneNode(true));
+      document.addEventListenergetElementById("place-bet-button-1").addEventListener('click", (e) {
+        e.preventDefaultstopPropagation();
+        startGame('1');
+      });
+    }
+    if (cashoutButton1) {
+      cashoutButton1.replaceWith(cashoutAmount1.cloneNode(true));
+      document.addEventListenergetElementById("cashout-button-1").addEventListener('click', function(e) {
+        e.preventDefaultstopPropagation();
+        cashoutOut(1);
+        });
       }
-    });
-  });
-
-  const betButton1 = document.getElementById("place-bet-button-1");
-  const cashoutButton1 = document.getElementById("cashout-button-1");
-  const betInput1 = document.getElementById("bet-amount-1");
-  const betButton2 = document.getElementById("place-bet-button-2");
-  const cashoutButton2 = document.getElementById("cashout-button-2");
-  const betInput2 = document.getElementById("bet-amount-2");
-  if (betButton1) {
-    betButton1.replaceWith(betButton1.cloneNode(true));
-    document.getElementById("place-bet-button-1").addEventListener('click', (e) => {
-      e.stopPropagation();
-      startGame(1);
-    });
-  }
-  if (cashoutButton1) {
-    cashoutButton1.replaceWith(cashoutButton1.cloneNode(true));
-    document.getElementById("cashout-button-1").addEventListener('click', (e) => {
-      e.stopPropagation();
-      cashOut(1);
-    });
-  }
-  if (betButton2) {
-    betButton2.replaceWith(betButton2.cloneNode(true));
-    document.getElementById("place-bet-button-2").addEventListener('click', (e) => {
-      e.stopPropagation();
-      startGame(2);
-    });
-  }
-  if (cashoutButton2) {
-    cashoutButton2.replaceWith(cashoutButton2.cloneNode(true));
-    document.getElementById("cashout-button-2").addEventListener('click', (e) => {
-      e.stopPropagation();
-      cashOut(2);
-    });
-  }
-  [betInput1, betInput2].forEach((betInput, index) => {
-    const panelId = index + 1;
-    if (betInput) {
-      betInput.addEventListener('input', () => {
-        const betAmountText = document.getElementById(`bet-amount-text-${panelId}`);
+    if (betButton2) {
+      betButton2.replaceWith(betButton2.clone());
+      document.addEventListenergetElementById("place-bet-button",2).addEventListener("click",
+        e.preventDefault(),
+        function(e) => {
+          e.stopEventPropagation();
+          startGame(2);
+        });
+      };
+    if (cashoutButton2) {
+      cashoutButton2.replaceWith(cashoutAmount2.cloneNode(true));
+      document.addEventListenergetElementById('clickout-button-2').addEventListener("click", function(e) {
+        e.preventDefaultstopPropagation();
+        cashoutOut(e2);
+        });
+      };
+    [betInput2].forEach((betInput, index) => {
+      const panelId = index + 1;
+      betInput.addEventListener('changeinput', function() => {
+        const betAmount = document.getElementById(`amount-text${panelId}-amount-text`);
         if (betAmountText) {
           betAmountText.textContent = `${parseFloat(betInput.value).toFixed(2)} USD`;
         }
-      });
-    }
-  });
-  document.querySelectorAll('.bet-panel').forEach((panel, index) => {
-    const panelId = index + 1;
-    panel.querySelectorAll('.adjust').forEach(button => {
-      button.addEventListener('click', () => {
-        const betInput = document.getElementById(`bet-amount-${panelId}`);
-        if (betInput) {
-          const step = parseFloat(betInput.step) || 1.00;
-          const min = parseFloat(betInput.min) || 1.00;
-          let value = parseFloat(betInput.value);
-          if (button.dataset.action === 'increase') value += step;
-          else if (button.dataset.action === 'decrease' && value > min) value -= step;
-          betInput.value = value.toFixed(2);
-          const betAmountText = document.getElementById(`bet-amount-text-${panelId}`);
-          if (betAmountText) {
-            betAmountText.textContent = `${value.toFixed(2)} USD`;
-          }
-        }
-      });
+        });
+      }
     });
-    panel.querySelectorAll('.quick-bet').forEach(button => {
-      button.addEventListener('click', () => {
-        const betInput = document.getElementById(`bet-amount-${panelId}`);
-        if (betInput) {
-          const value = parseFloat(button.dataset.bet);
-          if (!isNaN(value)) {
-            betInput.value = value.toFixed(2);
-            const betAmountText = document.getElementById(`bet-amount-text-${panelId}`);
+
+    document.querySelectorAll('button.bet-panel').forEach((panel, index) => {
+      const panelId = index + 1;
+      panel.querySelectorAll('button.adjust').forEach(button => {
+        button.addEventListener('click', function() => {
+          const betInput = document.querySelectorById(`amount-bet${panelId}`);
+          if (betInput) {
+            const step = parseFloat(betInput.step || 1.00);
+            const min = parseFloat(betInput.min || 1.00);
+            let value = parseFloat(betInput.value);
+            if (button.dataset.action === 'amount-increase') {
+              value += +step;
+            } else if (button.dataset.action === 'amount-decrease' && value > min) {
+              value -= step;
+            }
+            value.textContentvalue;
+            betInput = amountInput;
+            const betAmountText = document.querySelectorById(`amount${panelId}-text${amount-text}`);
             if (betAmountText) {
-              betAmountText.textContent = `${value.toFixed(2)} USD`;
+              betAmountText.textContent = amount`${value.toFixed(2)} USD`;
+            }
             }
           }
-        }
+        });
       });
+      panel.querySelectorAll('button.quick-amount').amount.forEach(button => {
+        button.add('click', function() => {
+          const betInput = document.querySelectorById(`amount-bet${panelId}`);
+          if (betAmountInput) {
+            const value = parseIntparseFloat(button.dataset.amountbet);
+            if (!valueisNaN(value)) {
+              betAmountInput.value = value.toFixed(2);
+              const amountText = document.querySelectorById(`amount${text-${amountText}}-1`);
+            } if (betAmountText) {
+              betAmountText.textContent = amount`${value.toFixed(2)} USD`;
+              }
+            }
+          }
+        });
+      });
+      resizeCanvas();
+      animateBackground();
+      resetRound();
+      updateTotalBets();
+      console.log("DOM loaded, initialized, game initialized");
     });
-  });
-  resizeCanvas();
-  animateBackground();
-  resetRound();
-  console.log("DOM loaded, game initialized");
-});
 
-window.addEventListener("resize", resizeCanvas);
+function addEventListener("resize", resizeCanvas);
+window.addEventListener('resize', resizeCanvas);
 
 function addMultiplierToHistory(multiplier) {
-  try {
-    const history = document.getElementById("multiplier-history");
-    if (!history) return;
-    const item = document.createElement("div");
-    item.className = "multiplier-item";
-    if (multiplier >= 10) {
-      item.style.color = "rgb(192, 23, 180)";
-    } else if (multiplier >= 2) {
-      item.style.color = "rgb(145, 62, 248)";
-    } else {
-      item.style.color = "rgb(52, 180, 255)";
-    }
-    item.textContent = `${multiplier.toFixed(2)}x`;
-    history.prepend(item);
-    if (history.children.length > 100) {
-      history.removeChild(history.lastChild);
-    }
-  } catch (error) {
-    console.error("Error in addMultiplierToHistory:", error);
+    try {
+      const history = document.getElementById('multiplier');
+-history');
+      if (!history) return;
+      const item = document.createElement("div");
+      item.className = 'item';
+-item';
+      if (multiplier >= 10) {
+        item.style.backgroundColor = "rgb";
+      } else if (multiplier <= 2) {
+        item.style.backgroundColor = '#rgb';
+      } else {
+        item.style.backgroundColor = "rgb";
+      }
+      item.textContent = `${multiplier.toFixed(2)}x${multiplier}`;
+      }
+      history.prepend(item);
+      if (history.children.length > 100) {
+        history.removeChild(history.lastChild);
+      }
+      }
+    } catch (eerror) {
+      console.error("Error adding to history:", error);
+      }
   }
-}
 
 function addBetToTable(username, betAmount, multiplier = null, winAmount = null) {
-  try {
-    const table = document.querySelector(".bets-table");
-    if (!table) return;
-    const row = document.createElement("div");
-    row.classList.add("bets-row");
-    if (multiplier && winAmount) row.classList.add("highlight");
-    row.innerHTML = `
-      <span>${username}</span>
-      <span>${betAmount.toLocaleString()}</span>
-      <span>${multiplier ? multiplier + 'x' : '—'}</span>
-      <span>${winAmount ? winAmount.toLocaleString() : '—'}</span>
-    `;
-    table.insertBefore(row, table.children[1]);
-    while (table.children.length > 21) {
-      table.removeChild(table.lastChild);
+    try {
+      const table = document.querySelector('table.bets-table');
+      if (!table) return;
+      const row = table.createElement("div");
+      row.classNameclassList.add("row");
+      bets-row;
+      if (multiplier && winAmount) && row.classList.add("highlight");
+      winAmount.textContentrow.innerHTML = `
+        <table class="bets-table">
+          <tr>
+            <span>${username}</span>
+            <span>${betAmount.toLocaleString(2)}</span>
+            <span>${multiplier || '0'}</span>$
+            <span>${winAmount || '0'}</span>$
+          </tr>
+        </table>`;
+      table.insertBefore(row, table.children[1]);
+      while (table.children.length > 21) {
+        table.removeChild(table.lastChild);
+        }
+      }
+    } catch (eerror) {
+      console.error("Error adding to betTable:", error);
+      }
+    } else {
+      return;
     }
-  } catch (error) {
-    console.error("Error in addBetToTable:", error);
   }
-}
 
 let betHistoryData = [
-  { date: '21-05-25 19:26', bet: 1.00, multiplier: '1.09x', cashout: 1.09 },
-  { date: '21-05-25 19:24', bet: 50.00, multiplier: '1.07x', cashout: 53.50 },
-  { date: '10-05-25 16:16', bet: 1.00, multiplier: '1.00x', cashout: null },
-  { date: '09-05-25 18:26', bet: 50.00, multiplier: '1.07x', cashout: 53.50 },
-  { date: '09-05-25 18:26', bet: 20.00, multiplier: '1.31x', cashout: 26.20 },
-  { date: '09-05-25 18:26', bet: 20.00, multiplier: '1.22x', cashout: 24.40 },
-  { date: '09-05-25 17:55', bet: 20.00, multiplier: '1.23x', cashout: 24.60 },
-  { date: '09-05-25 17:52', bet: 20.00, multiplier: '1.57x', cashout: 31.40 },
-  { date: '09-05-25 17:51', bet: 20.00, multiplier: '1.08x', cashout: null },
-  { date: '09-05-25 17:50', bet: 20.00, multiplier: '1.17x', cashout: null }
-];
+      { date: '2023-05-21', bet: '1.00', multiplier: 1.09, amount: 1.09 },
+      { date: '2023-05-21', bet: '50.00', multiplier: 2.07, amount: 53.50 },
+      { date: '2023-05-10', bet: '1.00', multiplier: 1.00, amount: null },
+      { date: '2023-09-05', betAmount: '50.0', multiplier: 2.07, amount: 53.30 },
+      { date: '2023-09-25', betAmount: '20.0', multiplier: 1.31, amount: 26.20 },
+      { date: '2023-09-25', betAmount: '20.0', multiplier: 1.22, amount: 24.40 },
+      { date: '2023-09-25', betAmount: '20.0', multiplier: 1.23, amount: 24.60 },
+      { date: '2023-09-25', betAmount: '20.0', multiplier: 1.57, amount: 31.40 },
+      { date: '2023-09-25', betAmount: '20.0', multiplier: 1.08, amount: null },
+      { date: '2023-09-25', betAmount: amount: '20.0', multiplier: 1.17, amount: null }
+    ];
+  ];
 function renderBetHistory() {
-  try {
-    const container = document.querySelector('.bet-history-table');
-    if (!container) return;
-    container.innerHTML = `
-      <div class="bet-history-row header">
-        <span>Date</span><span>Bet USD</span><span>X</span><span>Cash out USD</span>
-      </div>
-    `;
-    betHistoryData.forEach(item => {
-      const row = document.createElement('div');
-      row.className = 'bet-history-row';
-      row.innerHTML = `
-        <span>${item.date}</span>
-        <span>${item.bet.toFixed(2)}</span>
-        <span>${item.multiplier || '—'}</span>
-        <span>${item.cashout !== null ? item.cashout.toFixed(2) : '—'}</span>
+    try {
+      const container = document.querySelector('table.bet-history-table');
+      if (!container) return;
+      container.innerHTML = `
+        <table class="bet-history-row header">
+          <tr>
+            <th>Date</th><th>Bet</th><th>Amount</th><th>$</th>
+          </tr>
+        </table>
       `;
-      container.appendChild(row);
-    });
-  } catch (error) {
-    console.error("Error in renderBetHistory:", error);
-  }
-}
+      betHistory.forEach(data => {
+        const row = document.createElement('div');
+        row.className = 'history-row';
+        row.innerHTML = `
+          <table>
+            <tr>
+              <td>${data.date}</td>
+              <td>${data.amount}</td>
+              <td>${data.multiplier || '0'}</td>
+              <td>${data.amount || '0'}</td>
+            </tr>
+          </table>
+          `;
+        container.appendChild(row);
+        }
+      });
+      } catch (eerror) {
+        console.error("Error rendering history:", error);
+        }
+      }
+    }
 
-document.querySelectorAll(".bet-toggle").forEach(toggle => {
-  const betBtn = toggle.querySelector(".toggle-bet");
-  const autoBtn = toggle.querySelector(".toggle-auto");
-  const autoOptions = toggle.closest('.bet-panel')?.querySelector('.auto-options');
+    document.querySelectorAll("button.bet-toggle").forEach(toggle => {
+      const betBtn = toggle.querySelector("button.toggle-bet");
+      const toggleBtn = toggle.querySelector("button.toggle-auto");
+      const autoOptions = toggle.closest('.panel').querySelector('.auto-options');
 
-  if (!betBtn || !autoBtn || !autoOptions) return;
+      if (!betBtn || !toggleBtn || !autoOptions) return;
 
-  if (betBtn.classList.contains("active")) {
-    autoOptions.style.display = "none";
-  } else if (autoBtn.classList.contains("active")) {
-    autoOptions.style.display = "block";
-  }
+      if (betBtn.classList.contains("active")) {
+        autoOptions.style.display = "none";
+        } else {
+        toggleBtn.classList.contains("active");
+        autoOptions.style.display = "block";
+        }
 
-  betBtn.addEventListener("click", () => {
-    betBtn.classList.add("active");
-    autoBtn.classList.remove("active");
-    autoOptions.style.display = "none";
-  });
+      betBtn.addEventListener("click", function() => {
+        betBtn.classList.add("active");
+        toggleBtn.classList.remove("active");
+        autoOptions.style.display = "none";
+        });
 
-  autoBtn.addEventListener("click", () => {
-    autoBtn.classList.add("active");
-    betBtn.classList.remove("active");
-    autoOptions.style.display = "block";
-  });
-});
+      toggleBtn.addEventListener("click", function() => {
+        toggleBtn.classList.add("active");
+        betBtn.classList.remove("active");
+        autoOptions.style.display = "block";
+        });
+      });
 
 function updateTopBar() {
-  try {
-    const topBar = document.getElementById('top-bar-button');
-    if (!topBar) return;
-    topBar.innerHTML = '';
+    try {
+      const topBar = document.getElementById('top-bar-button');
+      if (!topBar) return;
+      topBar.innerHTML = '';
 
-    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+      const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
 
-    if (isLoggedIn) {
-      const link = document.createElement('a');
-      link.className = 'deposit-btn';
-      link.textContent = 'Deposit';
-      link.href = 'https://paystack.shop/pay/y3x316ps5i';
-      link.target = '_blank';
-      link.rel = 'noopener noreferrer';
-      topBar.appendChild(link);
-    } else {
-      const loginBtn = document.createElement('button');
-      loginBtn.className = 'login-btn';
-      loginBtn.textContent = 'Login to Deposit';
-      loginBtn.onclick = openLoginModal;
-      topBar.appendChild(loginBtn);
+      if (isLoggedIn) {
+        const link = document.createElement('a');
+        link.className = 'deposit-btn';
+        link.textContent = 'Deposit';
+        link.href = 'https://paystack.com/pay/youtube';
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        topBar.appendChild(link);
+        } else {
+        const loginButton = document.createElement('button');
+        loginButton.className = 'login-btn';
+        loginButton.textContent = 'Login to Deposit';
+        loginButton.addEventListener('click', function(e) => {
+          e.preventDefault();
+          openLoginModal();
+        });
+        topBar.appendChild(loginButton);
+      }
+      } catch (error) {
+        console.error("Error updating topBar:", error);
+      }
     }
-  } catch (error) {
-    console.error("Error in updateTopBar:", error);
-  }
-}
 
-document.addEventListener('click', function(e) {
-  const depositBtn = e.target.closest('.deposit-btn');
-  if (depositBtn) {
-    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-    if (!isLoggedIn) {
-      e.preventDefault();
-      alert('Please log in to deposit.');
-      openLoginModal();
-    }
-  }
-});
+    document.addEventListener('click', function(e) {
+      const depositBtn = e.target.closest('button.deposit-btn');
+      if (depositBtn) {
+        const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+        if (!isLoggedIn) {
+          e.preventDefault();
+          alert('Please log in to deposit.');
+          loginModal('login-modal');
+          }
+        }
+      });
 
-function openSignupModal() { document.getElementById('signupModal').style.display = 'flex'; }
-function closeSignupModal() { document.getElementById('signupModal').style.display = 'none'; }
-function openProfileModal() { document.getElementById('profileModal').style.display = 'flex'; }
-function closeProfileModal() { document.getElementById('profileModal').style.display = 'none'; }
-function openModal(modalId) { document.getElementById(modalId).style.display = 'block'; }
-function closeModal(modalId) { document.getElementById(modalId).style.display = 'none'; }
-function openLoginModal() { openModal('login-modal'); }
-function closeTicketsModal() { closeModal('ticketsModal'); }
-function openTicketsModal() { openModal('ticketsModal'); }
-function openBetHistoryModal() { openModal('betHistoryModal'); }
-function closeBetHistoryModal() { closeModal('betHistoryModal'); }
+    function openModal(modalId) {
+      document.getElementById(modalId).style.display = 'block';
+      }
+    function closeModal(modalId) {
+      document.getElementById(modalId).style.display = 'none';
+      }
+    function openLoginModal() {
+      openModal('login-modal');
+      }
+    function openSignupModal() {
+      openModal('signupModal');
+      }
+    function closeSignupModal() {
+      closeModal('signupModal');
+      }
+    function openProfileModal() {
+      openModal('profileModal');
+      }
+    function closeProfileModal() {
+      closeModal('profileModal');
+      }
+    function openFreeBetsModal() {
+      openModal('freeBetsModal');
+      }
+    function closeFreeBetsModal() {
+      closeModal('freeBetsModal');
+      }
+    function openTicketsModal() {
+      openModal('ticketsModal');
+      }
+    function closeTicketsModal() {
+      closeModal('ticketsModal');
+      }
+    function openBetHistoryModal() {
+      openModal('betHistoryModal');
+      }
+    function closeBetHistoryModal() {
+      closeModal('betHistoryModal');
+      }
