@@ -632,12 +632,13 @@ body {
   top: 0;
   width: 100vw;
   height: 100vh;
-  overflow: auto;
-  background: rgba(0,0,0,0.7);
+  background: rgba(0, 0, 0, 0.7);
   justify-content: center;
   align-items: center;
 }
-
+.modal.active {
+  display: flex; /* Show modal when active */
+}
 .modal-content {
   background-color: #222;
   margin: auto;
@@ -648,7 +649,7 @@ body {
   max-width: 366px;
   color: #fff;
   position: relative;
-  box-shadow: 0 2px 20px rgba(0,0,0,0.6);
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.6);
 }
 
 .modal-content.dark-modal {
