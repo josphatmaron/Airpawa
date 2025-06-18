@@ -721,10 +721,10 @@ document.addEventListener('click', (e) => {
 function openModal(modalId) {
   const modal = document.getElementById(modalId);
   if (modal) {
-    modal.style.display = 'block';
+    modal.style.display = 'flex'; // Use flex for centering
     console.log(`Modal '${modalId}' opened`);
   } else {
-    console.error(`Modal element (#${modalId}) not found in HTML. Ensure <div id='${modalId}' class='modal'></div> exists.`);
+    console.error(`Modal element (#${modalId}) not found in HTML.`);
   }
 }
 
